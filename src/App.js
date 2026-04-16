@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   Plus, Users, LayoutGrid, BookOpen, Trash2, Edit3, TrendingUp,
   Target, Award, X, PlusCircle, CheckCircle2, AlertTriangle,
   Wrench, ShieldAlert, MessageCircle, ChevronDown, Calendar,
-  BarChart3, Lightbulb, ArrowRight, Clock, RefreshCw, Info
+  BarChart3, Lightbulb, ArrowRight, Clock, RefreshCw, Info, Lock, Key
 } from "lucide-react";
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -294,11 +294,89 @@ const QUADRANT_GUIDE = [
   },
 ];
 
-// ── main app ──────────────────────────────────────────────────────────────
+
+// ── KOMPONEN LOGIN GATE ───────────────────────────────────────────────────
+
+const LoginGate = ({ onLoginSuccess }) => {
+  const [code, setCode] = useState("");
+  const [error, setError] = useState(false);
+
+  // KODE AKSES YANG VALID
+  const VALID_CODES = ["LEADER-PRO-2026", "SCALEV-VIP"];
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (VALID_CODES.includes(code.trim().toUpperCase())) {
+      setError(false);
+      localStorage.setItem("ll_auth_status", "verified");
+      onLoginSuccess();
+    } else {
+      setError(true);
+      setCode(""); // Kosongkan input jika salah
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-[32px] p-8 sm:p-10 shadow-2xl animate-in fade-in zoom-in duration-500">
+        
+        {/* Logo */}
+        <div className="flex flex-col items-center justify-center mb-10">
+          <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center shadow-lg mb-5">
+            <Users className="w-8 h-8 text-slate-900" />
+          </div>
+          <div className="text-2xl sm:text-3xl font-black tracking-tight leading-none uppercase text-white">LEADER<span className="text-slate-400">LENS</span></div>
+          <div className="text-xs text-slate-500 font-mono mt-2 text-center">People Diagnostics Premium</div>
+        </div>
+
+        {/* Formulir */}
+        <form onSubmit={handleLogin} className="space-y-6">
+          <div className="space-y-2">
+            <label className="block text-xs font-black text-slate-400 uppercase tracking-widest text-center">
+              Masukkan Kode Akses
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Key className="h-5 w-5 text-slate-500" />
+              </div>
+              <input 
+                type="text" 
+                required
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                className={`w-full pl-12 pr-4 py-4 bg-slate-950 border ${error ? 'border-red-500 focus:ring-red-500' : 'border-slate-800 focus:ring-indigo-500'} rounded-2xl text-base sm:text-lg font-bold text-white outline-none focus:ring-2 transition-all text-center uppercase tracking-wider placeholder:text-slate-700 placeholder:normal-case placeholder:tracking-normal`}
+                placeholder="Misal: LEADER-PRO-2026" 
+              />
+            </div>
+            {error && (
+              <p className="text-xs font-bold text-red-500 text-center animate-in slide-in-from-top-2">Kode akses tidak valid. Silakan periksa email Anda.</p>
+            )}
+          </div>
+
+          <button type="submit"
+            className="w-full bg-white text-slate-900 py-4 rounded-2xl font-black text-sm sm:text-base tracking-widest uppercase hover:bg-slate-200 active:scale-[0.98] transition-all shadow-xl flex items-center justify-center gap-2">
+            <Lock className="w-4 h-4" /> Buka Akses
+          </button>
+        </form>
+
+        <div className="mt-8 text-center border-t border-slate-800 pt-6">
+          <p className="text-xs text-slate-500 leading-relaxed">
+            Belum punya kode akses? <br />
+            Silakan selesaikan pembelian di <span className="font-bold text-slate-300">halaman Scalev</span> untuk mendapatkan kode eksklusif Anda via email.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+// ── MAIN APP ──────────────────────────────────────────────────────────────
 
 const EMPTY_FORM = { name: "", role: "", competency: 2, commitment: 2, competencyNotes: [""], commitmentNotes: [""], disc: "S" };
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [members, setMembers] = useState([]);
   const [isMounted, setIsMounted] = useState(false);
   const [tab, setTab] = useState("matrix");
@@ -310,6 +388,12 @@ export default function App() {
 
   useEffect(() => {
     setIsMounted(true);
+    // Cek Status Autentikasi
+    if (localStorage.getItem("ll_auth_status") === "verified") {
+      setIsAuthenticated(true);
+    }
+    
+    // Tarik Data
     try {
       const storedData = localStorage.getItem("ll_v8");
       if (storedData) setMembers(JSON.parse(storedData));
@@ -319,14 +403,14 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (isMounted) {
+    if (isMounted && isAuthenticated) {
       try {
         localStorage.setItem("ll_v8", JSON.stringify(members));
       } catch (e) {
         console.warn("Storage write error", e);
       }
     }
-  }, [members, isMounted]);
+  }, [members, isMounted, isAuthenticated]);
 
   const closeModal = () => { setModal(false); setEditId(null); setForm(EMPTY_FORM); };
 
@@ -362,6 +446,12 @@ export default function App() {
 
   if (!isMounted) return null;
 
+  // TAMPILKAN HALAMAN LOGIN JIKA BELUM TERVERIFIKASI
+  if (!isAuthenticated) {
+    return <LoginGate onLoginSuccess={() => setIsAuthenticated(true)} />;
+  }
+
+  // JIKA SUDAH LOGIN, TAMPILKAN APLIKASI UTAMA
   return (
     <div className="min-h-screen bg-slate-950 text-white pb-24" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
       <style>{`
@@ -437,7 +527,7 @@ export default function App() {
 
         <div className="fade-in" key={tab}>
 
-          {/* MATRIX TAB - DIPERBARUI: LABEL DI LUAR KUADRAN */}
+          {/* MATRIX TAB - LABEL DI LUAR KUADRAN */}
           {tab === "matrix" && (
             <div className="flex flex-col items-center gap-6">
               {members.length === 0 ? (
@@ -463,7 +553,7 @@ export default function App() {
                     {/* Matrix Square */}
                     <div className="w-full aspect-square relative bg-slate-900 rounded-3xl sm:rounded-[32px] border border-slate-800 overflow-hidden shadow-2xl">
                       
-                      {/* Grid lines (Makin Jelas / Kontras) */}
+                      {/* Grid lines */}
                       <div className="absolute top-1/2 left-0 w-full h-[2px] bg-slate-500/80 z-0"></div>
                       <div className="absolute top-0 left-1/2 w-[2px] h-full bg-slate-500/80 z-0"></div>
                       
