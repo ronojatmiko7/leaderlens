@@ -6,7 +6,7 @@ import {
   BarChart3, Lightbulb, ArrowRight, Clock, RefreshCw, Info
 } from "lucide-react";
 
-// ── helpers (Tetap Sama) ───────────────────────────────────────────────────
+// ── helpers ──────────────────────────────────────────────────────────────────
 
 const getQuadrant = (comp, comm) => {
   const hi = v => v >= 3;
@@ -173,35 +173,35 @@ const formatDate = (ts) => {
   return new Date(ts).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
 };
 
-// ── sub-components (Update dengan Kelas Responsif) ──────────────────────────
+// ── sub-components (Tailwind Responsiveness applied here) ─────────────────
 
 const RatingSelector = ({ label, dim, value, onChange }) => (
-  <div className="space-y-2">
-    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest label-boost">{label}</label>
-    <div className="grid grid-cols-4 gap-1.5">
+  <div className="space-y-2 lg:space-y-4">
+    <label className="block text-[11px] sm:text-sm lg:text-xl font-black text-slate-400 uppercase tracking-widest">{label}</label>
+    <div className="grid grid-cols-4 gap-1.5 lg:gap-4">
       {[1, 2, 3, 4].map(n => (
         <button key={n} type="button" onClick={() => onChange(n)}
-          className={`py-3 rounded-xl font-black text-sm transition-all border-2 ${value === n ? "bg-slate-900 text-white border-slate-900" : "bg-white text-slate-400 border-slate-100 hover:border-slate-300"}`}>
+          className={`py-3 lg:py-5 rounded-xl lg:rounded-2xl font-black text-sm lg:text-2xl transition-all border-2 ${value === n ? "bg-slate-900 text-white border-slate-900 shadow-md" : "bg-white text-slate-400 border-slate-100 hover:border-slate-300"}`}>
           {n}
         </button>
       ))}
     </div>
     {value && (
-      <p className="text-[10px] text-slate-500 italic pt-1 pl-1 anchor-boost">{RATING_ANCHORS[dim][value]}</p>
+      <p className="text-[10px] sm:text-xs lg:text-base text-slate-500 italic pt-1 lg:pt-2 pl-1">{RATING_ANCHORS[dim][value]}</p>
     )}
   </div>
 );
 
 const DISCSelector = ({ value, onChange }) => (
-  <div className="space-y-2">
-    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest label-boost">Profil DISC</label>
-    <div className="grid grid-cols-4 gap-2">
+  <div className="space-y-2 lg:space-y-4">
+    <label className="block text-[11px] sm:text-sm lg:text-xl font-black text-slate-400 uppercase tracking-widest">Profil DISC</label>
+    <div className="grid grid-cols-4 gap-2 lg:gap-5">
       {Object.entries(DISC_META).map(([id, m]) => (
         <button key={id} type="button" onClick={() => onChange(id)}
-          className={`flex flex-col items-center p-3 rounded-2xl border-2 transition-all ${value === id ? "border-slate-900 bg-slate-50" : "border-slate-100 bg-white hover:border-slate-200"}`}>
-          <div className={`w-7 h-7 sm:w-10 sm:h-10 rounded-full mb-1.5 ${m.bg} flex items-center justify-center text-white text-xs sm:text-lg font-black shadow`}>{id}</div>
-          <span className="text-[8px] sm:text-[12px] font-black uppercase text-slate-500 leading-tight text-center">{m.label}</span>
-          <span className="text-[7px] sm:text-[10px] text-slate-400 text-center leading-tight mt-0.5">{m.desc}</span>
+          className={`flex flex-col items-center p-3 lg:p-6 rounded-2xl border-2 transition-all ${value === id ? "border-slate-900 bg-slate-50 shadow-md" : "border-slate-100 bg-white hover:border-slate-200"}`}>
+          <div className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-16 lg:h-16 rounded-full mb-1.5 lg:mb-4 ${m.bg} flex items-center justify-center text-white text-xs sm:text-lg lg:text-3xl font-black shadow-sm`}>{id}</div>
+          <span className="text-[9px] sm:text-[12px] lg:text-lg font-black uppercase text-slate-500 leading-tight text-center">{m.label}</span>
+          <span className="text-[8px] sm:text-[10px] lg:text-sm text-slate-400 text-center leading-tight mt-0.5 lg:mt-2">{m.desc}</span>
         </button>
       ))}
     </div>
@@ -209,22 +209,22 @@ const DISCSelector = ({ value, onChange }) => (
 );
 
 const NoteInput = ({ label, type, notes, onAdd, onUpdate, onRemove, prompt }) => (
-  <div className="space-y-2">
+  <div className="space-y-2 lg:space-y-4">
     <div className="flex justify-between items-center">
-      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest label-boost">{label}</label>
-      <button type="button" onClick={() => onAdd(type)} className="text-[10px] sm:text-sm font-bold text-indigo-600 flex items-center gap-1">
-        <PlusCircle className="w-3 h-3 sm:w-4 sm:h-4" /> Tambah
+      <label className="text-[11px] sm:text-sm lg:text-xl font-black text-slate-400 uppercase tracking-widest">{label}</label>
+      <button type="button" onClick={() => onAdd(type)} className="text-[10px] sm:text-sm lg:text-lg font-bold text-indigo-600 flex items-center gap-1">
+        <PlusCircle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-6 lg:h-6" /> Tambah
       </button>
     </div>
-    <p className="text-[10px] text-slate-400 italic prompt-boost">{prompt}</p>
+    <p className="text-[10px] sm:text-xs lg:text-base text-slate-400 italic mb-2 lg:mb-4">{prompt}</p>
     {notes.map((n, i) => (
-      <div key={i} className="flex gap-2">
-        <input className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs sm:text-base outline-none focus:ring-2 focus:ring-slate-900"
+      <div key={i} className="flex gap-2 lg:gap-4 items-center">
+        <input className="flex-1 px-4 py-3 lg:px-6 lg:py-5 bg-white border border-slate-200 rounded-xl lg:rounded-2xl text-xs sm:text-base lg:text-xl outline-none focus:ring-2 focus:ring-slate-900"
           placeholder="Tuliskan bukti perilaku..." value={n}
           onChange={e => onUpdate(type, i, e.target.value)} />
         {notes.length > 1 && (
-          <button type="button" onClick={() => onRemove(type, i)} className="p-2 text-slate-300 hover:text-red-400">
-            <X className="w-3 h-3 sm:w-5 sm:h-5" />
+          <button type="button" onClick={() => onRemove(type, i)} className="p-2 lg:p-4 text-slate-300 hover:text-red-400">
+            <X className="w-4 h-4 sm:w-5 sm:h-5 lg:w-8 lg:h-8" />
           </button>
         )}
       </div>
@@ -234,22 +234,22 @@ const NoteInput = ({ label, type, notes, onAdd, onUpdate, onRemove, prompt }) =>
 
 const PlanCard = ({ item }) => {
   const iconMap = {
-    wrench: <Wrench className="w-4 h-4" />,
-    message: <MessageCircle className="w-4 h-4" />,
-    shield: <ShieldAlert className="w-4 h-4" />,
-    refresh: <RefreshCw className="w-4 h-4" />,
-    award: <Award className="w-4 h-4" />,
+    wrench: <Wrench className="w-4 h-4 lg:w-6 lg:h-6" />,
+    message: <MessageCircle className="w-4 h-4 lg:w-6 lg:h-6" />,
+    shield: <ShieldAlert className="w-4 h-4 lg:w-6 lg:h-6" />,
+    refresh: <RefreshCw className="w-4 h-4 lg:w-6 lg:h-6" />,
+    award: <Award className="w-4 h-4 lg:w-6 lg:h-6" />,
   };
   return (
-    <div className="rounded-2xl p-5 border" style={{ background: item.bg, borderColor: item.border }}>
-      <div className="flex items-center gap-2 mb-3" style={{ color: item.color }}>
+    <div className="rounded-2xl lg:rounded-3xl p-5 lg:p-8 border" style={{ background: item.bg, borderColor: item.border }}>
+      <div className="flex items-center gap-2 lg:gap-3 mb-3 lg:mb-5" style={{ color: item.color }}>
         {iconMap[item.icon]}
-        <span className="text-[10px] sm:text-sm font-black uppercase tracking-widest">{item.title}</span>
+        <span className="text-[10px] sm:text-sm lg:text-lg font-black uppercase tracking-widest">{item.title}</span>
       </div>
-      <ul className="space-y-2.5">
+      <ul className="space-y-2.5 lg:space-y-4">
         {item.items.map((act, i) => (
-          <li key={i} className="flex gap-2.5 text-[11px] sm:text-base leading-relaxed font-medium text-slate-700">
-            <ArrowRight className="w-3 h-3 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5" style={{ color: item.color }} />
+          <li key={i} className="flex gap-2.5 lg:gap-4 text-[11px] sm:text-base lg:text-xl leading-relaxed font-medium text-slate-700">
+            <ArrowRight className="w-3 h-3 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0 mt-0.5 lg:mt-1" style={{ color: item.color }} />
             {act}
           </li>
         ))}
@@ -258,45 +258,13 @@ const PlanCard = ({ item }) => {
   );
 };
 
-const QUADRANT_GUIDE = [
-  {
-    q: "Q1", label: "Critical Area", color: "#EF4444", bg: "#FEF2F2",
-    diagnosis: "Anggota tim tidak memiliki kemampuan DAN motivasi yang cukup. Ini situasi paling berat.",
-    rootCause: "Bisa karena salah rekrut, burnout ekstrem, atau sudah terlalu lama di posisi yang salah.",
-    mistake: "Kesalahan umum: terus memberi training padahal masalah utamanya adalah motivasi — atau sebaliknya, terus memberi semangat padahal skill-nya memang tidak ada.",
-    urgency: "Butuh intervensi ganda: skill DAN will secara bersamaan. Jika tidak ada progres dalam 90 hari, eskalasi ke PIP.",
-  },
-  {
-    q: "Q2", label: "Potential Talent", color: "#F59E0B", bg: "#FFFBEB",
-    diagnosis: "Semangat tinggi tapi kemampuan belum cukup. Sering terjadi pada karyawan baru atau yang baru dipromosikan.",
-    rootCause: "Bukan masalah karakter — mereka belum punya tools yang tepat. Energinya ada, tinggal diarahkan.",
-    mistake: "Kesalahan umum: membiarkan mereka 'belajar sendiri' karena terlihat bersemangat. Tanpa struktur, antusiasme ini akan habis dalam 3–6 bulan.",
-    urgency: "Prioritas: berikan skill secepat mungkin sebelum motivasi turun. Golden window: 90 hari pertama.",
-  },
-  {
-    q: "Q3", label: "Expert in Slump", color: "#3B82F6", bg: "#EFF6FF",
-    diagnosis: "Kemampuan tinggi tapi motivasi turun drastis. Ini yang paling sering salah didiagnosis.",
-    rootCause: "Bukan malas. Ada sesuatu yang patah: tidak dihargai, bored, konflik dengan atasan/rekan, atau masalah pribadi.",
-    mistake: "Kesalahan terbesar: memperlakukan mereka seperti Q1 — memberi training atau monitoring ketat. Ini akan memperburuk keadaan karena terasa seperti penghinaan.",
-    urgency: "Prioritas: percakapan coaching yang dalam, bukan evaluasi performa. Gali dulu sebelum intervensi.",
-  },
-  {
-    q: "Q4", label: "Star Performer", color: "#10B981", bg: "#ECFDF5",
-    diagnosis: "Kemampuan dan motivasi sama-sama tinggi. Aset terbesar tim Anda.",
-    rootCause: "Risiko tersembunyi: mereka sering diabaikan karena 'tidak masalah'. Padahal mereka yang paling rentan keluar.",
-    mistake: "Kesalahan terbesar: tidak berinvestasi pada mereka karena sudah berjalan sendiri. Turnover satu Q4 bisa merusak tim selama berbulan-bulan.",
-    urgency: "Prioritas: retensi dan growth. Pastikan mereka punya tantangan baru, pengakuan, dan jalur karir yang jelas.",
-  },
-];
-
 // ── main app ──────────────────────────────────────────────────────────────
 
 const EMPTY_FORM = { name: "", role: "", competency: 2, commitment: 2, competencyNotes: [""], commitmentNotes: [""], disc: "S" };
 
 export default function App() {
-  const [members, setMembers] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("ll_v8") || "[]"); } catch { return []; }
-  });
+  const [members, setMembers] = useState([]);
+  const [isMounted, setIsMounted] = useState(false);
   const [tab, setTab] = useState("matrix");
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -304,9 +272,26 @@ export default function App() {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [expandedPlan, setExpandedPlan] = useState(null);
 
+  // FIX: Safe localStorage fetching untuk mencegah error SSR di Vercel
   useEffect(() => {
-    try { localStorage.setItem("ll_v8", JSON.stringify(members)); } catch {}
-  }, [members]);
+    setIsMounted(true);
+    try {
+      const storedData = localStorage.getItem("ll_v8");
+      if (storedData) setMembers(JSON.parse(storedData));
+    } catch (e) {
+      console.warn("Storage read error", e);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isMounted) {
+      try {
+        localStorage.setItem("ll_v8", JSON.stringify(members));
+      } catch (e) {
+        console.warn("Storage write error", e);
+      }
+    }
+  }, [members, isMounted]);
 
   const closeModal = () => { setModal(false); setEditId(null); setForm(EMPTY_FORM); };
 
@@ -340,100 +325,50 @@ export default function App() {
     { id: "guide", label: "Panduan" },
   ];
 
+  if (!isMounted) return null; // Mencegah hydration mismatch
+
   return (
     <div className="min-h-screen bg-slate-950 text-white pb-24" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=DM+Mono:wght@400;500&display=swap');
-        * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
+        * { -webkit-font-smoothing: antialiased; }
         .fade-in { animation: fadeIn 0.4s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- RESPONSIVE FONT SCALING (THE VERSATILE PART) --- */
-        
-        /* Mobile Scaling Base */
-        .text-\[10px\] { font-size: 11px; }
-        .text-\[9px\] { font-size: 10px; }
-        .text-\[8px\] { font-size: 9px; }
-        .text-\[7px\] { font-size: 8px; }
-
-        /* Desktop Boost (Large screens) */
-        @media (min-width: 1024px) {
-          .label-boost { font-size: 20px !important; margin-bottom: 12px !important; }
-          .anchor-boost, .prompt-boost { font-size: 16px !important; margin-top: 8px !important; }
-          
-          .text-sm { font-size: 18px !important; }
-          .text-lg { font-size: 24px !important; }
-          .text-xl { font-size: 32px !important; }
-          .text-2xl { font-size: 40px !important; }
-
-          .max-w-xl { max-width: 1000px !important; }
-          .p-8 { padding: 3.5rem !important; }
-          
-          /* Matrix Adjustments */
-          .text-\[8px\].opacity-30 { font-size: 16px !important; }
-        }
-
-        /* Fix Modal Responsiveness on very small screens */
-        @media (max-width: 480px) {
-          .grid-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
-          .p-8 { padding: 1.5rem !important; }
-        }
       `}</style>
 
       {/* Header */}
-      <header className="border-b border-slate-800 px-6 py-4 sticky top-0 z-40 bg-slate-950/95 backdrop-blur">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white flex items-center justify-center">
-              <Users className="w-4 h-4 sm:w-6 sm:h-6 text-slate-900" />
+      <header className="border-b border-slate-800 px-6 py-4 lg:py-6 sticky top-0 z-40 bg-slate-950/95 backdrop-blur">
+        <div className="max-w-4xl lg:max-w-6xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3 lg:gap-5">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 lg:w-14 lg:h-14 rounded-xl bg-white flex items-center justify-center">
+              <Users className="w-4 h-4 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-slate-900" />
             </div>
             <div>
-              <div className="text-sm sm:text-lg font-black tracking-tight leading-none uppercase">LEADER<span className="text-slate-400">LENS</span></div>
-              <div className="text-[9px] sm:text-xs text-slate-500 font-mono mt-0.5">People Diagnostics v8.0</div>
+              <div className="text-sm sm:text-lg lg:text-2xl font-black tracking-tight leading-none uppercase">LEADER<span className="text-slate-400">LENS</span></div>
+              <div className="text-[9px] sm:text-xs lg:text-sm text-slate-500 font-mono mt-0.5 lg:mt-1">People Diagnostics v8.0</div>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 lg:gap-6">
             {health && (
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700">
-                <div className="text-[10px] text-slate-400 font-mono">Tim</div>
-                <div className="text-sm font-black text-white">{health.score}<span className="text-slate-500 text-[10px]">/100</span></div>
+              <div className="hidden sm:flex items-center gap-2 lg:gap-3 px-3 py-1.5 lg:px-5 lg:py-3 rounded-xl bg-slate-800 border border-slate-700">
+                <div className="text-[10px] lg:text-sm text-slate-400 font-mono">Tim</div>
+                <div className="text-sm lg:text-xl font-black text-white">{health.score}<span className="text-slate-500 text-[10px] lg:text-sm">/100</span></div>
               </div>
             )}
             <button onClick={() => setModal(true)}
-              className="bg-white text-slate-900 px-4 py-2 sm:px-6 sm:py-3 rounded-xl font-black text-[10px] sm:text-sm tracking-widest uppercase hover:bg-slate-100 transition-all active:scale-95 shadow-lg">
+              className="bg-white text-slate-900 px-4 py-2 sm:px-6 sm:py-3 lg:px-8 lg:py-4 rounded-xl lg:rounded-2xl font-black text-[10px] sm:text-sm lg:text-base tracking-widest uppercase hover:bg-slate-100 transition-all active:scale-95 shadow-lg">
               + Tambah
             </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-6">
-        {/* Team Health Banner */}
-        {health && (
-          <div className="mb-6 grid grid-cols-2 sm:grid-cols-4 gap-3 fade-in">
-            {Object.entries(health.dist).map(([qid, count]) => {
-              const q = ["Q1","Q2","Q3","Q4"].map(id => {
-                const dummy = { Q1:{comp:1,comm:1}, Q2:{comp:1,comm:3}, Q3:{comp:3,comm:1}, Q4:{comp:3,comm:3} }[id];
-                return { id, ...getQuadrant(dummy.comp, dummy.comm) };
-              }).find(q => q.id === qid);
-              return (
-                <div key={qid} className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
-                  <div>
-                    <div className="text-[9px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1">{q.label}</div>
-                    <div className="text-2xl sm:text-4xl font-black" style={{ color: q.color }}>{count}</div>
-                  </div>
-                  <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full opacity-20" style={{ background: q.color }}></div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
+      <main className="max-w-4xl lg:max-w-6xl mx-auto px-4 py-6 lg:py-10">
         {/* Tabs */}
-        <div className="flex gap-1 p-1 bg-slate-900 rounded-2xl mb-8 border border-slate-800 overflow-x-auto scrollbar-hide">
+        <div className="flex gap-1 p-1 lg:p-2 bg-slate-900 rounded-2xl lg:rounded-3xl mb-8 lg:mb-12 border border-slate-800 overflow-x-auto scrollbar-hide">
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex-1 min-w-[80px] py-2.5 rounded-xl text-[10px] sm:text-sm font-black uppercase tracking-widest transition-all ${tab === t.id ? "bg-white text-slate-900" : "text-slate-500 hover:text-slate-300"}`}>
+              className={`flex-1 min-w-[80px] py-2.5 lg:py-4 rounded-xl lg:rounded-2xl text-[10px] sm:text-sm lg:text-lg font-black uppercase tracking-widest transition-all ${tab === t.id ? "bg-white text-slate-900" : "text-slate-500 hover:text-slate-300"}`}>
               {t.label}
             </button>
           ))}
@@ -443,20 +378,20 @@ export default function App() {
 
           {/* MATRIX TAB */}
           {tab === "matrix" && (
-            <div className="flex flex-col items-center gap-6">
+            <div className="flex flex-col items-center gap-6 lg:gap-10">
               {members.length === 0 ? (
-                <div className="text-center py-24">
-                  <div className="text-slate-600 font-black text-xs uppercase tracking-widest mb-3">Belum ada data</div>
-                  <button onClick={() => setModal(true)} className="text-white bg-slate-800 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-700 transition-all">
+                <div className="text-center py-24 lg:py-40">
+                  <div className="text-slate-600 font-black text-xs lg:text-lg uppercase tracking-widest mb-3 lg:mb-5">Belum ada data</div>
+                  <button onClick={() => setModal(true)} className="text-white bg-slate-800 px-6 py-3 lg:px-10 lg:py-5 rounded-2xl lg:rounded-3xl text-xs lg:text-xl font-black uppercase tracking-widest hover:bg-slate-700 transition-all">
                     + Tambah Anggota Pertama
                   </button>
                 </div>
               ) : (
                 <>
-                  <div className="w-full max-w-lg aspect-square relative bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl">
+                  <div className="w-full max-w-lg lg:max-w-3xl aspect-square relative bg-slate-900 rounded-3xl lg:rounded-[40px] border border-slate-800 overflow-hidden shadow-2xl">
                     {/* Axis labels */}
-                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-black text-slate-600 uppercase tracking-widest">Kompetensi →</div>
-                    <div className="absolute top-1/2 left-2 -translate-y-1/2 text-[9px] font-black text-slate-600 uppercase tracking-widest" style={{ writingMode: "vertical-rl", transform: "translateY(-50%) rotate(180deg)" }}>← Komitmen</div>
+                    <div className="absolute bottom-2 lg:bottom-6 left-1/2 -translate-x-1/2 text-[9px] lg:text-sm font-black text-slate-600 uppercase tracking-widest">Kompetensi →</div>
+                    <div className="absolute top-1/2 left-2 lg:left-6 -translate-y-1/2 text-[9px] lg:text-sm font-black text-slate-600 uppercase tracking-widest" style={{ writingMode: "vertical-rl", transform: "translateY(-50%) rotate(180deg)" }}>← Komitmen</div>
                     {/* Grid lines */}
                     <div className="absolute top-1/2 left-0 w-full h-px bg-slate-800"></div>
                     <div className="absolute top-0 left-1/2 w-px h-full bg-slate-800"></div>
@@ -470,7 +405,7 @@ export default function App() {
                           className="absolute group transition-transform hover:scale-125 z-10"
                           style={{ left: `${left}%`, bottom: `${bottom}%`, transform: "translate(-50%, 50%)" }}
                           title={m.name}>
-                          <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full border-2 border-slate-950 shadow-xl flex items-center justify-center text-white text-xs sm:text-base font-black relative"
+                          <div className="w-10 h-10 sm:w-14 sm:h-14 lg:w-20 lg:h-20 rounded-full border-2 border-slate-950 shadow-xl flex items-center justify-center text-white text-xs sm:text-base lg:text-2xl font-black relative"
                             style={{ background: q.color }}>
                             {m.name.charAt(0)}
                           </div>
@@ -485,30 +420,30 @@ export default function App() {
 
           {/* LIST TAB */}
           {tab === "list" && (
-            <div className="space-y-3">
+            <div className="space-y-3 lg:space-y-6">
               {members.length === 0 ? (
-                <div className="text-center py-24 text-slate-600 font-black text-xs uppercase tracking-widest">Belum ada anggota</div>
+                <div className="text-center py-24 lg:py-40 text-slate-600 font-black text-xs lg:text-lg uppercase tracking-widest">Belum ada anggota</div>
               ) : members.map(m => {
                 const q = getQuadrant(m.competency, m.commitment);
                 return (
-                  <div key={m.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 group">
-                    <div className="flex items-center gap-4 w-full sm:w-auto">
-                      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center text-white font-black text-lg sm:text-2xl flex-shrink-0"
+                  <div key={m.id} className="bg-slate-900 border border-slate-800 rounded-2xl lg:rounded-3xl p-5 lg:p-8 flex flex-col sm:flex-row items-center justify-between gap-4 lg:gap-8 group">
+                    <div className="flex items-center gap-4 lg:gap-8 w-full sm:w-auto">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-2xl lg:rounded-3xl flex items-center justify-center text-white font-black text-lg sm:text-2xl lg:text-3xl flex-shrink-0"
                         style={{ background: q.color }}>
                         {m.name.charAt(0)}
                       </div>
                       <div className="flex-1">
-                        <div className="font-black text-white text-base sm:text-xl leading-tight">{m.name}</div>
-                        <div className="text-[10px] sm:text-sm text-slate-500 mt-0.5">{m.role || "—"}</div>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          <span className="text-[9px] sm:text-xs font-black px-2 py-0.5 rounded-full" style={{ background: q.bg, color: q.text }}>{q.label}</span>
-                          <span className="text-[9px] sm:text-xs font-black px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">DISC {m.disc}</span>
+                        <div className="font-black text-white text-base sm:text-xl lg:text-3xl leading-tight">{m.name}</div>
+                        <div className="text-[10px] sm:text-sm lg:text-xl text-slate-500 mt-0.5 lg:mt-2">{m.role || "—"}</div>
+                        <div className="flex flex-wrap gap-2 lg:gap-3 mt-2 lg:mt-4">
+                          <span className="text-[9px] sm:text-xs lg:text-sm font-black px-2 py-0.5 lg:px-4 lg:py-1.5 rounded-full" style={{ background: q.bg, color: q.text }}>{q.label}</span>
+                          <span className="text-[9px] sm:text-xs lg:text-sm font-black px-2 py-0.5 lg:px-4 lg:py-1.5 rounded-full bg-slate-800 text-slate-300">DISC {m.disc}</span>
                         </div>
                       </div>
                     </div>
-                    <div className="flex gap-1 self-end sm:self-center">
-                      <button onClick={() => openEdit(m)} className="p-2.5 text-slate-600 hover:text-white rounded-xl hover:bg-slate-800 transition-all"><Edit3 className="w-4 h-4 sm:w-6 sm:h-6" /></button>
-                      <button onClick={() => setDeleteConfirm(m.id)} className="p-2.5 text-slate-600 hover:text-red-400 rounded-xl hover:bg-slate-800 transition-all"><Trash2 className="w-4 h-4 sm:w-6 sm:h-6" /></button>
+                    <div className="flex gap-1 lg:gap-3 self-end sm:self-center">
+                      <button onClick={() => openEdit(m)} className="p-2.5 lg:p-4 text-slate-600 hover:text-white rounded-xl hover:bg-slate-800 transition-all"><Edit3 className="w-4 h-4 sm:w-6 sm:h-6 lg:w-8 lg:h-8" /></button>
+                      <button onClick={() => setDeleteConfirm(m.id)} className="p-2.5 lg:p-4 text-slate-600 hover:text-red-400 rounded-xl hover:bg-slate-800 transition-all"><Trash2 className="w-4 h-4 sm:w-6 sm:h-6 lg:w-8 lg:h-8" /></button>
                     </div>
                   </div>
                 );
@@ -516,19 +451,89 @@ export default function App() {
             </div>
           )}
 
-          {/* PLANS TAB & GUIDE TAB (Disederhanakan untuk Responsivitas) */}
+          {/* PLANS & GUIDE TABS */}
           {tab === "plans" && (
-            <div className="space-y-4">
+            <div className="space-y-4 lg:space-y-6">
                {members.map(m => (
-                  <div key={m.id} className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
+                  <div key={m.id} className="bg-white rounded-2xl lg:rounded-3xl overflow-hidden border border-slate-100 shadow-sm">
                     <button onClick={() => setExpandedPlan(expandedPlan === m.id ? null : m.id)}
-                      className="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition-all text-slate-900">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center text-white font-black" style={{ background: getQuadrant(m.competency, m.commitment).color }}>
+                      className="w-full flex items-center justify-between p-5 lg:p-8 hover:bg-slate-50 transition-all text-slate-900">
+                      <div className="flex items-center gap-4 lg:gap-6">
+                        <div className="w-10 h-10 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl lg:rounded-2xl flex items-center justify-center text-white font-black lg:text-xl" style={{ background: getQuadrant(m.competency, m.commitment).color }}>
                           {m.name.charAt(0)}
                         </div>
-                        <div className="text-left font-black sm:text-xl">{m.name}</div>
+                        <div className="text-left font-black sm:text-xl lg:text-3xl">{m.name}</div>
                       </div>
-                      <ChevronDown className={`w-4 h-4 sm:w-6 sm:h-6 transition-transform ${expandedPlan === m.id ? "rotate-180" : ""}`} />
+                      <ChevronDown className={`w-4 h-4 sm:w-6 sm:h-6 lg:w-8 lg:h-8 transition-transform ${expandedPlan === m.id ? "rotate-180" : ""}`} />
                     </button>
-                    {expandedPlan
+                    {expandedPlan === m.id && (
+                      <div className="px-5 pb-5 lg:px-8 lg:pb-8 space-y-4 lg:space-y-6 border-t border-slate-100 pt-5 lg:pt-8">
+                        {getActionPlan(m).map((item, i) => <PlanCard key={i} item={item} />)}
+                      </div>
+                    )}
+                  </div>
+               ))}
+            </div>
+          )}
+          
+          {tab === "guide" && (
+            <div className="space-y-4 lg:space-y-6">
+               {QUADRANT_GUIDE.map(g => (
+                <div key={g.q} className="bg-white rounded-2xl lg:rounded-3xl border border-slate-100 overflow-hidden shadow-sm text-slate-800">
+                  <div className="p-5 lg:p-8 flex items-center gap-3 lg:gap-6 font-black sm:text-2xl lg:text-3xl" style={{ background: g.bg }}>
+                    <div className="w-8 h-8 sm:w-12 sm:h-12 lg:w-16 lg:h-16 rounded-xl lg:rounded-2xl flex items-center justify-center text-white" style={{ background: g.color }}>{g.q}</div>
+                    {g.label}
+                  </div>
+                  <div className="p-5 lg:p-8 space-y-4 lg:space-y-6 text-xs sm:text-lg lg:text-xl">
+                    <p><strong>Diagnosis:</strong> {g.diagnosis}</p>
+                    <p className="text-red-600 bg-red-50 p-3 lg:p-6 rounded-lg lg:rounded-2xl"><strong>Kesalahan:</strong> {g.mistake}</p>
+                  </div>
+                </div>
+               ))}
+            </div>
+          )}
+
+        </div>
+      </main>
+
+      {/* Modal / Form Input Data */}
+      {modal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 lg:p-8 bg-black/80 backdrop-blur-md">
+          <div className="bg-white w-full h-full sm:h-auto max-w-xl lg:max-w-4xl rounded-none sm:rounded-[40px] lg:rounded-[48px] shadow-2xl overflow-hidden flex flex-col">
+            <div className="px-8 pt-8 pb-4 lg:px-12 lg:pt-12 lg:pb-6 flex justify-between items-center border-b border-slate-100 sticky top-0 bg-white z-10">
+              <h2 className="text-xl sm:text-3xl lg:text-4xl font-black text-slate-900">{editId ? "Edit Mapping" : "Mapping Baru"}</h2>
+              <button onClick={closeModal} className="p-2 sm:p-4 bg-slate-100 rounded-full hover:bg-slate-200 transition-all"><X className="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-slate-500" /></button>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="p-8 lg:p-12 space-y-7 sm:space-y-10 lg:space-y-12 overflow-y-auto flex-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
+                <input required className="px-5 py-4 lg:px-6 lg:py-5 bg-slate-50 border border-slate-200 rounded-2xl lg:rounded-3xl text-base sm:text-xl lg:text-2xl font-bold outline-none text-slate-900 focus:ring-2 focus:ring-slate-900"
+                  placeholder="Nama Anggota" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+                <input className="px-5 py-4 lg:px-6 lg:py-5 bg-slate-50 border border-slate-200 rounded-2xl lg:rounded-3xl text-base sm:text-xl lg:text-2xl font-bold outline-none text-slate-900 focus:ring-2 focus:ring-slate-900"
+                  placeholder="Jabatan" value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} />
+              </div>
+
+              <DISCSelector value={form.disc} onChange={v => setForm({ ...form, disc: v })} />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+                <div className="space-y-6 lg:space-y-8">
+                  <RatingSelector label="Kompetensi" dim="competency" value={form.competency} onChange={v => setForm({ ...form, competency: v })} />
+                  <NoteInput label="Bukti Kompetensi" type="competencyNotes" notes={form.competencyNotes} onAdd={addNote} onUpdate={updateNote} onRemove={removeNote} prompt="Bukti perilaku spesifik?" />
+                </div>
+                <div className="space-y-6 lg:space-y-8">
+                  <RatingSelector label="Komitmen" dim="commitment" value={form.commitment} onChange={v => setForm({ ...form, commitment: v })} />
+                  <NoteInput label="Bukti Komitmen" type="commitmentNotes" notes={form.commitmentNotes} onAdd={addNote} onUpdate={updateNote} onRemove={removeNote} prompt="Bukti motivasi spesifik?" />
+                </div>
+              </div>
+
+              <button type="submit"
+                className="w-full bg-slate-900 text-white py-5 sm:py-7 lg:py-8 rounded-[24px] lg:rounded-[32px] font-black text-xs sm:text-xl lg:text-2xl tracking-widest uppercase hover:bg-slate-800 active:scale-95 transition-all shadow-xl mt-4 lg:mt-8">
+                Simpan Analisis
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
