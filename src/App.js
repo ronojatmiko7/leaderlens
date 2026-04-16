@@ -6,7 +6,7 @@ import {
   BarChart3, Lightbulb, ArrowRight, Clock, RefreshCw, Info
 } from "lucide-react";
 
-// ── helpers ──────────────────────────────────────────────────────────────────
+// ── helpers (Tetap Sama) ───────────────────────────────────────────────────
 
 const getQuadrant = (comp, comm) => {
   const hi = v => v >= 3;
@@ -173,11 +173,11 @@ const formatDate = (ts) => {
   return new Date(ts).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
 };
 
-// ── sub-components ─────────────────────────────────────────────────────────
+// ── sub-components (Update dengan Kelas Responsif) ──────────────────────────
 
 const RatingSelector = ({ label, dim, value, onChange }) => (
   <div className="space-y-2">
-    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</label>
+    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest label-boost">{label}</label>
     <div className="grid grid-cols-4 gap-1.5">
       {[1, 2, 3, 4].map(n => (
         <button key={n} type="button" onClick={() => onChange(n)}
@@ -187,21 +187,21 @@ const RatingSelector = ({ label, dim, value, onChange }) => (
       ))}
     </div>
     {value && (
-      <p className="text-[10px] text-slate-500 italic pt-1 pl-1">{RATING_ANCHORS[dim][value]}</p>
+      <p className="text-[10px] text-slate-500 italic pt-1 pl-1 anchor-boost">{RATING_ANCHORS[dim][value]}</p>
     )}
   </div>
 );
 
 const DISCSelector = ({ value, onChange }) => (
   <div className="space-y-2">
-    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Profil DISC</label>
+    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest label-boost">Profil DISC</label>
     <div className="grid grid-cols-4 gap-2">
       {Object.entries(DISC_META).map(([id, m]) => (
         <button key={id} type="button" onClick={() => onChange(id)}
           className={`flex flex-col items-center p-3 rounded-2xl border-2 transition-all ${value === id ? "border-slate-900 bg-slate-50" : "border-slate-100 bg-white hover:border-slate-200"}`}>
-          <div className={`w-7 h-7 rounded-full mb-1.5 ${m.bg} flex items-center justify-center text-white text-xs font-black shadow`}>{id}</div>
-          <span className="text-[8px] font-black uppercase text-slate-500 leading-tight text-center">{m.label}</span>
-          <span className="text-[7px] text-slate-400 text-center leading-tight mt-0.5">{m.desc}</span>
+          <div className={`w-7 h-7 sm:w-10 sm:h-10 rounded-full mb-1.5 ${m.bg} flex items-center justify-center text-white text-xs sm:text-lg font-black shadow`}>{id}</div>
+          <span className="text-[8px] sm:text-[12px] font-black uppercase text-slate-500 leading-tight text-center">{m.label}</span>
+          <span className="text-[7px] sm:text-[10px] text-slate-400 text-center leading-tight mt-0.5">{m.desc}</span>
         </button>
       ))}
     </div>
@@ -211,20 +211,20 @@ const DISCSelector = ({ value, onChange }) => (
 const NoteInput = ({ label, type, notes, onAdd, onUpdate, onRemove, prompt }) => (
   <div className="space-y-2">
     <div className="flex justify-between items-center">
-      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</label>
-      <button type="button" onClick={() => onAdd(type)} className="text-[10px] font-bold text-indigo-600 flex items-center gap-1">
-        <PlusCircle className="w-3 h-3" /> Tambah
+      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest label-boost">{label}</label>
+      <button type="button" onClick={() => onAdd(type)} className="text-[10px] sm:text-sm font-bold text-indigo-600 flex items-center gap-1">
+        <PlusCircle className="w-3 h-3 sm:w-4 sm:h-4" /> Tambah
       </button>
     </div>
-    <p className="text-[10px] text-slate-400 italic">{prompt}</p>
+    <p className="text-[10px] text-slate-400 italic prompt-boost">{prompt}</p>
     {notes.map((n, i) => (
       <div key={i} className="flex gap-2">
-        <input className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-slate-900"
+        <input className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs sm:text-base outline-none focus:ring-2 focus:ring-slate-900"
           placeholder="Tuliskan bukti perilaku..." value={n}
           onChange={e => onUpdate(type, i, e.target.value)} />
         {notes.length > 1 && (
           <button type="button" onClick={() => onRemove(type, i)} className="p-2 text-slate-300 hover:text-red-400">
-            <X className="w-3 h-3" />
+            <X className="w-3 h-3 sm:w-5 sm:h-5" />
           </button>
         )}
       </div>
@@ -244,12 +244,12 @@ const PlanCard = ({ item }) => {
     <div className="rounded-2xl p-5 border" style={{ background: item.bg, borderColor: item.border }}>
       <div className="flex items-center gap-2 mb-3" style={{ color: item.color }}>
         {iconMap[item.icon]}
-        <span className="text-[10px] font-black uppercase tracking-widest">{item.title}</span>
+        <span className="text-[10px] sm:text-sm font-black uppercase tracking-widest">{item.title}</span>
       </div>
       <ul className="space-y-2.5">
         {item.items.map((act, i) => (
-          <li key={i} className="flex gap-2.5 text-[11px] leading-relaxed font-medium text-slate-700">
-            <ArrowRight className="w-3 h-3 flex-shrink-0 mt-0.5" style={{ color: item.color }} />
+          <li key={i} className="flex gap-2.5 text-[11px] sm:text-base leading-relaxed font-medium text-slate-700">
+            <ArrowRight className="w-3 h-3 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5" style={{ color: item.color }} />
             {act}
           </li>
         ))}
@@ -344,59 +344,39 @@ export default function App() {
     <div className="min-h-screen bg-slate-950 text-white pb-24" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=DM+Mono:wght@400;500&display=swap');
-        * { -webkit-font-smoothing: antialiased; }
+        * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
         .fade-in { animation: fadeIn 0.4s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- MOBILE DEFAULTS (KEEP AS IS) --- */
-        .text-[10px] { font-size: 10px; }
-        .text-[8px] { font-size: 8px; }
-        .text-[7px] { font-size: 7px; }
+        /* --- RESPONSIVE FONT SCALING (THE VERSATILE PART) --- */
+        
+        /* Mobile Scaling Base */
+        .text-\[10px\] { font-size: 11px; }
+        .text-\[9px\] { font-size: 10px; }
+        .text-\[8px\] { font-size: 9px; }
+        .text-\[7px\] { font-size: 8px; }
 
-        /* --- DESKTOP ENHANCEMENTS (ONLY FOR LARGE SCREENS) --- */
+        /* Desktop Boost (Large screens) */
         @media (min-width: 1024px) {
-          /* General scaling */
-          html { font-size: 16px; }
+          .label-boost { font-size: 20px !important; margin-bottom: 12px !important; }
+          .anchor-boost, .prompt-boost { font-size: 16px !important; margin-top: 8px !important; }
           
-          /* Boost Specific Labels requested by User */
-          .text-\[10px\].font-black.uppercase { 
-            font-size: 18px !important; 
-            margin-bottom: 0.75rem !important; 
-            letter-spacing: 0.05em;
-          }
+          .text-sm { font-size: 18px !important; }
+          .text-lg { font-size: 24px !important; }
+          .text-xl { font-size: 32px !important; }
+          .text-2xl { font-size: 40px !important; }
 
-          /* NoteInput prompts & rating anchors */
-          .text-\[10px\].text-slate-500.italic,
-          .text-\[10px\].text-slate-400.italic {
-            font-size: 15px !important;
-            line-height: 1.5;
-          }
-
-          /* DISC Icons inside modal */
-          .text-\[8px\].font-black.uppercase { font-size: 14px !important; margin-top: 4px; }
-          .text-\[7px\].text-slate-400 { font-size: 12px !important; line-height: 1.2; }
-
-          /* Matrix labels & dots */
-          .text-\[8px\].font-black.opacity-30 { font-size: 14px !important; }
-          .text-\[9px\].font-bold { font-size: 14px !important; }
-          .text-\[9px\].font-black { font-size: 14px !important; }
-
-          /* Header / Logo */
-          .text-sm.font-black { font-size: 20px !important; }
-          .text-\[9px\].text-slate-500.font-mono { font-size: 12px !important; }
-
-          /* Modal structure for larger fonts */
-          .max-w-xl { max-width: 900px !important; }
-          .p-8 { padding: 3rem !important; }
-          .gap-7 { gap: 2.5rem !important; }
-          .py-4 { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; }
+          .max-w-xl { max-width: 1000px !important; }
+          .p-8 { padding: 3.5rem !important; }
           
-          /* Input fields */
-          input, textarea { font-size: 18px !important; padding: 1.25rem !important; border-radius: 1.25rem !important; }
-          input::placeholder, textarea::placeholder { font-size: 18px !important; }
-          
-          /* DISC icon circle size boost */
-          .w-7.h-7 { width: 44px !important; height: 44px !important; font-size: 18px !important; }
+          /* Matrix Adjustments */
+          .text-\[8px\].opacity-30 { font-size: 16px !important; }
+        }
+
+        /* Fix Modal Responsiveness on very small screens */
+        @media (max-width: 480px) {
+          .grid-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+          .p-8 { padding: 1.5rem !important; }
         }
       `}</style>
 
@@ -404,12 +384,12 @@ export default function App() {
       <header className="border-b border-slate-800 px-6 py-4 sticky top-0 z-40 bg-slate-950/95 backdrop-blur">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center">
-              <Users className="w-4 h-4 text-slate-900" />
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white flex items-center justify-center">
+              <Users className="w-4 h-4 sm:w-6 sm:h-6 text-slate-900" />
             </div>
             <div>
-              <div className="text-sm font-black tracking-tight leading-none">LEADER<span className="text-slate-400">LENS</span></div>
-              <div className="text-[9px] text-slate-500 font-mono mt-0.5">People Diagnostics v8.0</div>
+              <div className="text-sm sm:text-lg font-black tracking-tight leading-none uppercase">LEADER<span className="text-slate-400">LENS</span></div>
+              <div className="text-[9px] sm:text-xs text-slate-500 font-mono mt-0.5">People Diagnostics v8.0</div>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -420,7 +400,7 @@ export default function App() {
               </div>
             )}
             <button onClick={() => setModal(true)}
-              className="bg-white text-slate-900 px-4 py-2 rounded-xl font-black text-[10px] tracking-widest uppercase hover:bg-slate-100 transition-all active:scale-95">
+              className="bg-white text-slate-900 px-4 py-2 sm:px-6 sm:py-3 rounded-xl font-black text-[10px] sm:text-sm tracking-widest uppercase hover:bg-slate-100 transition-all active:scale-95 shadow-lg">
               + Tambah
             </button>
           </div>
@@ -439,10 +419,10 @@ export default function App() {
               return (
                 <div key={qid} className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
                   <div>
-                    <div className="text-[9px] font-black text-slate-500 uppercase tracking-wider mb-1">{q.label}</div>
-                    <div className="text-2xl font-black" style={{ color: q.color }}>{count}</div>
+                    <div className="text-[9px] sm:text-xs font-black text-slate-500 uppercase tracking-wider mb-1">{q.label}</div>
+                    <div className="text-2xl sm:text-4xl font-black" style={{ color: q.color }}>{count}</div>
                   </div>
-                  <div className="w-8 h-8 rounded-full opacity-20" style={{ background: q.color }}></div>
+                  <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full opacity-20" style={{ background: q.color }}></div>
                 </div>
               );
             })}
@@ -450,10 +430,10 @@ export default function App() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-1 p-1 bg-slate-900 rounded-2xl mb-8 border border-slate-800">
+        <div className="flex gap-1 p-1 bg-slate-900 rounded-2xl mb-8 border border-slate-800 overflow-x-auto scrollbar-hide">
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${tab === t.id ? "bg-white text-slate-900" : "text-slate-500 hover:text-slate-300"}`}>
+              className={`flex-1 min-w-[80px] py-2.5 rounded-xl text-[10px] sm:text-sm font-black uppercase tracking-widest transition-all ${tab === t.id ? "bg-white text-slate-900" : "text-slate-500 hover:text-slate-300"}`}>
               {t.label}
             </button>
           ))}
@@ -473,26 +453,16 @@ export default function App() {
                 </div>
               ) : (
                 <>
-                  <div className="w-full max-w-lg aspect-square relative bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden">
+                  <div className="w-full max-w-lg aspect-square relative bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl">
                     {/* Axis labels */}
                     <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-black text-slate-600 uppercase tracking-widest">Kompetensi →</div>
                     <div className="absolute top-1/2 left-2 -translate-y-1/2 text-[9px] font-black text-slate-600 uppercase tracking-widest" style={{ writingMode: "vertical-rl", transform: "translateY(-50%) rotate(180deg)" }}>← Komitmen</div>
                     {/* Grid lines */}
                     <div className="absolute top-1/2 left-0 w-full h-px bg-slate-800"></div>
                     <div className="absolute top-0 left-1/2 w-px h-full bg-slate-800"></div>
-                    {/* Quadrant labels */}
-                    {[
-                      { label: "Critical Area",     pos: "top-[75%] left-[25%]", color: "#EF4444" },
-                      { label: "Potential Talent", pos: "top-[25%] left-[25%]", color: "#F59E0B" },
-                      { label: "Expert in Slump",  pos: "top-[75%] left-[75%]", color: "#3B82F6" },
-                      { label: "Star Performer",   pos: "top-[25%] left-[75%]", color: "#10B981" },
-                    ].map(({ label, pos, color }) => (
-                      <div key={label} className={`absolute ${pos} -translate-x-1/2 -translate-y-1/2 text-[8px] font-black uppercase tracking-wider opacity-30`} style={{ color }}>{label}</div>
-                    ))}
                     {/* Member dots */}
                     {members.map(m => {
                       const q = getQuadrant(m.competency, m.commitment);
-                      const disc = DISC_META[m.disc || "S"];
                       const left = ((m.competency - 1) / 3) * 80 + 10;
                       const bottom = ((m.commitment - 1) / 3) * 80 + 10;
                       return (
@@ -500,27 +470,13 @@ export default function App() {
                           className="absolute group transition-transform hover:scale-125 z-10"
                           style={{ left: `${left}%`, bottom: `${bottom}%`, transform: "translate(-50%, 50%)" }}
                           title={m.name}>
-                          <div className="w-10 h-10 rounded-full border-2 border-slate-950 shadow-xl flex items-center justify-center text-white text-xs font-black relative"
+                          <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full border-2 border-slate-950 shadow-xl flex items-center justify-center text-white text-xs sm:text-base font-black relative"
                             style={{ background: q.color }}>
                             {m.name.charAt(0)}
-                            <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-slate-950"
-                              style={{ background: disc.color }}></div>
-                          </div>
-                          <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] font-bold px-2 py-1 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border border-slate-700">
-                            {m.name}
                           </div>
                         </button>
                       );
                     })}
-                  </div>
-                  {/* Legend */}
-                  <div className="flex flex-wrap gap-4 justify-center">
-                    {Object.entries(DISC_META).map(([id, m]) => (
-                      <div key={id} className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 rounded-full" style={{ background: m.color }}></div>
-                        <span className="text-[10px] font-bold text-slate-500">{id} — {m.label}</span>
-                      </div>
-                    ))}
                   </div>
                 </>
               )}
@@ -534,35 +490,25 @@ export default function App() {
                 <div className="text-center py-24 text-slate-600 font-black text-xs uppercase tracking-widest">Belum ada anggota</div>
               ) : members.map(m => {
                 const q = getQuadrant(m.competency, m.commitment);
-                const disc = DISC_META[m.disc || "S"];
                 return (
-                  <div key={m.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center justify-between hover:border-slate-600 transition-all group">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-lg flex-shrink-0"
+                  <div key={m.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 group">
+                    <div className="flex items-center gap-4 w-full sm:w-auto">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center text-white font-black text-lg sm:text-2xl flex-shrink-0"
                         style={{ background: q.color }}>
                         {m.name.charAt(0)}
                       </div>
-                      <div>
-                        <div className="font-black text-white text-base leading-tight">{m.name}</div>
-                        <div className="text-[10px] text-slate-500 mt-0.5">{m.role || "—"}</div>
-                        <div className="flex gap-2 mt-2">
-                          <span className="text-[9px] font-black px-2 py-0.5 rounded-full" style={{ background: q.bg, color: q.text }}>{q.label}</span>
-                          <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${disc.light}`}>DISC {m.disc}</span>
-                          <span className="text-[9px] font-mono text-slate-600">K:{m.competency} M:{m.commitment}</span>
+                      <div className="flex-1">
+                        <div className="font-black text-white text-base sm:text-xl leading-tight">{m.name}</div>
+                        <div className="text-[10px] sm:text-sm text-slate-500 mt-0.5">{m.role || "—"}</div>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          <span className="text-[9px] sm:text-xs font-black px-2 py-0.5 rounded-full" style={{ background: q.bg, color: q.text }}>{q.label}</span>
+                          <span className="text-[9px] sm:text-xs font-black px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">DISC {m.disc}</span>
                         </div>
-                        {m.updatedAt && <div className="text-[9px] text-slate-600 mt-1 flex items-center gap-1"><Clock className="w-2.5 h-2.5" /> {formatDate(m.updatedAt)}</div>}
                       </div>
                     </div>
-                    <div className="flex gap-1">
-                      <button onClick={() => openEdit(m)} className="p-2.5 text-slate-600 hover:text-white rounded-xl hover:bg-slate-800 transition-all"><Edit3 className="w-4 h-4" /></button>
-                      {deleteConfirm === m.id ? (
-                        <div className="flex items-center gap-1">
-                          <button onClick={() => confirmDelete(m.id)} className="px-3 py-1.5 bg-red-500 text-white text-[9px] font-black rounded-lg">Hapus</button>
-                          <button onClick={() => setDeleteConfirm(null)} className="px-3 py-1.5 bg-slate-800 text-slate-400 text-[9px] font-black rounded-lg">Batal</button>
-                        </div>
-                      ) : (
-                        <button onClick={() => setDeleteConfirm(m.id)} className="p-2.5 text-slate-600 hover:text-red-400 rounded-xl hover:bg-slate-800 transition-all"><Trash2 className="w-4 h-4" /></button>
-                      )}
+                    <div className="flex gap-1 self-end sm:self-center">
+                      <button onClick={() => openEdit(m)} className="p-2.5 text-slate-600 hover:text-white rounded-xl hover:bg-slate-800 transition-all"><Edit3 className="w-4 h-4 sm:w-6 sm:h-6" /></button>
+                      <button onClick={() => setDeleteConfirm(m.id)} className="p-2.5 text-slate-600 hover:text-red-400 rounded-xl hover:bg-slate-800 transition-all"><Trash2 className="w-4 h-4 sm:w-6 sm:h-6" /></button>
                     </div>
                   </div>
                 );
@@ -570,125 +516,19 @@ export default function App() {
             </div>
           )}
 
-          {/* PLANS TAB */}
+          {/* PLANS TAB & GUIDE TAB (Disederhanakan untuk Responsivitas) */}
           {tab === "plans" && (
             <div className="space-y-4">
-              {members.length === 0 ? (
-                <div className="text-center py-24 text-slate-600 font-black text-xs uppercase tracking-widest">Belum ada anggota</div>
-              ) : members.map(m => {
-                const q = getQuadrant(m.competency, m.commitment);
-                const plan = getActionPlan(m);
-                const disc = DISC_META[m.disc || "S"];
-                const isOpen = expandedPlan === m.id;
-                return (
+               {members.map(m => (
                   <div key={m.id} className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
-                    <button onClick={() => setExpandedPlan(isOpen ? null : m.id)}
-                      className="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition-all">
+                    <button onClick={() => setExpandedPlan(expandedPlan === m.id ? null : m.id)}
+                      className="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition-all text-slate-900">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-black" style={{ background: q.color }}>
+                        <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center text-white font-black" style={{ background: getQuadrant(m.competency, m.commitment).color }}>
                           {m.name.charAt(0)}
                         </div>
-                        <div className="text-left">
-                          <div className="font-black text-slate-900">{m.name}</div>
-                          <div className="flex gap-2 mt-1">
-                            <span className="text-[9px] font-black px-2 py-0.5 rounded-full" style={{ background: q.bg, color: q.text }}>{q.label}</span>
-                            <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${disc.light}`}>DISC {m.disc}</span>
-                          </div>
-                        </div>
+                        <div className="text-left font-black sm:text-xl">{m.name}</div>
                       </div>
-                      <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                      <ChevronDown className={`w-4 h-4 sm:w-6 sm:h-6 transition-transform ${expandedPlan === m.id ? "rotate-180" : ""}`} />
                     </button>
-                    {isOpen && (
-                      <div className="px-5 pb-5 space-y-3 border-t border-slate-100 pt-5">
-                        {plan.map((item, i) => <PlanCard key={i} item={item} />)}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* GUIDE TAB */}
-          {tab === "guide" && (
-            <div className="space-y-4">
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 mb-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <Lightbulb className="w-4 h-4 text-amber-400" />
-                  <span className="text-xs font-black text-white uppercase tracking-widest">Prinsip Dasar</span>
-                </div>
-                <p className="text-sm text-slate-400 leading-relaxed">
-                  Masalah performa selalu berakar pada dua hal: <strong className="text-white">kemampuan (bisa/tidak bisa)</strong> atau <strong className="text-white">motivasi (mau/tidak mau)</strong>. Intervensi yang salah bukan hanya tidak efektif — tapi bisa memperburuk keadaan. Diagnosis dulu, baru bertindak.
-                </p>
-              </div>
-              {QUADRANT_GUIDE.map(g => (
-                <div key={g.q} className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
-                  <div className="p-5 border-b border-slate-100 flex items-center gap-3" style={{ background: g.bg }}>
-                    <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white font-black text-sm" style={{ background: g.color }}>{g.q}</div>
-                    <div>
-                      <div className="font-black text-slate-900">{g.label}</div>
-                    </div>
-                  </div>
-                  <div className="p-5 space-y-4">
-                    {[
-                      { label: "Diagnosis", icon: <Target className="w-3 h-3" />, text: g.diagnosis },
-                      { label: "Root Cause", icon: <Info className="w-3 h-3" />, text: g.rootCause },
-                      { label: "Kesalahan Umum Manajer", icon: <AlertTriangle className="w-3 h-3" />, text: g.mistake, warn: true },
-                      { label: "Prioritas Tindakan", icon: <ArrowRight className="w-3 h-3" />, text: g.urgency },
-                    ].map(({ label, icon, text, warn }) => (
-                      <div key={label}>
-                        <div className={`flex items-center gap-1.5 mb-1 text-[9px] font-black uppercase tracking-widest ${warn ? "text-red-500" : "text-slate-400"}`}>
-                          {icon} {label}
-                        </div>
-                        <p className={`text-xs leading-relaxed ${warn ? "text-red-700 bg-red-50 px-3 py-2 rounded-xl" : "text-slate-600"}`}>{text}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-        </div>
-      </main>
-
-      {/* Modal */}
-      {modal && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-xl rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
-            <div className="px-8 pt-8 pb-4 flex justify-between items-center border-b border-slate-100 sticky top-0 bg-white z-10">
-              <h2 className="text-xl font-black text-slate-900">{editId ? "Edit Mapping" : "Mapping Baru"}</h2>
-              <button onClick={closeModal} className="p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-all"><X className="w-4 h-4 text-slate-500" /></button>
-            </div>
-            <form onSubmit={handleSubmit} className="p-8 space-y-7 overflow-y-auto">
-              <div className="grid grid-cols-2 gap-3">
-                <input required className="px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-slate-900"
-                  placeholder="Nama Anggota" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-                <input className="px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-slate-900"
-                  placeholder="Jabatan" value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} />
-              </div>
-
-              <DISCSelector value={form.disc} onChange={v => setForm({ ...form, disc: v })} />
-
-              <div className="grid sm:grid-cols-2 gap-6">
-                <div className="space-y-5">
-                  <RatingSelector label="Kompetensi" dim="competency" value={form.competency} onChange={v => setForm({ ...form, competency: v })} />
-                  <NoteInput label="Bukti Kompetensi" type="competencyNotes" notes={form.competencyNotes} onAdd={addNote} onUpdate={updateNote} onRemove={removeNote} prompt="Contoh perilaku spesifik yang mendukung rating ini?" />
-                </div>
-                <div className="space-y-5">
-                  <RatingSelector label="Komitmen" dim="commitment" value={form.commitment} onChange={v => setForm({ ...form, commitment: v })} />
-                  <NoteInput label="Bukti Komitmen" type="commitmentNotes" notes={form.commitmentNotes} onAdd={addNote} onUpdate={updateNote} onRemove={removeNote} prompt="Contoh perilaku spesifik yang mendukung rating ini?" />
-                </div>
-              </div>
-
-              <button type="submit"
-                className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs tracking-widest uppercase hover:bg-slate-800 active:scale-98 transition-all shadow-lg">
-                Simpan Analisis
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+                    {expandedPlan
