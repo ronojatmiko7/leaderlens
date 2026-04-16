@@ -79,7 +79,7 @@ const getDISCScript = (disc) => ({
     avoid:   "Jangan berikan keputusan mendadak atau deadline mepet tanpa penjelasan.",
   },
   C: {
-    open:    "Berbasis data: 'Ada beberapa angka yang ingin saya tunjukkan dan diskusikan.'",
+    open:    "Berbasis data: 'Ada beberapa angka yang ingin turnjukkan dan diskusikan.'",
     body:    "Bawa bukti konkret. Beri waktu mereka untuk berpikir sebelum minta respons.",
     avoid:   "Jangan beri feedback tanpa data pendukung — mereka akan menantang balik.",
   },
@@ -479,28 +479,43 @@ export default function App() {
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        /* CSS KHUSUS UNTUK FITUR PRINT PDF */
+        /* CSS KHUSUS UNTUK FITUR PRINT PDF - PENYEMPURNAAN */
         @media print {
-          body { background: white !important; color: black !important; }
-          /* Sembunyikan semua UI aplikasi */
+          /* Me-reset background hitam bawaan root aplikasi menjadi putih */
+          body, html, #root, .bg-slate-950, .min-h-screen { 
+            background-color: white !important; 
+            color: black !important; 
+          }
+          
+          /* Menyembunyikan elemen UI yang tidak perlu di cetak */
           header, .hide-on-print { display: none !important; }
-          /* Hanya tampilkan area dokumen */
+          
+          /* Menghilangkan background pembungkus akordion yang berwarna gelap */
+          .bg-slate-900 {
+            background-color: transparent !important;
+            border: none !important;
+          }
+          
+          /* Memastikan Kertas Dokumen terisi penuh tanpa terpotong margin UI */
           .print-area {
-            visibility: visible !important;
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            margin: 0;
-            padding: 0;
+            position: relative !important;
+            background-color: white !important;
+            color: black !important;
             box-shadow: none !important;
-            background: white !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+          }
+          
+          /* Memaksa seluruh teks di dalam dokumen menjadi warna hitam (khusus saat print) */
+          .print-area * {
             color: black !important;
           }
-          /* Paksa warna agar tercetak (untuk background kuadran/DISC) */
+          
+          /* Mengizinkan warna elemen grafis (seperti ikon dan border abu) tetap tercetak */
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          /* Reset margin halaman */
-          @page { margin: 1cm; }
+          
+          @page { margin: 1.5cm; }
         }
       `}</style>
 
@@ -531,7 +546,8 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 hide-on-print">
+      {/* Penutup hide-on-print dilepas dari tag main ini agar isi print bisa jalan */}
+      <main className="max-w-4xl lg:max-w-5xl mx-auto px-4 py-6">
         {/* Team Health Banner */}
         {health && (
           <div className="mb-6 grid grid-cols-2 sm:grid-cols-4 gap-3 fade-in hide-on-print">
@@ -596,25 +612,21 @@ export default function App() {
                       <div className="absolute top-0 left-1/2 w-[2px] h-full bg-slate-500/80 z-0"></div>
                       
                       {/* KETERANGAN KUADRAN BACKGROUND */}
-                      {/* Q2: Top Left */}
                       <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 text-center text-slate-700/50 z-0 pointer-events-none select-none flex flex-col items-center justify-center w-full">
                         <div className="text-2xl sm:text-4xl font-black mb-1">Q2</div>
                         <div className="text-[9px] sm:text-xs font-bold uppercase tracking-widest">Potential Talent</div>
                       </div>
                       
-                      {/* Q4: Top Right */}
                       <div className="absolute top-1/4 left-3/4 -translate-x-1/2 -translate-y-1/2 text-center text-slate-700/50 z-0 pointer-events-none select-none flex flex-col items-center justify-center w-full">
                         <div className="text-2xl sm:text-4xl font-black mb-1">Q4</div>
                         <div className="text-[9px] sm:text-xs font-bold uppercase tracking-widest">Star Performer</div>
                       </div>
 
-                      {/* Q1: Bottom Left */}
                       <div className="absolute top-3/4 left-1/4 -translate-x-1/2 -translate-y-1/2 text-center text-slate-700/50 z-0 pointer-events-none select-none flex flex-col items-center justify-center w-full">
                         <div className="text-[9px] sm:text-xs font-bold uppercase tracking-widest mb-1">Critical Area</div>
                         <div className="text-2xl sm:text-4xl font-black">Q1</div>
                       </div>
 
-                      {/* Q3: Bottom Right */}
                       <div className="absolute top-3/4 left-3/4 -translate-x-1/2 -translate-y-1/2 text-center text-slate-700/50 z-0 pointer-events-none select-none flex flex-col items-center justify-center w-full">
                         <div className="text-[9px] sm:text-xs font-bold uppercase tracking-widest mb-1">Expert in Slump</div>
                         <div className="text-2xl sm:text-4xl font-black">Q3</div>
@@ -690,10 +702,10 @@ export default function App() {
                {members.map(m => {
                   const q = getQuadrant(m.competency, m.commitment);
                   return (
-                  <div key={m.id} className="bg-slate-900 rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-800 shadow-sm transition-all">
-                    {/* Header Akordion */}
+                  <div key={m.id} className={`bg-slate-900 rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-800 shadow-sm transition-all ${expandedPlan !== m.id ? 'hide-on-print' : ''}`}>
+                    {/* Header Akordion - Disembunyikan saat print */}
                     <button onClick={() => setExpandedPlan(expandedPlan === m.id ? null : m.id)}
-                      className="w-full flex items-center justify-between p-5 sm:p-6 hover:bg-slate-800 transition-all text-white">
+                      className="w-full flex items-center justify-between p-5 sm:p-6 hover:bg-slate-800 transition-all text-white hide-on-print">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white font-black sm:text-lg" style={{ background: q.color }}>
                           {m.name.charAt(0)}
@@ -717,7 +729,7 @@ export default function App() {
                           </button>
                         </div>
 
-                        {/* MOCKUP KERTAS A4 FORMAL */}
+                        {/* MOCKUP KERTAS A4 FORMAL - INI AREA YANG AKAN MUNCUL SAAT PRINT */}
                         <div className={`bg-white text-slate-900 rounded-sm shadow-2xl mx-auto p-8 sm:p-12 max-w-3xl print-area`}>
                           
                           {/* Kop Dokumen */}
@@ -838,7 +850,7 @@ export default function App() {
                 </p>
               </div>
 
-              {/* SECTION 1: PANDUAN PENGISIAN FORM (DIPINDAH KE ATAS) */}
+              {/* SECTION 1: PANDUAN PENGISIAN FORM */}
               <section>
                 <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
                   <Edit3 className="w-6 h-6 text-slate-400" /> 1. Cara Mengisi Form Penilaian
@@ -875,7 +887,7 @@ export default function App() {
 
                   <div className="border-t border-slate-800 pt-8"></div>
 
-                  {/* Panduan Menulis Bukti Perilaku (Fakta vs Asumsi) */}
+                  {/* Panduan Menulis Bukti Perilaku */}
                   <div>
                     <h4 className="font-black text-white uppercase tracking-widest text-sm mb-3 flex items-center gap-2">
                       <Target className="w-5 h-5 text-emerald-400" /> Cara Menulis "Bukti Perilaku"
@@ -939,7 +951,7 @@ export default function App() {
                 </div>
               </section>
 
-              {/* SECTION 3: Profil DISC (DIPINDAH KE BAWAH) */}
+              {/* SECTION 3: Profil DISC */}
               <section>
                 <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
                   <Users className="w-6 h-6 text-slate-400" /> 3. Memahami Profil DISC
@@ -1008,6 +1020,26 @@ export default function App() {
                       <li><strong>Cara Komunikasi:</strong> Gunakan data, fakta, dan angka. Jangan berikan feedback kritis tanpa bukti tertulis atau metrik yang jelas.</li>
                     </ul>
                   </div>
+                </div>
+              </section>
+
+              {/* SECTION 4: Panduan PIP (BARU) */}
+              <section>
+                <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
+                  <FileText className="w-6 h-6 text-slate-400" /> 4. Mengisi Dokumen Tindak Lanjut (PIP)
+                </h3>
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8 space-y-4 text-sm sm:text-base text-slate-400 leading-relaxed">
+                  <p>
+                    Pada tab <strong>Action Plan</strong>, Anda dapat mengekspor atau mencetak dokumen tindak lanjut formal. Di bagian bawah dokumen tersebut, terdapat kolom kosong <strong>"Rencana Tindakan Lanjutan (Disepakati Bersama)"</strong>.
+                  </p>
+                  <p>
+                    <strong>Mengapa kolom durasi tidak disediakan untuk diketik di aplikasi?</strong><br/>
+                    Durasi dan tenggat waktu (<em>deadline</em>) adalah bagian dari komitmen psikologis yang harus disepakati secara langsung saat sesi tatap muka (1-on-1) dengan anggota tim Anda. Menuliskan kesepakatan target beserta durasinya secara bersama-sama di atas kertas cetak akan memicu tingkat pertanggungjawaban yang jauh lebih kuat bagi karyawan, ketimbang tenggat waktu yang sekadar "ditetapkan secara sepihak" oleh manajer di dalam aplikasi.
+                  </p>
+                  <p>
+                    <strong>Cara menggunakannya:</strong><br/>
+                    Setelah Anda menekan tombol "Simpan ke PDF" dan mencetaknya, duduklah bersama anggota tim Anda. Buka percakapan dengan panduan DISC yang tersedia, sepakati 3-4 langkah perbaikan nyata, lalu <strong>tuliskan secara manual target perbaikan beserta durasinya</strong> di atas garis yang disediakan. Terakhir, bubuhkan tanda tangan bersama sebagai bukti komitmen legal.
+                  </p>
                 </div>
               </section>
 
