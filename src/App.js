@@ -263,6 +263,37 @@ const PlanCard = ({ item }) => {
   );
 };
 
+const QUADRANT_GUIDE = [
+  {
+    q: "Q1", label: "Critical Area", color: "#EF4444", bg: "#FEF2F2",
+    diagnosis: "Anggota tim tidak memiliki kemampuan DAN motivasi yang cukup. Ini situasi paling berat.",
+    rootCause: "Bisa karena salah rekrut, burnout ekstrem, atau sudah terlalu lama di posisi yang salah.",
+    mistake: "Kesalahan umum: terus memberi training padahal masalah utamanya adalah motivasi — atau sebaliknya, terus memberi semangat padahal skill-nya memang tidak ada.",
+    urgency: "Butuh intervensi ganda: skill DAN will secara bersamaan. Jika tidak ada progres dalam 90 hari, eskalasi ke PIP.",
+  },
+  {
+    q: "Q2", label: "Potential Talent", color: "#F59E0B", bg: "#FFFBEB",
+    diagnosis: "Semangat tinggi tapi kemampuan belum cukup. Sering terjadi pada karyawan baru atau yang baru dipromosikan.",
+    rootCause: "Bukan masalah karakter — mereka belum punya tools yang tepat. Energinya ada, tinggal diarahkan.",
+    mistake: "Kesalahan umum: membiarkan mereka 'belajar sendiri' karena terlihat bersemangat. Tanpa struktur, antusiasme ini akan habis dalam 3–6 bulan.",
+    urgency: "Prioritas: berikan skill secepat mungkin sebelum motivasi turun. Golden window: 90 hari pertama.",
+  },
+  {
+    q: "Q3", label: "Expert in Slump", color: "#3B82F6", bg: "#EFF6FF",
+    diagnosis: "Kemampuan tinggi tapi motivasi turun drastis. Ini yang paling sering salah didiagnosis.",
+    rootCause: "Bukan malas. Ada sesuatu yang patah: tidak dihargai, bored, konflik dengan atasan/rekan, atau masalah pribadi.",
+    mistake: "Kesalahan terbesar: memperlakukan mereka seperti Q1 — memberi training atau monitoring ketat. Ini akan memperburuk keadaan karena terasa seperti penghinaan.",
+    urgency: "Prioritas: percakapan coaching yang dalam, bukan evaluasi performa. Gali dulu sebelum intervensi.",
+  },
+  {
+    q: "Q4", label: "Star Performer", color: "#10B981", bg: "#ECFDF5",
+    diagnosis: "Kemampuan dan motivasi sama-sama tinggi. Aset terbesar tim Anda.",
+    rootCause: "Risiko tersembunyi: mereka sering diabaikan karena 'tidak masalah'. Padahal mereka yang paling rentan keluar.",
+    mistake: "Kesalahan terbesar: tidak berinvestasi pada mereka karena sudah berjalan sendiri. Turnover satu Q4 bisa merusak tim selama berbulan-bulan.",
+    urgency: "Prioritas: retensi dan growth. Pastikan mereka punya tantangan baru, pengakuan, dan jalur karir yang jelas.",
+  },
+];
+
 // ── main app ──────────────────────────────────────────────────────────────
 
 const EMPTY_FORM = { name: "", role: "", competency: 2, commitment: 2, competencyNotes: [""], commitmentNotes: [""], disc: "S" };
@@ -420,11 +451,13 @@ export default function App() {
                 <>
                   <div className="w-full max-w-lg aspect-square relative bg-slate-900 rounded-3xl sm:rounded-[32px] border border-slate-800 overflow-hidden shadow-2xl">
                     {/* Axis labels */}
-                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-black text-slate-600 uppercase tracking-widest">Kompetensi →</div>
-                    <div className="absolute top-1/2 left-3 -translate-y-1/2 text-[10px] sm:text-xs font-black text-slate-600 uppercase tracking-widest" style={{ writingMode: "vertical-rl", transform: "translateY(-50%) rotate(180deg)" }}>← Komitmen</div>
-                    {/* Grid lines */}
-                    <div className="absolute top-1/2 left-0 w-full h-px bg-slate-800"></div>
-                    <div className="absolute top-0 left-1/2 w-px h-full bg-slate-800"></div>
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest z-10">Kompetensi →</div>
+                    <div className="absolute top-1/2 left-3 -translate-y-1/2 text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest z-10" style={{ writingMode: "vertical-rl", transform: "translateY(-50%) rotate(180deg)" }}>← Komitmen</div>
+                    
+                    {/* Grid lines (Makin Jelas / Kontras) */}
+                    <div className="absolute top-1/2 left-0 w-full h-[2px] bg-slate-500/80 z-0"></div>
+                    <div className="absolute top-0 left-1/2 w-[2px] h-full bg-slate-500/80 z-0"></div>
+                    
                     {/* Member dots */}
                     {members.map(m => {
                       const q = getQuadrant(m.competency, m.commitment);
@@ -432,7 +465,7 @@ export default function App() {
                       const bottom = ((m.commitment - 1) / 3) * 80 + 10;
                       return (
                         <button key={m.id} onClick={() => openEdit(m)}
-                          className="absolute group transition-transform hover:scale-125 z-10"
+                          className="absolute group transition-transform hover:scale-125 z-20"
                           style={{ left: `${left}%`, bottom: `${bottom}%`, transform: "translate(-50%, 50%)" }}
                           title={m.name}>
                           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-slate-950 shadow-xl flex items-center justify-center text-white text-xs sm:text-sm font-black relative"
@@ -481,7 +514,7 @@ export default function App() {
             </div>
           )}
 
-          {/* PLANS & GUIDE TABS */}
+          {/* PLANS TAB */}
           {tab === "plans" && (
             <div className="space-y-4">
                {members.map(m => (
@@ -492,7 +525,7 @@ export default function App() {
                         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white font-black sm:text-lg" style={{ background: getQuadrant(m.competency, m.commitment).color }}>
                           {m.name.charAt(0)}
                         </div>
-                        <div className="text-left font-black sm:text-lg">{m.name}</div>
+                        <div className="text-left font-black sm:text-lg lg:text-xl">{m.name}</div>
                       </div>
                       <ChevronDown className={`w-5 h-5 sm:w-6 sm:h-6 transition-transform ${expandedPlan === m.id ? "rotate-180" : ""}`} />
                     </button>
@@ -506,20 +539,118 @@ export default function App() {
             </div>
           )}
           
+          {/* GUIDE TAB (Diperbarui dengan Penjelasan DISC & Kuadran Lengkap) */}
           {tab === "guide" && (
-            <div className="space-y-4 sm:space-y-6">
-               {QUADRANT_GUIDE.map(g => (
-                <div key={g.q} className="bg-white rounded-2xl sm:rounded-3xl border border-slate-100 overflow-hidden shadow-sm text-slate-800">
-                  <div className="p-5 sm:p-6 flex items-center gap-4 font-black sm:text-lg" style={{ background: g.bg }}>
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white" style={{ background: g.color }}>{g.q}</div>
-                    {g.label}
+            <div className="space-y-10 sm:space-y-12 pb-8">
+              
+              {/* Intro Banner */}
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-400" />
+                  <span className="text-sm sm:text-lg font-black text-white uppercase tracking-widest">Panduan LeaderLens</span>
+                </div>
+                <p className="text-sm sm:text-base text-slate-400 leading-relaxed">
+                  LeaderLens dirancang berdasarkan metodologi manajemen SDM modern. Ia menggabungkan pemahaman gaya komunikasi dari <strong>Profil Perilaku DISC</strong> dengan diagnosis kinerja berbasis <strong>Matriks Skill vs Will (Kompetensi vs Komitmen)</strong>. Gunakan panduan ini untuk memahami cara mengelola setiap tipe anggota tim Anda.
+                </p>
+              </div>
+
+              {/* SECTION 1: Profil DISC */}
+              <section>
+                <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
+                  <Users className="w-6 h-6 text-slate-400" /> 1. Memahami Profil DISC
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  {/* D - Dominance */}
+                  <div className="bg-white rounded-2xl p-6 border-l-8 border-red-500 text-slate-800 shadow-sm">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-10 h-10 rounded-full bg-red-500 text-white font-black text-xl flex items-center justify-center">D</div>
+                      <div>
+                        <h4 className="font-black text-lg uppercase tracking-tight text-slate-900">Dominance</h4>
+                        <p className="text-xs font-bold text-red-600 uppercase tracking-wider">Fokus: Hasil & Kontrol</p>
+                      </div>
+                    </div>
+                    <ul className="text-sm text-slate-600 space-y-2 list-disc pl-4">
+                      <li>Sangat termotivasi oleh tantangan, pencapaian, dan otoritas.</li>
+                      <li>Mengambil keputusan dengan cepat dan berani mengambil risiko.</li>
+                      <li><strong>Cara Komunikasi:</strong> Bicaralah langsung ke inti masalah (to the point). Jangan bertele-tele atau menjelaskan detail yang tidak perlu.</li>
+                    </ul>
                   </div>
-                  <div className="p-5 sm:p-6 space-y-4 text-sm sm:text-base">
-                    <p><strong>Diagnosis:</strong> {g.diagnosis}</p>
-                    <p className="text-red-700 bg-red-50 p-4 rounded-xl"><strong>Kesalahan:</strong> {g.mistake}</p>
+
+                  {/* I - Influence */}
+                  <div className="bg-white rounded-2xl p-6 border-l-8 border-amber-400 text-slate-800 shadow-sm">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-10 h-10 rounded-full bg-amber-400 text-white font-black text-xl flex items-center justify-center">I</div>
+                      <div>
+                        <h4 className="font-black text-lg uppercase tracking-tight text-slate-900">Influence</h4>
+                        <p className="text-xs font-bold text-amber-600 uppercase tracking-wider">Fokus: Orang & Antusiasme</p>
+                      </div>
+                    </div>
+                    <ul className="text-sm text-slate-600 space-y-2 list-disc pl-4">
+                      <li>Termotivasi oleh pengakuan sosial, kerja tim, dan popularitas.</li>
+                      <li>Sangat persuasif, optimis, dan pandai mencairkan suasana.</li>
+                      <li><strong>Cara Komunikasi:</strong> Libatkan mereka secara emosional. Berikan apresiasi publik. Jangan langsung fokus pada angka tanpa basa-basi yang hangat.</li>
+                    </ul>
+                  </div>
+
+                  {/* S - Steadiness */}
+                  <div className="bg-white rounded-2xl p-6 border-l-8 border-emerald-500 text-slate-800 shadow-sm">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-10 h-10 rounded-full bg-emerald-500 text-white font-black text-xl flex items-center justify-center">S</div>
+                      <div>
+                        <h4 className="font-black text-lg uppercase tracking-tight text-slate-900">Steadiness</h4>
+                        <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider">Fokus: Kerja Sama & Konsistensi</p>
+                      </div>
+                    </div>
+                    <ul className="text-sm text-slate-600 space-y-2 list-disc pl-4">
+                      <li>Termotivasi oleh keamanan, harmoni, dan lingkungan yang stabil.</li>
+                      <li>Pendengar yang sangat baik, sabar, namun tidak menyukai perubahan mendadak.</li>
+                      <li><strong>Cara Komunikasi:</strong> Pendekatan harus santai dan ramah. Jika ada perubahan sistem/aturan, jelaskan alasannya secara bertahap dan logis.</li>
+                    </ul>
+                  </div>
+
+                  {/* C - Compliance */}
+                  <div className="bg-white rounded-2xl p-6 border-l-8 border-blue-500 text-slate-800 shadow-sm">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-10 h-10 rounded-full bg-blue-500 text-white font-black text-xl flex items-center justify-center">C</div>
+                      <div>
+                        <h4 className="font-black text-lg uppercase tracking-tight text-slate-900">Compliance</h4>
+                        <p className="text-xs font-bold text-blue-600 uppercase tracking-wider">Fokus: Akurasi & Kualitas</p>
+                      </div>
+                    </div>
+                    <ul className="text-sm text-slate-600 space-y-2 list-disc pl-4">
+                      <li>Termotivasi oleh keahlian, standar tinggi, dan logika.</li>
+                      <li>Sangat analitis, detail-oriented, namun terkadang terlalu perfeksionis.</li>
+                      <li><strong>Cara Komunikasi:</strong> Gunakan data, fakta, dan angka. Jangan berikan feedback kritis tanpa bukti tertulis atau metrik yang jelas.</li>
+                    </ul>
                   </div>
                 </div>
-               ))}
+              </section>
+
+              {/* SECTION 2: 4 Kuadran */}
+              <section>
+                <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
+                  <LayoutGrid className="w-6 h-6 text-slate-400" /> 2. Matriks Skill vs Will (4 Kuadran)
+                </h3>
+                <div className="space-y-4 sm:space-y-6">
+                   {QUADRANT_GUIDE.map(g => (
+                    <div key={g.q} className="bg-white rounded-2xl sm:rounded-3xl border border-slate-100 overflow-hidden shadow-sm text-slate-800">
+                      <div className="p-5 sm:p-6 flex items-center gap-4 font-black sm:text-xl lg:text-2xl" style={{ background: g.bg }}>
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white" style={{ background: g.color }}>{g.q}</div>
+                        {g.label}
+                      </div>
+                      <div className="p-5 sm:p-6 space-y-4 text-sm sm:text-base">
+                        <p><strong>Diagnosis:</strong> {g.diagnosis}</p>
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <p className="text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100"><strong>Akar Masalah (Root Cause):</strong><br/>{g.rootCause}</p>
+                          <p className="text-red-700 bg-red-50 p-4 rounded-xl border border-red-100"><strong>Kesalahan Manajer:</strong><br/>{g.mistake}</p>
+                        </div>
+                        <p className="text-indigo-800 bg-indigo-50 p-4 rounded-xl border border-indigo-100 font-medium"><strong>Prioritas Tindakan:</strong> {g.urgency}</p>
+                      </div>
+                    </div>
+                   ))}
+                </div>
+              </section>
+
             </div>
           )}
 
