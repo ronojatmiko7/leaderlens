@@ -13,14 +13,14 @@ const getQuadrant = (comp, comm) => {
   if (!hi(comp) && !hi(comm)) return { id: "Q1", label: "Critical Area",    color: "#EF4444", bg: "#FEF2F2", border: "#FECACA", text: "#991B1B", dot: "bg-red-500"    };
   if (!hi(comp) &&  hi(comm)) return { id: "Q2", label: "Potential Talent", color: "#F59E0B", bg: "#FFFBEB", border: "#FDE68A", text: "#92400E", dot: "bg-amber-500"  };
   if ( hi(comp) && !hi(comm)) return { id: "Q3", label: "Expert in Slump",  color: "#3B82F6", bg: "#EFF6FF", border: "#BFDBFE", text: "#1E40AF", dot: "bg-blue-500"   };
-  return                              { id: "Q4", label: "Star Performer",   color: "#10B981", bg: "#ECFDF5", border: "#A7F3D0", text: "#065F46", dot: "bg-emerald-500" };
+  return                                { id: "Q4", label: "Star Performer",   color: "#10B981", bg: "#ECFDF5", border: "#A7F3D0", text: "#065F46", dot: "bg-emerald-500" };
 };
 
 const DISC_META = {
   D: { label: "Dominance",   color: "#EF4444", bg: "bg-red-500",    light: "bg-red-50 text-red-700",   desc: "Fokus hasil & kontrol"        },
-  I: { label: "Influence",   color: "#F59E0B", bg: "bg-amber-400",  light: "bg-amber-50 text-amber-700", desc: "Fokus antusiasme & orang"   },
+  I: { label: "Influence",   color: "#F59E0B", bg: "bg-amber-400",   light: "bg-amber-50 text-amber-700", desc: "Fokus antusiasme & orang"   },
   S: { label: "Steadiness",  color: "#10B981", bg: "bg-emerald-500",light: "bg-emerald-50 text-emerald-700", desc: "Fokus kerja sama & sabar" },
-  C: { label: "Compliance",  color: "#3B82F6", bg: "bg-blue-500",   light: "bg-blue-50 text-blue-700", desc: "Fokus akurasi & kualitas"      },
+  C: { label: "Compliance",  color: "#3B82F6", bg: "bg-blue-500",    light: "bg-blue-50 text-blue-700", desc: "Fokus akurasi & kualitas"      },
 };
 
 const RATING_ANCHORS = {
@@ -347,6 +347,23 @@ export default function App() {
         * { -webkit-font-smoothing: antialiased; }
         .fade-in { animation: fadeIn 0.4s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* MODIFIKASI UKURAN FONT UNTUK DESKTOP (MD/LG BREAKPOINTS) */
+        @media (min-width: 1024px) {
+          .text-\[9px\] { font-size: 11px !important; }
+          .text-\[10px\] { font-size: 13px !important; }
+          .text-xs { font-size: 15px !important; }
+          .text-sm { font-size: 17px !important; }
+          .text-base { font-size: 19px !important; }
+          .text-lg { font-size: 22px !important; }
+          .text-xl { font-size: 26px !important; }
+          .text-2xl { font-size: 32px !important; }
+          
+          /* Adjust layout spacing slightly for larger fonts */
+          .p-5 { padding: 1.5rem !important; }
+          .p-8 { padding: 2.5rem !important; }
+          button { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
+        }
       `}</style>
 
       {/* Header */}
@@ -431,7 +448,7 @@ export default function App() {
                     <div className="absolute top-0 left-1/2 w-px h-full bg-slate-800"></div>
                     {/* Quadrant labels */}
                     {[
-                      { label: "Critical Area",    pos: "top-[75%] left-[25%]", color: "#EF4444" },
+                      { label: "Critical Area",     pos: "top-[75%] left-[25%]", color: "#EF4444" },
                       { label: "Potential Talent", pos: "top-[25%] left-[25%]", color: "#F59E0B" },
                       { label: "Expert in Slump",  pos: "top-[75%] left-[75%]", color: "#3B82F6" },
                       { label: "Star Performer",   pos: "top-[25%] left-[75%]", color: "#10B981" },
