@@ -3,7 +3,8 @@ import {
   Plus, Users, LayoutGrid, BookOpen, Trash2, Edit3, TrendingUp,
   Target, Award, X, PlusCircle, CheckCircle2, AlertTriangle,
   Wrench, ShieldAlert, MessageCircle, ChevronDown, Calendar,
-  BarChart3, Lightbulb, ArrowRight, Clock, RefreshCw, Info, Lock, Key
+  BarChart3, Lightbulb, ArrowRight, Clock, RefreshCw, Info, Lock, Key,
+  Printer, FileText, CheckCircle, XCircle
 } from "lucide-react";
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -16,11 +17,34 @@ const getQuadrant = (comp, comm) => {
   return                                { id: "Q4", label: "Star Performer",   color: "#10B981", bg: "#ECFDF5", border: "#A7F3D0", text: "#065F46", dot: "bg-emerald-500" };
 };
 
+const getDocumentTitle = (qId) => {
+  if (qId === "Q1") return "PERFORMANCE IMPROVEMENT PLAN (PIP)";
+  if (qId === "Q2") return "ACCELERATED DEVELOPMENT PLAN (ADP)";
+  if (qId === "Q3") return "RE-ENGAGEMENT & ALIGNMENT PLAN";
+  return "TALENT RETENTION & GROWTH PLAN";
+};
+
 const DISC_META = {
-  D: { label: "Dominance",   color: "#EF4444", bg: "bg-red-500",    light: "bg-red-50 text-red-700",   desc: "Fokus hasil & kontrol"        },
-  I: { label: "Influence",   color: "#F59E0B", bg: "bg-amber-400",   light: "bg-amber-50 text-amber-700", desc: "Fokus antusiasme & orang"   },
-  S: { label: "Steadiness",  color: "#10B981", bg: "bg-emerald-500",light: "bg-emerald-50 text-emerald-700", desc: "Fokus kerja sama & sabar" },
-  C: { label: "Compliance",  color: "#3B82F6", bg: "bg-blue-500",    light: "bg-blue-50 text-blue-700", desc: "Fokus akurasi & kualitas"      },
+  D: { 
+    label: "Dominance", color: "#EF4444", bg: "bg-red-500", light: "bg-red-50 text-red-700", desc: "Fokus hasil & kontrol",
+    strengths: "Eksekusi cepat, berani ambil risiko, mandiri, dan sangat berorientasi pada target akhir.",
+    weaknesses: "Sering terburu-buru, kurang sabar, cenderung mengabaikan detail, dan bisa terkesan otoriter."
+  },
+  I: { 
+    label: "Influence", color: "#F59E0B", bg: "bg-amber-400", light: "bg-amber-50 text-amber-700", desc: "Fokus antusiasme & orang",
+    strengths: "Komunikator ulung, antusias, mudah bergaul, dan sangat jago memotivasi energi tim.",
+    weaknesses: "Mudah terdistraksi, kurang teliti pada urusan detail/administrasi, dan kadang over-promising."
+  },
+  S: { 
+    label: "Steadiness", color: "#10B981", bg: "bg-emerald-500", light: "bg-emerald-50 text-emerald-700", desc: "Fokus kerja sama & sabar",
+    strengths: "Pemain tim yang loyal, pendengar yang baik, konsisten, dan selalu menciptakan harmoni.",
+    weaknesses: "Menghindari konflik, lambat beradaptasi pada perubahan mendadak, dan sulit berkata 'tidak'."
+  },
+  C: { 
+    label: "Compliance", color: "#3B82F6", bg: "bg-blue-500", light: "bg-blue-50 text-blue-700", desc: "Fokus akurasi & kualitas",
+    strengths: "Sangat teliti, analitis, memiliki standar kualitas tinggi, dan patuh pada sistem/prosedur.",
+    weaknesses: "Terlalu perfeksionis, lambat ambil keputusan jika data kurang (analysis paralysis), dan kaku."
+  },
 };
 
 const RATING_ANCHORS = {
@@ -64,7 +88,21 @@ const getDISCScript = (disc) => ({
 const getActionPlan = (m) => {
   const q = getQuadrant(m.competency, m.commitment);
   const script = getDISCScript(m.disc || "S");
+  const discData = DISC_META[m.disc || "S"];
   const plan = [];
+
+  plan.push({
+    type: "profile",
+    title: `Analisis Karakter (${discData.label})`,
+    color: discData.color,
+    bg: "#F8FAFC",
+    border: "#E2E8F0",
+    icon: "info",
+    items: [
+      `KELEBIHAN UTAMA: ${discData.strengths}`,
+      `POTENSI KEKURANGAN: ${discData.weaknesses}`
+    ],
+  });
 
   if (m.competency < 3) {
     plan.push({
@@ -106,7 +144,7 @@ const getActionPlan = (m) => {
   if (q.id === "Q1") {
     plan.push({
       type: "pip",
-      title: "Performance Improvement Plan",
+      title: "Prosedur PIP (Perhatian Khusus)",
       color: "#EF4444",
       bg: "#FEF2F2",
       border: "#FECACA",
@@ -123,7 +161,7 @@ const getActionPlan = (m) => {
   if (q.id === "Q3") {
     plan.push({
       type: "reengagement",
-      title: "Re-engagement Strategy",
+      title: "Strategi Re-engagement",
       color: "#3B82F6",
       bg: "#EFF6FF",
       border: "#BFDBFE",
@@ -140,7 +178,7 @@ const getActionPlan = (m) => {
   if (q.id === "Q4") {
     plan.push({
       type: "growth",
-      title: "Growth & Retention",
+      title: "Fokus Retensi & Growth",
       color: "#10B981",
       bg: "#ECFDF5",
       border: "#A7F3D0",
@@ -170,7 +208,7 @@ const teamHealthScore = (members) => {
 
 const formatDate = (ts) => {
   if (!ts) return null;
-  return new Date(ts).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
+  return new Date(ts).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
 };
 
 // ── sub-components ─────────────────────────────────────────────────────────
@@ -236,32 +274,6 @@ const NoteInput = ({ label, type, notes, onAdd, onUpdate, onRemove, prompt }) =>
     </div>
   </div>
 );
-
-const PlanCard = ({ item }) => {
-  const iconMap = {
-    wrench: <Wrench className="w-4 h-4 sm:w-5 sm:h-5" />,
-    message: <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />,
-    shield: <ShieldAlert className="w-4 h-4 sm:w-5 sm:h-5" />,
-    refresh: <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" />,
-    award: <Award className="w-4 h-4 sm:w-5 sm:h-5" />,
-  };
-  return (
-    <div className="rounded-2xl p-5 sm:p-6 border" style={{ background: item.bg, borderColor: item.border }}>
-      <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4" style={{ color: item.color }}>
-        {iconMap[item.icon]}
-        <span className="text-[11px] sm:text-sm font-black uppercase tracking-widest">{item.title}</span>
-      </div>
-      <ul className="space-y-2.5 sm:space-y-3">
-        {item.items.map((act, i) => (
-          <li key={i} className="flex gap-2.5 sm:gap-3 text-xs sm:text-sm leading-relaxed font-medium text-slate-700">
-            <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 mt-0.5 sm:mt-0" style={{ color: item.color }} />
-            {act}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
 
 const QUADRANT_GUIDE = [
   {
@@ -444,14 +456,16 @@ export default function App() {
     { id: "guide", label: "Panduan" },
   ];
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   if (!isMounted) return null;
 
-  // TAMPILKAN HALAMAN LOGIN JIKA BELUM TERVERIFIKASI
   if (!isAuthenticated) {
     return <LoginGate onLoginSuccess={() => setIsAuthenticated(true)} />;
   }
 
-  // JIKA SUDAH LOGIN, TAMPILKAN APLIKASI UTAMA
   return (
     <div className="min-h-screen bg-slate-950 text-white pb-24" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
       <style>{`
@@ -459,15 +473,39 @@ export default function App() {
         * { -webkit-font-smoothing: antialiased; }
         .fade-in { animation: fadeIn 0.4s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        /* Kustom scrollbar untuk estetika */
+        /* Kustom scrollbar */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* CSS KHUSUS UNTUK FITUR PRINT PDF */
+        @media print {
+          body { background: white !important; color: black !important; }
+          /* Sembunyikan semua UI aplikasi */
+          header, .hide-on-print { display: none !important; }
+          /* Hanya tampilkan area dokumen */
+          .print-area {
+            visibility: visible !important;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            box-shadow: none !important;
+            background: white !important;
+            color: black !important;
+          }
+          /* Paksa warna agar tercetak (untuk background kuadran/DISC) */
+          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          /* Reset margin halaman */
+          @page { margin: 1cm; }
+        }
       `}</style>
 
       {/* Header */}
-      <header className="border-b border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-40 bg-slate-950/95 backdrop-blur">
+      <header className="border-b border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-40 bg-slate-950/95 backdrop-blur hide-on-print">
         <div className="max-w-4xl lg:max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white flex items-center justify-center">
@@ -475,7 +513,7 @@ export default function App() {
             </div>
             <div>
               <div className="text-sm sm:text-base lg:text-xl font-black tracking-tight leading-none uppercase">LEADER<span className="text-slate-400">LENS</span></div>
-              <div className="text-[9px] sm:text-[11px] lg:text-xs text-slate-500 font-mono mt-0.5">People Diagnostics v8.0</div>
+              <div className="text-[9px] sm:text-[11px] lg:text-xs text-slate-500 font-mono mt-0.5">People Diagnostics Premium</div>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -493,10 +531,10 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-4xl lg:max-w-5xl mx-auto px-4 py-6">
+      <main className="max-w-4xl lg:max-w-5xl mx-auto px-4 py-6 hide-on-print">
         {/* Team Health Banner */}
         {health && (
-          <div className="mb-6 grid grid-cols-2 sm:grid-cols-4 gap-3 fade-in">
+          <div className="mb-6 grid grid-cols-2 sm:grid-cols-4 gap-3 fade-in hide-on-print">
             {Object.entries(health.dist).map(([qid, count]) => {
               const q = ["Q1","Q2","Q3","Q4"].map(id => {
                 const dummy = { Q1:{comp:1,comm:1}, Q2:{comp:1,comm:3}, Q3:{comp:3,comm:1}, Q4:{comp:3,comm:3} }[id];
@@ -516,7 +554,7 @@ export default function App() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-1 p-1 bg-slate-900 rounded-2xl mb-8 border border-slate-800 overflow-x-auto scrollbar-hide">
+        <div className="flex gap-1 p-1 bg-slate-900 rounded-2xl mb-8 border border-slate-800 overflow-x-auto scrollbar-hide hide-on-print">
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`flex-1 min-w-[80px] py-3 rounded-xl text-[10px] sm:text-xs lg:text-sm font-black uppercase tracking-widest transition-all ${tab === t.id ? "bg-white text-slate-900" : "text-slate-500 hover:text-slate-300"}`}>
@@ -527,7 +565,7 @@ export default function App() {
 
         <div className="fade-in" key={tab}>
 
-          {/* MATRIX TAB - LABEL DI LUAR KUADRAN */}
+          {/* MATRIX TAB */}
           {tab === "matrix" && (
             <div className="flex flex-col items-center gap-6">
               {members.length === 0 ? (
@@ -556,6 +594,31 @@ export default function App() {
                       {/* Grid lines */}
                       <div className="absolute top-1/2 left-0 w-full h-[2px] bg-slate-500/80 z-0"></div>
                       <div className="absolute top-0 left-1/2 w-[2px] h-full bg-slate-500/80 z-0"></div>
+                      
+                      {/* KETERANGAN KUADRAN BACKGROUND */}
+                      {/* Q2: Top Left */}
+                      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 text-center text-slate-700/50 z-0 pointer-events-none select-none flex flex-col items-center justify-center w-full">
+                        <div className="text-2xl sm:text-4xl font-black mb-1">Q2</div>
+                        <div className="text-[9px] sm:text-xs font-bold uppercase tracking-widest">Potential Talent</div>
+                      </div>
+                      
+                      {/* Q4: Top Right */}
+                      <div className="absolute top-1/4 left-3/4 -translate-x-1/2 -translate-y-1/2 text-center text-slate-700/50 z-0 pointer-events-none select-none flex flex-col items-center justify-center w-full">
+                        <div className="text-2xl sm:text-4xl font-black mb-1">Q4</div>
+                        <div className="text-[9px] sm:text-xs font-bold uppercase tracking-widest">Star Performer</div>
+                      </div>
+
+                      {/* Q1: Bottom Left */}
+                      <div className="absolute top-3/4 left-1/4 -translate-x-1/2 -translate-y-1/2 text-center text-slate-700/50 z-0 pointer-events-none select-none flex flex-col items-center justify-center w-full">
+                        <div className="text-[9px] sm:text-xs font-bold uppercase tracking-widest mb-1">Critical Area</div>
+                        <div className="text-2xl sm:text-4xl font-black">Q1</div>
+                      </div>
+
+                      {/* Q3: Bottom Right */}
+                      <div className="absolute top-3/4 left-3/4 -translate-x-1/2 -translate-y-1/2 text-center text-slate-700/50 z-0 pointer-events-none select-none flex flex-col items-center justify-center w-full">
+                        <div className="text-[9px] sm:text-xs font-bold uppercase tracking-widest mb-1">Expert in Slump</div>
+                        <div className="text-2xl sm:text-4xl font-black">Q3</div>
+                      </div>
                       
                       {/* Member dots */}
                       {members.map(m => {
@@ -621,32 +684,146 @@ export default function App() {
             </div>
           )}
 
-          {/* PLANS TAB */}
+          {/* ACTION PLANS TAB / DOKUMEN */}
           {tab === "plans" && (
             <div className="space-y-4">
-               {members.map(m => (
-                  <div key={m.id} className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-100 shadow-sm">
+               {members.map(m => {
+                  const q = getQuadrant(m.competency, m.commitment);
+                  return (
+                  <div key={m.id} className="bg-slate-900 rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-800 shadow-sm transition-all">
+                    {/* Header Akordion */}
                     <button onClick={() => setExpandedPlan(expandedPlan === m.id ? null : m.id)}
-                      className="w-full flex items-center justify-between p-5 sm:p-6 hover:bg-slate-50 transition-all text-slate-900">
+                      className="w-full flex items-center justify-between p-5 sm:p-6 hover:bg-slate-800 transition-all text-white">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white font-black sm:text-lg" style={{ background: getQuadrant(m.competency, m.commitment).color }}>
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white font-black sm:text-lg" style={{ background: q.color }}>
                           {m.name.charAt(0)}
                         </div>
-                        <div className="text-left font-black sm:text-lg lg:text-xl">{m.name}</div>
+                        <div className="text-left">
+                          <div className="font-black sm:text-lg lg:text-xl">{m.name}</div>
+                          <div className="text-[10px] sm:text-xs text-slate-400 mt-1 uppercase tracking-widest">{getDocumentTitle(q.id)}</div>
+                        </div>
                       </div>
-                      <ChevronDown className={`w-5 h-5 sm:w-6 sm:h-6 transition-transform ${expandedPlan === m.id ? "rotate-180" : ""}`} />
+                      <ChevronDown className={`w-5 h-5 sm:w-6 sm:h-6 text-slate-500 transition-transform ${expandedPlan === m.id ? "rotate-180" : ""}`} />
                     </button>
+                    
+                    {/* Kertas A4 View (Area yang di Print) */}
                     {expandedPlan === m.id && (
-                      <div className="px-5 pb-5 sm:px-6 sm:pb-6 space-y-4 border-t border-slate-100 pt-5 sm:pt-6">
-                        {getActionPlan(m).map((item, i) => <PlanCard key={i} item={item} />)}
+                      <div className="p-4 sm:p-8 bg-slate-950 border-t border-slate-800">
+                        
+                        {/* Tombol Print (Sembunyi saat di-print) */}
+                        <div className="flex justify-end mb-4 hide-on-print">
+                          <button onClick={handlePrint} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-colors">
+                            <Printer className="w-4 h-4" /> Simpan ke PDF
+                          </button>
+                        </div>
+
+                        {/* MOCKUP KERTAS A4 FORMAL */}
+                        <div className={`bg-white text-slate-900 rounded-sm shadow-2xl mx-auto p-8 sm:p-12 max-w-3xl print-area`}>
+                          
+                          {/* Kop Dokumen */}
+                          <div className="border-b-2 border-slate-900 pb-6 mb-8 text-center">
+                            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-tight text-slate-900 mb-2">
+                              {getDocumentTitle(q.id)}
+                            </h1>
+                            <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">
+                              Dokumen Konfidensial HR & Manajemen
+                            </p>
+                          </div>
+
+                          {/* Info Karyawan */}
+                          <div className="grid grid-cols-2 gap-4 mb-8 text-sm sm:text-base">
+                            <div>
+                              <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Nama Karyawan</p>
+                              <p className="font-black text-slate-900">{m.name}</p>
+                            </div>
+                            <div>
+                              <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Tanggal Dokumen</p>
+                              <p className="font-black text-slate-900">{formatDate(Date.now())}</p>
+                            </div>
+                            <div>
+                              <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Jabatan / Peran</p>
+                              <p className="font-black text-slate-900">{m.role || "-"}</p>
+                            </div>
+                            <div>
+                              <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Status Kuadran</p>
+                              <p className="font-black" style={{ color: q.color }}>{q.label} ({q.id})</p>
+                            </div>
+                          </div>
+
+                          {/* Poin-Poin Action Plan dipetakan ke format Dokumen */}
+                          <div className="space-y-8">
+                            {getActionPlan(m).map((item, idx) => (
+                              <div key={idx} className="break-inside-avoid">
+                                <h3 className="text-sm sm:text-base font-black uppercase tracking-wider text-slate-900 mb-3 flex items-center gap-2 border-b border-slate-200 pb-2">
+                                  <span className="w-6 h-6 rounded bg-slate-100 flex items-center justify-center text-xs">{idx + 1}</span>
+                                  {item.title}
+                                </h3>
+                                <ul className="space-y-2.5 pl-8">
+                                  {item.items.map((act, i) => (
+                                    <li key={i} className="text-sm sm:text-base text-slate-700 leading-relaxed list-disc">
+                                      {act}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Fakta Kinerja (Dari Input User) */}
+                          <div className="mt-8 break-inside-avoid border-t-2 border-dashed border-slate-200 pt-8">
+                            <h3 className="text-sm sm:text-base font-black uppercase tracking-wider text-slate-900 mb-4">Catatan Lampiran Observasi Manajer</h3>
+                            <div className="grid sm:grid-cols-2 gap-6">
+                              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Fakta Kompetensi (Skor: {m.competency}/4)</p>
+                                <ul className="list-disc pl-4 text-sm text-slate-700 space-y-1">
+                                  {m.competencyNotes.map((note, i) => <li key={i}>{note || "-"}</li>)}
+                                </ul>
+                              </div>
+                              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Fakta Komitmen (Skor: {m.commitment}/4)</p>
+                                <ul className="list-disc pl-4 text-sm text-slate-700 space-y-1">
+                                  {m.commitmentNotes.map((note, i) => <li key={i}>{note || "-"}</li>)}
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* KOLOM KOSONG: ACTION PLAN DISEPAKATI BERSAMA */}
+                          <div className="mt-8 break-inside-avoid border-t-2 border-slate-900 pt-8">
+                            <h3 className="text-sm sm:text-base font-black uppercase tracking-wider text-slate-900 mb-2">Rencana Tindakan Lanjutan (Disepakati Bersama)</h3>
+                            <p className="text-xs text-slate-500 mb-8 italic">Bagian ini diisi secara manual setelah melakukan diskusi 1-on-1 dengan karyawan untuk menyepakati target dan langkah konkret.</p>
+                            <div className="space-y-6">
+                              <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">1.</span></div>
+                              <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">2.</span></div>
+                              <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">3.</span></div>
+                              <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">4.</span></div>
+                            </div>
+                          </div>
+
+                          {/* Tanda Tangan */}
+                          <div className="mt-16 pt-8 grid grid-cols-2 gap-8 text-center break-inside-avoid">
+                            <div>
+                              <div className="border-b border-slate-400 h-16 mx-8"></div>
+                              <p className="mt-2 text-sm font-black text-slate-900">Manajer / Atasan</p>
+                              <p className="text-xs text-slate-500">Tanda tangan & Nama Jelas</p>
+                            </div>
+                            <div>
+                              <div className="border-b border-slate-400 h-16 mx-8"></div>
+                              <p className="mt-2 text-sm font-black text-slate-900">{m.name}</p>
+                              <p className="text-xs text-slate-500">Tanda tangan & Nama Jelas</p>
+                            </div>
+                          </div>
+
+                        </div>
                       </div>
                     )}
                   </div>
-               ))}
+                  );
+               })}
             </div>
           )}
           
-          {/* GUIDE TAB */}
+          {/* GUIDE TAB (URUTAN DIUBAH) */}
           {tab === "guide" && (
             <div className="space-y-10 sm:space-y-12 pb-8">
               
@@ -661,10 +838,111 @@ export default function App() {
                 </p>
               </div>
 
-              {/* SECTION 1: Profil DISC */}
+              {/* SECTION 1: PANDUAN PENGISIAN FORM (DIPINDAH KE ATAS) */}
               <section>
                 <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
-                  <Users className="w-6 h-6 text-slate-400" /> 1. Memahami Profil DISC
+                  <Edit3 className="w-6 h-6 text-slate-400" /> 1. Cara Mengisi Form Penilaian
+                </h3>
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8 space-y-8">
+                  
+                  {/* Panduan Kompetensi & Komitmen */}
+                  <div className="grid sm:grid-cols-2 gap-8">
+                    <div>
+                      <h4 className="font-black text-indigo-400 uppercase tracking-widest text-sm mb-3">Penilaian Kompetensi (Skill)</h4>
+                      <p className="text-sm text-slate-400 leading-relaxed mb-4">
+                        Nilai kemampuan teknis karyawan dalam menjalankan <strong>tugas utama</strong> mereka saat ini. Jangan nilai potensi masa depan, nilailah apa yang bisa mereka lakukan hari ini.
+                      </p>
+                      <ul className="text-sm text-slate-300 space-y-2">
+                        <li><strong>1:</strong> Sering salah, sangat bergantung pada bantuan orang lain.</li>
+                        <li><strong>2:</strong> Bisa melakukan tugas dasar, tapi tugas kompleks harus dibimbing.</li>
+                        <li><strong>3:</strong> Mandiri, jarang membuat kesalahan fatal.</li>
+                        <li><strong>4:</strong> Ahli, bisa bekerja lebih cepat dari target dan bisa mengajari junior.</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-black text-amber-400 uppercase tracking-widest text-sm mb-3">Penilaian Komitmen (Will)</h4>
+                      <p className="text-sm text-slate-400 leading-relaxed mb-4">
+                        Nilai motivasi, rasa tanggung jawab, dan inisiatif karyawan. Apakah mereka peduli dengan hasil kerja mereka?
+                      </p>
+                      <ul className="text-sm text-slate-300 space-y-2">
+                        <li><strong>1:</strong> Sering menunda, banyak alasan, terlihat tidak peduli.</li>
+                        <li><strong>2:</strong> Bekerja seadanya (bare minimum), tidak mau mengambil tugas ekstra.</li>
+                        <li><strong>3:</strong> Rajin, menyelesaikan tugas tepat waktu tanpa perlu ditagih.</li>
+                        <li><strong>4:</strong> Proaktif mencari solusi, antusias, menularkan semangat positif.</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-slate-800 pt-8"></div>
+
+                  {/* Panduan Menulis Bukti Perilaku (Fakta vs Asumsi) */}
+                  <div>
+                    <h4 className="font-black text-white uppercase tracking-widest text-sm mb-3 flex items-center gap-2">
+                      <Target className="w-5 h-5 text-emerald-400" /> Cara Menulis "Bukti Perilaku"
+                    </h4>
+                    <p className="text-sm text-slate-400 leading-relaxed mb-6">
+                      Kolom Bukti Perilaku <strong>sangat krusial</strong> karena tulisan Anda akan dicetak ke dalam Dokumen Action Plan (PDF). <strong>Gunakan FAKTA, bukan OPINI.</strong> Fakta bisa diukur dan diamati, opini bisa diperdebatkan.
+                    </p>
+
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      {/* Contoh Buruk */}
+                      <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-5">
+                        <div className="flex items-center gap-2 text-red-400 font-bold mb-3">
+                          <XCircle className="w-5 h-5" /> SALAH (Berbasis Opini)
+                        </div>
+                        <ul className="text-sm text-slate-300 space-y-3">
+                          <li>"Dia itu orangnya pemalas banget."</li>
+                          <li>"Kerjaannya nggak pernah bener."</li>
+                          <li>"Kelihatannya dia nggak niat kerja."</li>
+                        </ul>
+                      </div>
+                      
+                      {/* Contoh Baik */}
+                      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-5">
+                        <div className="flex items-center gap-2 text-emerald-400 font-bold mb-3">
+                          <CheckCircle className="w-5 h-5" /> BENAR (Berbasis Fakta)
+                        </div>
+                        <ul className="text-sm text-slate-300 space-y-3">
+                          <li>"Terlambat mengumpulkan laporan mingguan sebanyak 3 kali bulan ini."</li>
+                          <li>"Terdapat 5 kesalahan input data pada laporan Q3."</li>
+                          <li>"Menolak saat diminta membantu proyek X pada hari Selasa."</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </section>
+
+              {/* SECTION 2: 4 Kuadran */}
+              <section>
+                <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
+                  <LayoutGrid className="w-6 h-6 text-slate-400" /> 2. Matriks Skill vs Will (4 Kuadran)
+                </h3>
+                <div className="space-y-4 sm:space-y-6">
+                   {QUADRANT_GUIDE.map(g => (
+                    <div key={g.q} className="bg-white rounded-2xl sm:rounded-3xl border border-slate-100 overflow-hidden shadow-sm text-slate-800">
+                      <div className="p-5 sm:p-6 flex items-center gap-4 font-black sm:text-xl lg:text-2xl" style={{ background: g.bg }}>
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white" style={{ background: g.color }}>{g.q}</div>
+                        {g.label}
+                      </div>
+                      <div className="p-5 sm:p-6 space-y-4 text-sm sm:text-base">
+                        <p><strong>Diagnosis:</strong> {g.diagnosis}</p>
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <p className="text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100"><strong>Akar Masalah (Root Cause):</strong><br/>{g.rootCause}</p>
+                          <p className="text-red-700 bg-red-50 p-4 rounded-xl border border-red-100"><strong>Kesalahan Manajer:</strong><br/>{g.mistake}</p>
+                        </div>
+                        <p className="text-indigo-800 bg-indigo-50 p-4 rounded-xl border border-indigo-100 font-medium"><strong>Prioritas Tindakan:</strong> {g.urgency}</p>
+                      </div>
+                    </div>
+                   ))}
+                </div>
+              </section>
+
+              {/* SECTION 3: Profil DISC (DIPINDAH KE BAWAH) */}
+              <section>
+                <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
+                  <Users className="w-6 h-6 text-slate-400" /> 3. Memahami Profil DISC
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   {/* D - Dominance */}
@@ -733,42 +1011,16 @@ export default function App() {
                 </div>
               </section>
 
-              {/* SECTION 2: 4 Kuadran */}
-              <section>
-                <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
-                  <LayoutGrid className="w-6 h-6 text-slate-400" /> 2. Matriks Skill vs Will (4 Kuadran)
-                </h3>
-                <div className="space-y-4 sm:space-y-6">
-                   {QUADRANT_GUIDE.map(g => (
-                    <div key={g.q} className="bg-white rounded-2xl sm:rounded-3xl border border-slate-100 overflow-hidden shadow-sm text-slate-800">
-                      <div className="p-5 sm:p-6 flex items-center gap-4 font-black sm:text-xl lg:text-2xl" style={{ background: g.bg }}>
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white" style={{ background: g.color }}>{g.q}</div>
-                        {g.label}
-                      </div>
-                      <div className="p-5 sm:p-6 space-y-4 text-sm sm:text-base">
-                        <p><strong>Diagnosis:</strong> {g.diagnosis}</p>
-                        <div className="grid sm:grid-cols-2 gap-4">
-                          <p className="text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100"><strong>Akar Masalah (Root Cause):</strong><br/>{g.rootCause}</p>
-                          <p className="text-red-700 bg-red-50 p-4 rounded-xl border border-red-100"><strong>Kesalahan Manajer:</strong><br/>{g.mistake}</p>
-                        </div>
-                        <p className="text-indigo-800 bg-indigo-50 p-4 rounded-xl border border-indigo-100 font-medium"><strong>Prioritas Tindakan:</strong> {g.urgency}</p>
-                      </div>
-                    </div>
-                   ))}
-                </div>
-              </section>
-
             </div>
           )}
 
         </div>
       </main>
 
-      {/* Modal - SCROLLABLE & PROPORTIONAL */}
+      {/* Modal Input Form */}
       {modal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-6 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white w-full h-full sm:h-auto sm:max-h-[90vh] max-w-2xl rounded-none sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden">
-            {/* Modal Header - Fixed/Sticky */}
             <div className="px-6 py-5 sm:px-8 border-b border-slate-100 flex justify-between items-center bg-white z-10 flex-shrink-0 shadow-sm">
               <h2 className="text-xl sm:text-2xl font-black text-slate-900">{editId ? "Edit Mapping" : "Mapping Baru"}</h2>
               <button onClick={closeModal} className="p-2 sm:p-2.5 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors">
@@ -776,41 +1028,31 @@ export default function App() {
               </button>
             </div>
             
-            {/* Modal Body - Scrollable Area */}
             <div className="flex-1 overflow-y-auto custom-scrollbar p-6 sm:p-8">
               <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-10">
-                
-                {/* Name & Role */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <input required className="w-full px-4 py-3 sm:py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm sm:text-base font-bold outline-none text-slate-900 focus:ring-2 focus:ring-slate-900 placeholder:text-slate-400"
                     placeholder="Nama Anggota" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
                   <input className="w-full px-4 py-3 sm:py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm sm:text-base font-bold outline-none text-slate-900 focus:ring-2 focus:ring-slate-900 placeholder:text-slate-400"
                     placeholder="Jabatan" value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} />
                 </div>
-
                 <DISCSelector value={form.disc} onChange={v => setForm({ ...form, disc: v })} />
-
-                {/* Competency & Commitment Rows */}
                 <div className="space-y-8 sm:space-y-10 border-t border-slate-100 pt-8 sm:pt-10">
                   <div className="space-y-5">
                     <RatingSelector label="Kompetensi" dim="competency" value={form.competency} onChange={v => setForm({ ...form, competency: v })} />
                     <NoteInput label="Bukti Kompetensi" type="competencyNotes" notes={form.competencyNotes} onAdd={addNote} onUpdate={updateNote} onRemove={removeNote} prompt="Bukti perilaku spesifik?" />
                   </div>
-                  
                   <div className="space-y-5 border-t border-slate-100 pt-8 sm:pt-10">
                     <RatingSelector label="Komitmen" dim="commitment" value={form.commitment} onChange={v => setForm({ ...form, commitment: v })} />
                     <NoteInput label="Bukti Komitmen" type="commitmentNotes" notes={form.commitmentNotes} onAdd={addNote} onUpdate={updateNote} onRemove={removeNote} prompt="Bukti motivasi spesifik?" />
                   </div>
                 </div>
-
-                {/* Submit Button */}
                 <div className="pt-4">
                   <button type="submit"
                     className="w-full bg-slate-900 text-white py-4 sm:py-5 rounded-2xl font-black text-sm sm:text-base tracking-widest uppercase hover:bg-slate-800 active:scale-[0.98] transition-all shadow-xl">
                     Simpan Analisis
                   </button>
                 </div>
-
               </form>
             </div>
           </div>
