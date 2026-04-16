@@ -437,7 +437,7 @@ export default function App() {
 
         <div className="fade-in" key={tab}>
 
-          {/* MATRIX TAB */}
+          {/* MATRIX TAB - DIPERBARUI: LABEL DI LUAR KUADRAN */}
           {tab === "matrix" && (
             <div className="flex flex-col items-center gap-6">
               {members.length === 0 ? (
@@ -448,35 +448,52 @@ export default function App() {
                   </button>
                 </div>
               ) : (
-                <>
-                  <div className="w-full max-w-lg aspect-square relative bg-slate-900 rounded-3xl sm:rounded-[32px] border border-slate-800 overflow-hidden shadow-2xl">
-                    {/* Axis labels */}
-                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest z-10">Kompetensi →</div>
-                    <div className="absolute top-1/2 left-3 -translate-y-1/2 text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest z-10" style={{ writingMode: "vertical-rl", transform: "translateY(-50%) rotate(180deg)" }}>← Komitmen</div>
-                    
-                    {/* Grid lines (Makin Jelas / Kontras) */}
-                    <div className="absolute top-1/2 left-0 w-full h-[2px] bg-slate-500/80 z-0"></div>
-                    <div className="absolute top-0 left-1/2 w-[2px] h-full bg-slate-500/80 z-0"></div>
-                    
-                    {/* Member dots */}
-                    {members.map(m => {
-                      const q = getQuadrant(m.competency, m.commitment);
-                      const left = ((m.competency - 1) / 3) * 80 + 10;
-                      const bottom = ((m.commitment - 1) / 3) * 80 + 10;
-                      return (
-                        <button key={m.id} onClick={() => openEdit(m)}
-                          className="absolute group transition-transform hover:scale-125 z-20"
-                          style={{ left: `${left}%`, bottom: `${bottom}%`, transform: "translate(-50%, 50%)" }}
-                          title={m.name}>
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-slate-950 shadow-xl flex items-center justify-center text-white text-xs sm:text-sm font-black relative"
-                            style={{ background: q.color }}>
-                            {m.name.charAt(0)}
-                          </div>
-                        </button>
-                      );
-                    })}
+                <div className="w-full max-w-lg lg:max-w-2xl flex gap-2 sm:gap-4 mt-4">
+                  {/* Y Axis Container */}
+                  <div className="flex items-center">
+                    <span 
+                      className="text-[10px] sm:text-xs lg:text-sm font-black text-slate-400 uppercase tracking-widest whitespace-nowrap" 
+                      style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
+                      ← Komitmen
+                    </span>
                   </div>
-                </>
+
+                  {/* Matrix Box + X Axis Container */}
+                  <div className="flex-1 flex flex-col gap-2 sm:gap-4">
+                    {/* Matrix Square */}
+                    <div className="w-full aspect-square relative bg-slate-900 rounded-3xl sm:rounded-[32px] border border-slate-800 overflow-hidden shadow-2xl">
+                      
+                      {/* Grid lines (Makin Jelas / Kontras) */}
+                      <div className="absolute top-1/2 left-0 w-full h-[2px] bg-slate-500/80 z-0"></div>
+                      <div className="absolute top-0 left-1/2 w-[2px] h-full bg-slate-500/80 z-0"></div>
+                      
+                      {/* Member dots */}
+                      {members.map(m => {
+                        const q = getQuadrant(m.competency, m.commitment);
+                        const left = ((m.competency - 1) / 3) * 80 + 10;
+                        const bottom = ((m.commitment - 1) / 3) * 80 + 10;
+                        return (
+                          <button key={m.id} onClick={() => openEdit(m)}
+                            className="absolute group transition-transform hover:scale-125 z-20"
+                            style={{ left: `${left}%`, bottom: `${bottom}%`, transform: "translate(-50%, 50%)" }}
+                            title={m.name}>
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-slate-950 shadow-xl flex items-center justify-center text-white text-xs sm:text-sm font-black relative"
+                              style={{ background: q.color }}>
+                              {m.name.charAt(0)}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    
+                    {/* X Axis Label */}
+                    <div className="text-center">
+                      <span className="text-[10px] sm:text-xs lg:text-sm font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">
+                        Kompetensi →
+                      </span>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
           )}
@@ -539,7 +556,7 @@ export default function App() {
             </div>
           )}
           
-          {/* GUIDE TAB (Diperbarui dengan Penjelasan DISC & Kuadran Lengkap) */}
+          {/* GUIDE TAB */}
           {tab === "guide" && (
             <div className="space-y-10 sm:space-y-12 pb-8">
               
