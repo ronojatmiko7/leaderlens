@@ -348,21 +348,30 @@ export default function App() {
         .fade-in { animation: fadeIn 0.4s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* MODIFIKASI UKURAN FONT UNTUK DESKTOP (MD/LG BREAKPOINTS) */
+        /* OVERRIDE UKURAN FONT DESKTOP SECARA AGRESIF */
         @media (min-width: 1024px) {
-          .text-\[9px\] { font-size: 11px !important; }
-          .text-\[10px\] { font-size: 13px !important; }
-          .text-xs { font-size: 15px !important; }
-          .text-sm { font-size: 17px !important; }
-          .text-base { font-size: 19px !important; }
-          .text-lg { font-size: 22px !important; }
-          .text-xl { font-size: 26px !important; }
-          .text-2xl { font-size: 32px !important; }
+          /* Targeting arbitrary Tailwind classes in JSX */
+          .text-\[7px\] { font-size: 14px !important; }
+          .text-\[8px\] { font-size: 15px !important; }
+          .text-\[9px\] { font-size: 16px !important; }
+          .text-\[10px\] { font-size: 18px !important; }
+          .text-\[11px\] { font-size: 18px !important; }
           
-          /* Adjust layout spacing slightly for larger fonts */
-          .p-5 { padding: 1.5rem !important; }
-          .p-8 { padding: 2.5rem !important; }
-          button { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
+          /* Standard classes scaling */
+          .text-xs { font-size: 18px !important; }
+          .text-sm { font-size: 20px !important; }
+          .text-base { font-size: 22px !important; }
+          .text-lg { font-size: 24px !important; }
+          .text-xl { font-size: 30px !important; }
+          .text-2xl { font-size: 38px !important; }
+          
+          /* Layout adjustments for bigger fonts */
+          header .text-sm { font-size: 24px !important; } /* Logo text */
+          .max-w-4xl { max-width: 1200px !important; }
+          .grid-cols-4 { gap: 1rem !important; }
+          .p-5 { padding: 2rem !important; }
+          .p-8 { padding: 3rem !important; }
+          input, textarea { font-size: 18px !important; padding: 1rem !important; }
         }
       `}</style>
 
