@@ -745,4 +745,398 @@ export default function App() {
 
           {/* ACTION PLANS TAB / DOKUMEN */}
           {tab === "plans" && (
-            <div className="space-
+            <div className="space-y-4">
+               {members.map(m => {
+                  const q = getQuadrant(m.competency, m.commitment);
+                  return (
+                  <div key={m.id} className={`bg-slate-900 rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-800 shadow-sm transition-all ${expandedPlan !== m.id ? 'hide-on-print' : ''}`}>
+                    {/* Header Akordion - Disembunyikan saat print */}
+                    <button onClick={() => setExpandedPlan(expandedPlan === m.id ? null : m.id)}
+                      className="w-full flex items-center justify-between p-5 sm:p-6 hover:bg-slate-800 transition-all text-white hide-on-print">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white font-black sm:text-lg" style={{ background: q.color }}>
+                          {m.name.charAt(0)}
+                        </div>
+                        <div className="text-left">
+                          <div className="font-black sm:text-lg lg:text-xl">{m.name}</div>
+                          <div className="text-[10px] sm:text-xs text-slate-400 mt-1 uppercase tracking-widest">{getDocumentTitle(q.id)}</div>
+                        </div>
+                      </div>
+                      <ChevronDown className={`w-5 h-5 sm:w-6 sm:h-6 text-slate-500 transition-transform ${expandedPlan === m.id ? "rotate-180" : ""}`} />
+                    </button>
+                    
+                    {/* Kertas A4 View (Area yang di Print) */}
+                    {expandedPlan === m.id && (
+                      <div className="p-4 sm:p-8 bg-slate-950 border-t border-slate-800">
+                        
+                        {/* Tombol Print (Sembunyi saat di-print) */}
+                        <div className="flex justify-end mb-4 hide-on-print">
+                          <button onClick={handlePrint} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-colors">
+                            <Printer className="w-4 h-4" /> Simpan ke PDF
+                          </button>
+                        </div>
+
+                        {/* MOCKUP KERTAS A4 FORMAL - INI AREA YANG AKAN MUNCUL SAAT PRINT */}
+                        <div className={`bg-white text-slate-900 rounded-sm shadow-2xl mx-auto p-8 sm:p-12 max-w-3xl print-area`}>
+                          
+                          {/* Kop Dokumen */}
+                          <div className="border-b-2 border-slate-900 pb-6 mb-8 text-center">
+                            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-tight text-slate-900 mb-2">
+                              {getDocumentTitle(q.id)}
+                            </h1>
+                            <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">
+                              Dokumen Konfidensial HR & Manajemen
+                            </p>
+                          </div>
+
+                          {/* Info Karyawan */}
+                          <div className="grid grid-cols-2 gap-4 mb-8 text-sm sm:text-base">
+                            <div>
+                              <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Nama Karyawan</p>
+                              <p className="font-black text-slate-900">{m.name}</p>
+                            </div>
+                            <div>
+                              <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Tanggal Dokumen</p>
+                              <p className="font-black text-slate-900">{formatDate(Date.now())}</p>
+                            </div>
+                            <div>
+                              <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Jabatan / Peran</p>
+                              <p className="font-black text-slate-900">{m.role || "-"}</p>
+                            </div>
+                            <div>
+                              <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Status Kuadran</p>
+                              <p className="font-black" style={{ color: q.color }}>{q.label} ({q.id})</p>
+                            </div>
+                          </div>
+
+                          {/* Poin-Poin Action Plan dipetakan ke format Dokumen */}
+                          <div className="space-y-8">
+                            {getActionPlan(m).map((item, idx) => (
+                              <div key={idx} className="break-inside-avoid">
+                                <h3 className="text-sm sm:text-base font-black uppercase tracking-wider text-slate-900 mb-3 flex items-center gap-2 border-b border-slate-200 pb-2">
+                                  <span className="w-6 h-6 rounded bg-slate-100 flex items-center justify-center text-xs">{idx + 1}</span>
+                                  {item.title}
+                                </h3>
+                                <ul className="space-y-2.5 pl-8">
+                                  {item.items.map((act, i) => (
+                                    <li key={i} className="text-sm sm:text-base text-slate-700 leading-relaxed list-disc">
+                                      {act}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Fakta Kinerja (Dari Input User) */}
+                          <div className="mt-8 break-inside-avoid border-t-2 border-dashed border-slate-200 pt-8">
+                            <h3 className="text-sm sm:text-base font-black uppercase tracking-wider text-slate-900 mb-4">Catatan Lampiran Observasi Manajer</h3>
+                            <div className="grid sm:grid-cols-2 gap-6">
+                              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Fakta Kompetensi (Skor: {m.competency}/4)</p>
+                                <ul className="list-disc pl-4 text-sm text-slate-700 space-y-1">
+                                  {m.competencyNotes.map((note, i) => <li key={i}>{note || "-"}</li>)}
+                                </ul>
+                              </div>
+                              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Fakta Komitmen (Skor: {m.commitment}/4)</p>
+                                <ul className="list-disc pl-4 text-sm text-slate-700 space-y-1">
+                                  {m.commitmentNotes.map((note, i) => <li key={i}>{note || "-"}</li>)}
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* KOLOM KOSONG: ACTION PLAN DISEPAKATI BERSAMA */}
+                          <div className="mt-8 break-inside-avoid border-t-2 border-slate-900 pt-8">
+                            <h3 className="text-sm sm:text-base font-black uppercase tracking-wider text-slate-900 mb-2">Rencana Tindakan Lanjutan (Disepakati Bersama)</h3>
+                            <p className="text-xs text-slate-500 mb-8 italic">Bagian ini diisi secara manual setelah melakukan diskusi 1-on-1 dengan karyawan untuk menyepakati target dan langkah konkret.</p>
+                            <div className="space-y-6">
+                              <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">1.</span></div>
+                              <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">2.</span></div>
+                              <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">3.</span></div>
+                              <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">4.</span></div>
+                            </div>
+                          </div>
+
+                          {/* Tanda Tangan */}
+                          <div className="mt-16 pt-8 grid grid-cols-2 gap-8 text-center break-inside-avoid">
+                            <div>
+                              <div className="border-b border-slate-400 h-16 mx-8"></div>
+                              <p className="mt-2 text-sm font-black text-slate-900">Manajer / Atasan</p>
+                              <p className="text-xs text-slate-500">Tanda tangan & Nama Jelas</p>
+                            </div>
+                            <div>
+                              <div className="border-b border-slate-400 h-16 mx-8"></div>
+                              <p className="mt-2 text-sm font-black text-slate-900">{m.name}</p>
+                              <p className="text-xs text-slate-500">Tanda tangan & Nama Jelas</p>
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  );
+               })}
+            </div>
+          )}
+          
+          {/* GUIDE TAB (URUTAN DIUBAH) */}
+          {tab === "guide" && (
+            <div className="space-y-10 sm:space-y-12 pb-8">
+              
+              {/* Intro Banner */}
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-400" />
+                  <span className="text-sm sm:text-lg font-black text-white uppercase tracking-widest">Panduan LeaderLens</span>
+                </div>
+                <p className="text-sm sm:text-base text-slate-400 leading-relaxed">
+                  LeaderLens dirancang berdasarkan metodologi manajemen SDM modern. Ia menggabungkan pemahaman gaya komunikasi dari <strong>Profil Perilaku DISC</strong> dengan diagnosis kinerja berbasis <strong>Matriks Skill vs Will (Kompetensi vs Komitmen)</strong>. Gunakan panduan ini untuk memahami cara mengelola setiap tipe anggota tim Anda.
+                </p>
+              </div>
+
+              {/* SECTION 1: PANDUAN PENGISIAN FORM */}
+              <section>
+                <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
+                  <Edit3 className="w-6 h-6 text-slate-400" /> 1. Cara Mengisi Form Penilaian
+                </h3>
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8 space-y-8">
+                  
+                  {/* Panduan Kompetensi & Komitmen */}
+                  <div className="grid sm:grid-cols-2 gap-8">
+                    <div>
+                      <h4 className="font-black text-indigo-400 uppercase tracking-widest text-sm mb-3">Penilaian Kompetensi (Skill)</h4>
+                      <p className="text-sm text-slate-400 leading-relaxed mb-4">
+                        Nilai kemampuan teknis karyawan dalam menjalankan <strong>tugas utama</strong> mereka saat ini. Jangan nilai potensi masa depan, nilailah apa yang bisa mereka lakukan hari ini.
+                      </p>
+                      <ul className="text-sm text-slate-300 space-y-2">
+                        <li><strong>1:</strong> Sering salah, sangat bergantung pada bantuan orang lain.</li>
+                        <li><strong>2:</strong> Bisa melakukan tugas dasar, tapi tugas kompleks harus dibimbing.</li>
+                        <li><strong>3:</strong> Mandiri, jarang membuat kesalahan fatal.</li>
+                        <li><strong>4:</strong> Ahli, bisa bekerja lebih cepat dari target dan bisa mengajari junior.</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-black text-amber-400 uppercase tracking-widest text-sm mb-3">Penilaian Komitmen (Will)</h4>
+                      <p className="text-sm text-slate-400 leading-relaxed mb-4">
+                        Nilai motivasi, rasa tanggung jawab, dan inisiatif karyawan. Apakah mereka peduli dengan hasil kerja mereka?
+                      </p>
+                      <ul className="text-sm text-slate-300 space-y-2">
+                        <li><strong>1:</strong> Sering menunda, banyak alasan, terlihat tidak peduli.</li>
+                        <li><strong>2:</strong> Bekerja seadanya (bare minimum), tidak mau mengambil tugas ekstra.</li>
+                        <li><strong>3:</strong> Rajin, menyelesaikan tugas tepat waktu tanpa perlu ditagih.</li>
+                        <li><strong>4:</strong> Proaktif mencari solusi, antusias, menularkan semangat positif.</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-slate-800 pt-8"></div>
+
+                  {/* Panduan Menulis Bukti Perilaku */}
+                  <div>
+                    <h4 className="font-black text-white uppercase tracking-widest text-sm mb-3 flex items-center gap-2">
+                      <Target className="w-5 h-5 text-emerald-400" /> Cara Menulis "Bukti Perilaku"
+                    </h4>
+                    <p className="text-sm text-slate-400 leading-relaxed mb-6">
+                      Kolom Bukti Perilaku <strong>sangat krusial</strong> karena tulisan Anda akan dicetak ke dalam Dokumen Action Plan (PDF). <strong>Gunakan FAKTA, bukan OPINI.</strong> Fakta bisa diukur dan diamati, opini bisa diperdebatkan.
+                    </p>
+
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      {/* Contoh Buruk */}
+                      <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-5">
+                        <div className="flex items-center gap-2 text-red-400 font-bold mb-3">
+                          <XCircle className="w-5 h-5" /> SALAH (Berbasis Opini)
+                        </div>
+                        <ul className="text-sm text-slate-300 space-y-3">
+                          <li>"Dia itu orangnya pemalas banget."</li>
+                          <li>"Kerjaannya nggak pernah bener."</li>
+                          <li>"Kelihatannya dia nggak niat kerja."</li>
+                        </ul>
+                      </div>
+                      
+                      {/* Contoh Baik */}
+                      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-5">
+                        <div className="flex items-center gap-2 text-emerald-400 font-bold mb-3">
+                          <CheckCircle className="w-5 h-5" /> BENAR (Berbasis Fakta)
+                        </div>
+                        <ul className="text-sm text-slate-300 space-y-3">
+                          <li>"Terlambat mengumpulkan laporan mingguan sebanyak 3 kali bulan ini."</li>
+                          <li>"Terdapat 5 kesalahan input data pada laporan Q3."</li>
+                          <li>"Menolak saat diminta membantu proyek X pada hari Selasa."</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </section>
+
+              {/* SECTION 2: 4 Kuadran */}
+              <section>
+                <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
+                  <LayoutGrid className="w-6 h-6 text-slate-400" /> 2. Matriks Skill vs Will (4 Kuadran)
+                </h3>
+                <div className="space-y-4 sm:space-y-6">
+                   {QUADRANT_GUIDE.map(g => (
+                    <div key={g.q} className="bg-white rounded-2xl sm:rounded-3xl border border-slate-100 overflow-hidden shadow-sm text-slate-800">
+                      <div className="p-5 sm:p-6 flex items-center gap-4 font-black sm:text-xl lg:text-2xl" style={{ background: g.bg }}>
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white" style={{ background: g.color }}>{g.q}</div>
+                        {g.label}
+                      </div>
+                      <div className="p-5 sm:p-6 space-y-4 text-sm sm:text-base">
+                        <p><strong>Diagnosis:</strong> {g.diagnosis}</p>
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <p className="text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100"><strong>Akar Masalah (Root Cause):</strong><br/>{g.rootCause}</p>
+                          <p className="text-red-700 bg-red-50 p-4 rounded-xl border border-red-100"><strong>Kesalahan Manajer:</strong><br/>{g.mistake}</p>
+                        </div>
+                        <p className="text-indigo-800 bg-indigo-50 p-4 rounded-xl border border-indigo-100 font-medium"><strong>Prioritas Tindakan:</strong> {g.urgency}</p>
+                      </div>
+                    </div>
+                   ))}
+                </div>
+              </section>
+
+              {/* SECTION 3: Profil DISC */}
+              <section>
+                <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
+                  <Users className="w-6 h-6 text-slate-400" /> 3. Memahami Profil DISC
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  {/* D - Dominance */}
+                  <div className="bg-white rounded-2xl p-6 border-l-8 border-red-500 text-slate-800 shadow-sm">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-10 h-10 rounded-full bg-red-500 text-white font-black text-xl flex items-center justify-center">D</div>
+                      <div>
+                        <h4 className="font-black text-lg uppercase tracking-tight text-slate-900">Dominance</h4>
+                        <p className="text-xs font-bold text-red-600 uppercase tracking-wider">Fokus: Hasil & Kontrol</p>
+                      </div>
+                    </div>
+                    <ul className="text-sm text-slate-600 space-y-2 list-disc pl-4">
+                      <li>Sangat termotivasi oleh tantangan, pencapaian, dan otoritas.</li>
+                      <li>Mengambil keputusan dengan cepat dan berani mengambil risiko.</li>
+                      <li><strong>Cara Komunikasi:</strong> Bicaralah langsung ke inti masalah (to the point). Jangan bertele-tele atau menjelaskan detail yang tidak perlu.</li>
+                    </ul>
+                  </div>
+
+                  {/* I - Influence */}
+                  <div className="bg-white rounded-2xl p-6 border-l-8 border-amber-400 text-slate-800 shadow-sm">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-10 h-10 rounded-full bg-amber-400 text-white font-black text-xl flex items-center justify-center">I</div>
+                      <div>
+                        <h4 className="font-black text-lg uppercase tracking-tight text-slate-900">Influence</h4>
+                        <p className="text-xs font-bold text-amber-600 uppercase tracking-wider">Fokus: Orang & Antusiasme</p>
+                      </div>
+                    </div>
+                    <ul className="text-sm text-slate-600 space-y-2 list-disc pl-4">
+                      <li>Termotivasi oleh pengakuan sosial, kerja tim, dan popularitas.</li>
+                      <li>Sangat persuasif, optimis, dan pandai mencairkan suasana.</li>
+                      <li><strong>Cara Komunikasi:</strong> Libatkan mereka secara emosional. Berikan apresiasi publik. Jangan langsung fokus pada angka tanpa basa-basi yang hangat.</li>
+                    </ul>
+                  </div>
+
+                  {/* S - Steadiness */}
+                  <div className="bg-white rounded-2xl p-6 border-l-8 border-emerald-500 text-slate-800 shadow-sm">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-10 h-10 rounded-full bg-emerald-500 text-white font-black text-xl flex items-center justify-center">S</div>
+                      <div>
+                        <h4 className="font-black text-lg uppercase tracking-tight text-slate-900">Steadiness</h4>
+                        <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider">Fokus: Kerja Sama & Konsistensi</p>
+                      </div>
+                    </div>
+                    <ul className="text-sm text-slate-600 space-y-2 list-disc pl-4">
+                      <li>Termotivasi oleh keamanan, harmoni, dan lingkungan yang stabil.</li>
+                      <li>Pendengar yang sangat baik, sabar, namun tidak menyukai perubahan mendadak.</li>
+                      <li><strong>Cara Komunikasi:</strong> Pendekatan harus santai dan ramah. Jika ada perubahan sistem/aturan, jelaskan alasannya secara bertahap dan logis.</li>
+                    </ul>
+                  </div>
+
+                  {/* C - Compliance */}
+                  <div className="bg-white rounded-2xl p-6 border-l-8 border-blue-500 text-slate-800 shadow-sm">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-10 h-10 rounded-full bg-blue-500 text-white font-black text-xl flex items-center justify-center">C</div>
+                      <div>
+                        <h4 className="font-black text-lg uppercase tracking-tight text-slate-900">Compliance</h4>
+                        <p className="text-xs font-bold text-blue-600 uppercase tracking-wider">Fokus: Akurasi & Kualitas</p>
+                      </div>
+                    </div>
+                    <ul className="text-sm text-slate-600 space-y-2 list-disc pl-4">
+                      <li>Termotivasi oleh keahlian, standar tinggi, dan logika.</li>
+                      <li>Sangat analitis, detail-oriented, namun terkadang terlalu perfeksionis.</li>
+                      <li><strong>Cara Komunikasi:</strong> Gunakan data, fakta, dan angka. Jangan berikan feedback kritis tanpa bukti tertulis atau metrik yang jelas.</li>
+                    </ul>
+                  </div>
+                </div>
+              </section>
+
+              {/* SECTION 4: Panduan PIP (BARU) */}
+              <section>
+                <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
+                  <FileText className="w-6 h-6 text-slate-400" /> 4. Mengisi Dokumen Tindak Lanjut (PIP)
+                </h3>
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8 space-y-4 text-sm sm:text-base text-slate-400 leading-relaxed">
+                  <p>
+                    Pada tab <strong>Action Plan</strong>, Anda dapat mengekspor atau mencetak dokumen tindak lanjut formal. Di bagian bawah dokumen tersebut, terdapat kolom kosong <strong>"Rencana Tindakan Lanjutan (Disepakati Bersama)"</strong>.
+                  </p>
+                  <p>
+                    <strong>Mengapa kolom durasi tidak disediakan untuk diketik di aplikasi?</strong><br/>
+                    Durasi dan tenggat waktu (<em>deadline</em>) adalah bagian dari komitmen psikologis yang harus disepakati secara langsung saat sesi tatap muka (1-on-1) dengan anggota tim Anda. Menuliskan kesepakatan target beserta durasinya secara bersama-sama di atas kertas cetak akan memicu tingkat pertanggungjawaban yang jauh lebih kuat bagi karyawan, ketimbang tenggat waktu yang sekadar "ditetapkan secara sepihak" oleh manajer di dalam aplikasi.
+                  </p>
+                  <p>
+                    <strong>Cara menggunakannya:</strong><br/>
+                    Setelah Anda menekan tombol "Simpan ke PDF" dan mencetaknya, duduklah bersama anggota tim Anda. Buka percakapan dengan panduan DISC yang tersedia, sepakati 3-4 langkah perbaikan nyata, lalu <strong>tuliskan secara manual target perbaikan beserta durasinya</strong> di atas garis yang disediakan. Terakhir, bubuhkan tanda tangan bersama sebagai bukti komitmen legal.
+                  </p>
+                </div>
+              </section>
+
+            </div>
+          )}
+
+        </div>
+      </main>
+
+      {/* Modal Input Form */}
+      {modal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-6 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white w-full h-full sm:h-auto sm:max-h-[90vh] max-w-2xl rounded-none sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+            <div className="px-6 py-5 sm:px-8 border-b border-slate-100 flex justify-between items-center bg-white z-10 flex-shrink-0 shadow-sm">
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900">{editId ? "Edit Mapping" : "Mapping Baru"}</h2>
+              <button onClick={closeModal} className="p-2 sm:p-2.5 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors">
+                <X className="w-5 h-5 text-slate-500" />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-6 sm:p-8">
+              <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-10">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <input required className="w-full px-4 py-3 sm:py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm sm:text-base font-bold outline-none text-slate-900 focus:ring-2 focus:ring-slate-900 placeholder:text-slate-400"
+                    placeholder="Nama Anggota" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+                  <input className="w-full px-4 py-3 sm:py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm sm:text-base font-bold outline-none text-slate-900 focus:ring-2 focus:ring-slate-900 placeholder:text-slate-400"
+                    placeholder="Jabatan" value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} />
+                </div>
+                <DISCSelector value={form.disc} onChange={v => setForm({ ...form, disc: v })} />
+                <div className="space-y-8 sm:space-y-10 border-t border-slate-100 pt-8 sm:pt-10">
+                  <div className="space-y-5">
+                    <RatingSelector label="Kompetensi" dim="competency" value={form.competency} onChange={v => setForm({ ...form, competency: v })} />
+                    <NoteInput label="Bukti Kompetensi" type="competencyNotes" notes={form.competencyNotes} onAdd={addNote} onUpdate={updateNote} onRemove={removeNote} prompt="Bukti perilaku spesifik?" />
+                  </div>
+                  <div className="space-y-5 border-t border-slate-100 pt-8 sm:pt-10">
+                    <RatingSelector label="Komitmen" dim="commitment" value={form.commitment} onChange={v => setForm({ ...form, commitment: v })} />
+                    <NoteInput label="Bukti Komitmen" type="commitmentNotes" notes={form.commitmentNotes} onAdd={addNote} onUpdate={updateNote} onRemove={removeNote} prompt="Bukti motivasi spesifik?" />
+                  </div>
+                </div>
+                <div className="pt-4">
+                  <button type="submit"
+                    className="w-full bg-slate-900 text-white py-4 sm:py-5 rounded-2xl font-black text-sm sm:text-base tracking-widest uppercase hover:bg-slate-800 active:scale-[0.98] transition-all shadow-xl">
+                    Simpan Analisis
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
