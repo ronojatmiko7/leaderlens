@@ -907,7 +907,10 @@ export default function App() {
       <h1 className="text-lg sm:text-xl font-black uppercase tracking-tight text-slate-900 mb-1">
         Leader's Pre-Flight Briefing
       </h1>
-      <p className="text-xs font-bold text-red-600 uppercase tracking-widest">
+      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">
+        {managerProfile?.company || "Internal Management Document"}
+      </p>
+      <p className="text-xs font-bold text-red-600 uppercase tracking-widest mt-2">
         Strictly Confidential — Do Not Share With Employee
       </p>
     </div>
@@ -957,7 +960,7 @@ export default function App() {
         {getDocumentTitle(q.id)}
       </h1>
       <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">
-        Joint Performance & Development Agreement
+        Prepared by: {managerProfile?.full_name} | {managerProfile?.title}
       </p>
     </div>
 
@@ -1016,13 +1019,13 @@ export default function App() {
     <div className="mt-16 pt-8 grid grid-cols-2 gap-8 text-center break-inside-avoid">
       <div>
         <div className="border-b border-slate-400 h-16 mx-8"></div>
-        <p className="mt-2 text-sm font-black text-slate-900">Manajer / Atasan</p>
-        <p className="text-xs text-slate-500">Tanda tangan & Nama Jelas</p>
+        <p className="mt-2 text-sm font-black text-slate-900">{managerProfile?.full_name || "Manajer / Atasan"}</p>
+        <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{managerProfile?.title || "Leadership Role"}</p>
       </div>
       <div>
         <div className="border-b border-slate-400 h-16 mx-8"></div>
         <p className="mt-2 text-sm font-black text-slate-900">{m.name}</p>
-        <p className="text-xs text-slate-500">Karyawan</p>
+        <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Karyawan / Anggota Tim</p>
       </div>
     </div>
   </div>
