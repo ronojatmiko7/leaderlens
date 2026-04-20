@@ -10,7 +10,7 @@ import {
 
 // ── Inisialisasi Supabase ────────────────────────────────────────────────────
 const supabaseUrl = 'https://bervlosjswfmqhxisikn.supabase.co';
-const supabaseKey = 'sb_publishable_K8AkcW5zCRSpNxP-dSVD2A_dXfqNPuI';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJlcnZsb3Nqc3dmbXFoeGlzaWtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyODkyMjEsImV4cCI6MjA5MTg2NTIyMX0.IHTyFaCz7ExiHs7KSGaOnK3jdXXU7c47tcGHxOlKtME';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 
