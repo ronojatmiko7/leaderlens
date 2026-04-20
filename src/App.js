@@ -92,6 +92,8 @@ const getDISCScript = (disc) => ({
 }[disc]);
 
 const getActionPlan = (m) => {
+  // Add these two safety lines
+  m = { ...m, competencyNotes: m.competencyNotes || [], commitmentNotes: m.commitmentNotes || [] };
   const q = getQuadrant(m.competency, m.commitment);
   const script = getDISCScript(m.disc || "S");
   const discData = DISC_META[m.disc || "S"];
@@ -430,7 +432,11 @@ export default function App() {
   const closeModal = () => { setModal(false); setEditId(null); setForm(EMPTY_FORM); };
 
   const openEdit = (m) => {
-    setForm({ ...m, competencyNotes: m.competencyNotes?.length ? m.competencyNotes : [""], commitmentNotes: m.commitmentNotes?.length ? m.commitmentNotes : [""] });
+    setForm({ 
+      ...m, 
+      competencyNotes: Array.isArray(m.competencyNotes) && m.competencyNotes.length ? m.competencyNotes : [""], 
+      commitmentNotes: Array.isArray(m.commitmentNotes) && m.commitmentNotes.length ? m.commitmentNotes : [""] 
+    });
     setEditId(m.id); setModal(true);
   };
 
