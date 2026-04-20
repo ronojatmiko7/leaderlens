@@ -843,103 +843,138 @@ export default function App() {
                         </div>
 
                         {/* MOCKUP KERTAS A4 FORMAL - INI AREA YANG AKAN MUNCUL SAAT PRINT */}
-                        <div className={`bg-white text-slate-900 rounded-sm shadow-2xl mx-auto p-8 sm:p-12 max-w-3xl print-area`}>
-                          
-                          {/* Kop Dokumen */}
-                          <div className="border-b-2 border-slate-900 pb-6 mb-8 text-center">
-                            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-tight text-slate-900 mb-2">
-                              {getDocumentTitle(q.id)}
-                            </h1>
-                            <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">
-                              Dokumen Konfidensial HR & Manajemen
-                            </p>
-                          </div>
+                        {/* AREA CETAK (PRINT AREA) KESELURUHAN */}
+<div className={`bg-white text-slate-900 rounded-sm shadow-2xl mx-auto max-w-3xl print-area`}>
+  
+  {/* =========================================================================
+      PART 1: MANAGER'S BRIEFING (PANDUAN RAHASIA MANAJER)
+      ========================================================================= */}
+  <div className="p-8 sm:p-12">
+    {/* Kop Dokumen Internal */}
+    <div className="border-b-2 border-slate-900 pb-4 mb-6 text-center">
+      <h1 className="text-lg sm:text-xl font-black uppercase tracking-tight text-slate-900 mb-1">
+        Leader's Pre-Flight Briefing
+      </h1>
+      <p className="text-xs font-bold text-red-600 uppercase tracking-widest">
+        Strictly Confidential — Do Not Share With Employee
+      </p>
+    </div>
 
-                          {/* Info Karyawan */}
-                          <div className="grid grid-cols-2 gap-4 mb-8 text-sm sm:text-base">
-                            <div>
-                              <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Nama Karyawan</p>
-                              <p className="font-black text-slate-900">{m.name}</p>
-                            </div>
-                            <div>
-                              <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Tanggal Dokumen</p>
-                              <p className="font-black text-slate-900">{formatDate(Date.now())}</p>
-                            </div>
-                            <div>
-                              <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Jabatan / Peran</p>
-                              <p className="font-black text-slate-900">{m.role || "-"}</p>
-                            </div>
-                            <div>
-                              <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Status Kuadran</p>
-                              <p className="font-black" style={{ color: q.color }}>{q.label} ({q.id})</p>
-                            </div>
-                          </div>
+    {/* Info Singkat */}
+    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-8 flex justify-between items-center">
+      <div>
+        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Target Diskusi</p>
+        <p className="font-black text-slate-900 text-lg">{m.name}</p>
+      </div>
+      <div className="text-right">
+        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Profil & Kuadran</p>
+        <p className="font-black" style={{ color: q.color }}>DISC {m.disc} | {q.id}</p>
+      </div>
+    </div>
 
-                          {/* Poin-Poin Action Plan dipetakan ke format Dokumen */}
-                          <div className="space-y-8">
-                            {getActionPlan(m).map((item, idx) => (
-                              <div key={idx} className="break-inside-avoid">
-                                <h3 className="text-sm sm:text-base font-black uppercase tracking-wider text-slate-900 mb-3 flex items-center gap-2 border-b border-slate-200 pb-2">
-                                  <span className="w-6 h-6 rounded bg-slate-100 flex items-center justify-center text-xs">{idx + 1}</span>
-                                  {item.title}
-                                </h3>
-                                <ul className="space-y-2.5 pl-8">
-                                  {item.items.map((act, i) => (
-                                    <li key={i} className="text-sm sm:text-base text-slate-700 leading-relaxed list-disc">
-                                      {act}
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            ))}
-                          </div>
+    {/* Panduan Manajerial (Dari getActionPlan) */}
+    <div className="space-y-6">
+      {getActionPlan(m).map((item, idx) => (
+        <div key={idx} className="break-inside-avoid bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+          <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 mb-3 flex items-center gap-2 border-b border-slate-100 pb-2" style={{ color: item.color }}>
+            <span className="w-6 h-6 rounded flex items-center justify-center text-xs text-white" style={{ background: item.color }}>
+              {idx + 1}
+            </span>
+            {item.title}
+          </h3>
+          <ul className="space-y-2 pl-6">
+            {item.items.map((act, i) => (
+              <li key={i} className="text-xs sm:text-sm text-slate-700 leading-relaxed list-disc">
+                {act}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
 
-                          {/* Fakta Kinerja (Dari Input User) */}
-                          <div className="mt-8 break-inside-avoid border-t-2 border-dashed border-slate-200 pt-8">
-                            <h3 className="text-sm sm:text-base font-black uppercase tracking-wider text-slate-900 mb-4">Catatan Lampiran Observasi Manajer</h3>
-                            <div className="grid sm:grid-cols-2 gap-6">
-                              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                                <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Fakta Kompetensi (Skor: {m.competency}/4)</p>
-                                <ul className="list-disc pl-4 text-sm text-slate-700 space-y-1">
-                                  {m.competencyNotes.map((note, i) => <li key={i}>{note || "-"}</li>)}
-                                </ul>
-                              </div>
-                              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                                <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Fakta Komitmen (Skor: {m.commitment}/4)</p>
-                                <ul className="list-disc pl-4 text-sm text-slate-700 space-y-1">
-                                  {m.commitmentNotes.map((note, i) => <li key={i}>{note || "-"}</li>)}
-                                </ul>
-                              </div>
-                            </div>
-                          </div>
+  {/* =========================================================================
+      PART 2: JOINT AGREEMENT (DOKUMEN KESEPAKATAN KARYAWAN)
+      ========================================================================= */}
+  <div className="p-8 sm:p-12 border-t-8 border-slate-900" style={{ pageBreakBefore: 'always' }}>
+    
+    {/* Kop Dokumen Resmi */}
+    <div className="border-b-2 border-slate-900 pb-6 mb-8 text-center">
+      <h1 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-tight text-slate-900 mb-2">
+        {getDocumentTitle(q.id)}
+      </h1>
+      <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">
+        Joint Performance & Development Agreement
+      </p>
+    </div>
 
-                          {/* KOLOM KOSONG: ACTION PLAN DISEPAKATI BERSAMA */}
-                          <div className="mt-8 break-inside-avoid border-t-2 border-slate-900 pt-8">
-                            <h3 className="text-sm sm:text-base font-black uppercase tracking-wider text-slate-900 mb-2">Rencana Tindakan Lanjutan (Disepakati Bersama)</h3>
-                            <p className="text-xs text-slate-500 mb-8 italic">Bagian ini diisi secara manual setelah melakukan diskusi 1-on-1 dengan karyawan untuk menyepakati target dan langkah konkret.</p>
-                            <div className="space-y-6">
-                              <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">1.</span></div>
-                              <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">2.</span></div>
-                              <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">3.</span></div>
-                              <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">4.</span></div>
-                            </div>
-                          </div>
+    {/* Info Karyawan */}
+    <div className="grid grid-cols-2 gap-4 mb-8 text-sm sm:text-base bg-slate-50 p-6 rounded-xl border border-slate-200">
+      <div>
+        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Nama Karyawan</p>
+        <p className="font-black text-slate-900">{m.name}</p>
+      </div>
+      <div>
+        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Tanggal Dokumen</p>
+        <p className="font-black text-slate-900">{formatDate(Date.now())}</p>
+      </div>
+      <div className="mt-4">
+        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Jabatan / Peran</p>
+        <p className="font-black text-slate-900">{m.role || "-"}</p>
+      </div>
+      <div className="mt-4">
+        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Fokus Pengembangan</p>
+        <p className="font-black" style={{ color: q.color }}>{q.label}</p>
+      </div>
+    </div>
 
-                          {/* Tanda Tangan */}
-                          <div className="mt-16 pt-8 grid grid-cols-2 gap-8 text-center break-inside-avoid">
-                            <div>
-                              <div className="border-b border-slate-400 h-16 mx-8"></div>
-                              <p className="mt-2 text-sm font-black text-slate-900">Manajer / Atasan</p>
-                              <p className="text-xs text-slate-500">Tanda tangan & Nama Jelas</p>
-                            </div>
-                            <div>
-                              <div className="border-b border-slate-400 h-16 mx-8"></div>
-                              <p className="mt-2 text-sm font-black text-slate-900">{m.name}</p>
-                              <p className="text-xs text-slate-500">Tanda tangan & Nama Jelas</p>
-                            </div>
-                          </div>
+    {/* Fakta Kinerja Berdasarkan Observasi */}
+    <div className="mb-8 break-inside-avoid">
+      <h3 className="text-sm sm:text-base font-black uppercase tracking-wider text-slate-900 mb-4">I. Observasi Kinerja Terkini</h3>
+      <div className="grid sm:grid-cols-2 gap-6">
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Fakta Kompetensi Teknis</p>
+          <ul className="list-disc pl-4 text-sm text-slate-700 space-y-1">
+            {m.competencyNotes.map((note, i) => <li key={i}>{note || "-"}</li>)}
+          </ul>
+        </div>
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Fakta Komitmen & Sikap</p>
+          <ul className="list-disc pl-4 text-sm text-slate-700 space-y-1">
+            {m.commitmentNotes.map((note, i) => <li key={i}>{note || "-"}</li>)}
+          </ul>
+        </div>
+      </div>
+    </div>
 
-                        </div>
+    {/* Kolom Kesepakatan Tindakan */}
+    <div className="break-inside-avoid">
+      <h3 className="text-sm sm:text-base font-black uppercase tracking-wider text-slate-900 mb-2">II. Rencana Tindakan Lanjutan (Disepakati Bersama)</h3>
+      <p className="text-xs text-slate-500 mb-8 italic">Poin-poin di bawah ini diisi bersama antara Manajer dan Karyawan, mencakup tindakan spesifik, target terukur, dan tenggat waktu.</p>
+      <div className="space-y-8">
+        <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">1.</span></div>
+        <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">2.</span></div>
+        <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">3.</span></div>
+        <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">4.</span></div>
+      </div>
+    </div>
+
+    {/* Tanda Tangan */}
+    <div className="mt-16 pt-8 grid grid-cols-2 gap-8 text-center break-inside-avoid">
+      <div>
+        <div className="border-b border-slate-400 h-16 mx-8"></div>
+        <p className="mt-2 text-sm font-black text-slate-900">Manajer / Atasan</p>
+        <p className="text-xs text-slate-500">Tanda tangan & Nama Jelas</p>
+      </div>
+      <div>
+        <div className="border-b border-slate-400 h-16 mx-8"></div>
+        <p className="mt-2 text-sm font-black text-slate-900">{m.name}</p>
+        <p className="text-xs text-slate-500">Karyawan</p>
+      </div>
+    </div>
+  </div>
+</div>
                       </div>
                     )}
                   </div>
