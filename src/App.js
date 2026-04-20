@@ -33,23 +33,23 @@ const getDocumentTitle = (qId) => {
 const DISC_META = {
   D: { 
     label: "Dominance", color: "#EF4444", bg: "bg-red-500", light: "bg-red-50 text-red-700", desc: "Fokus hasil & kontrol",
-    strengths: "Eksekusi cepat, berani ambil risiko, mandiri, dan sangat berorientasi pada target akhir.",
-    weaknesses: "Sering terburu-buru, kurang sabar, cenderung mengabaikan detail, dan bisa terkesan otoriter."
+    strengths: "Eksekusi cepat tanpa banyak basa-basi, berani ambil keputusan sulit di saat orang lain ragu, sangat efektif dalam situasi krisis atau tenggat ketat, dan punya drive internal yang kuat untuk melampaui target.",
+    weaknesses: "Cenderung mengabaikan proses dan perasaan orang lain demi hasil, bisa terkesan otoriter atau intimidatif tanpa disadari, sulit menerima feedback yang terasa seperti serangan personal, dan berisiko burn out anggota tim yang lebih lambat."
   },
   I: { 
     label: "Influence", color: "#F59E0B", bg: "bg-amber-400", light: "bg-amber-50 text-amber-700", desc: "Fokus antusiasme & orang",
-    strengths: "Komunikator ulung, antusias, mudah bergaul, dan sangat jago memotivasi energi tim.",
-    weaknesses: "Mudah terdistraksi, kurang teliti pada urusan detail/administrasi, dan kadang over-promising."
+    strengths: "Kemampuan membangun relasi dan kepercayaan dengan sangat cepat, jago mengubah suasana tim yang lesu menjadi bersemangat, sangat efektif sebagai jembatan antara divisi atau kepentingan yang berbeda, dan punya intuisi sosial yang kuat.",
+    weaknesses: "Rentan mengikuti mood — performanya bisa naik-turun drastis tergantung suasana hati, cenderung over-promise karena tidak ingin mengecewakan, lemah dalam follow-through pada tugas yang bersifat administratif atau repetitif, dan bisa mendominasi percakapan tanpa menyadarinya."
   },
   S: { 
     label: "Steadiness", color: "#10B981", bg: "bg-emerald-500", light: "bg-emerald-50 text-emerald-700", desc: "Fokus kerja sama & sabar",
-    strengths: "Pemain tim yang loyal, pendengar yang baik, konsisten, dan selalu menciptakan harmoni.",
-    weaknesses: "Menghindari konflik, lambat beradaptasi pada perubahan mendadak, dan sulit berkata 'tidak'."
+    strengths: "Tulang punggung tim yang sesungguhnya — konsisten, dapat diandalkan, dan jarang membuat drama. Pendengar aktif yang membuat anggota tim lain merasa aman untuk berbicara, sangat efektif dalam peran yang membutuhkan kesabaran dan ketelitian jangka panjang.",
+    weaknesses: "Sangat menghindari konflik hingga masalah kecil bisa menumpuk diam-diam, lambat beradaptasi pada perubahan mendadak dan butuh waktu untuk 'mencerna', sulit berkata tidak meskipun sudah kelebihan beban kerja, dan cenderung memendam ketidakpuasan daripada mengungkapkannya."
   },
   C: { 
     label: "Compliance", color: "#3B82F6", bg: "bg-blue-500", light: "bg-blue-50 text-blue-700", desc: "Fokus akurasi & kualitas",
-    strengths: "Sangat teliti, analitis, memiliki standar kualitas tinggi, dan patuh pada sistem/prosedur.",
-    weaknesses: "Terlalu perfeksionis, lambat ambil keputusan jika data kurang (analysis paralysis), dan kaku."
+    strengths: "Standar kualitas tertinggi di tim — mereka yang pertama menangkap kesalahan sebelum menjadi masalah besar. Sangat sistematis, mampu berpikir beberapa langkah ke depan, dan menjadi aset berharga dalam pekerjaan yang membutuhkan presisi tinggi atau analisis mendalam.",
+    weaknesses: "Rentan analysis paralysis — sulit mengambil keputusan jika data dirasa belum cukup, cenderung kritis terhadap ide orang lain tanpa menawarkan solusi alternatif, bisa terkesan dingin atau tidak peduli padahal sebenarnya sangat fokus, dan perfeksionisme mereka bisa memperlambat ritme tim."
   },
 };
 
@@ -70,28 +70,188 @@ const RATING_ANCHORS = {
 
 const getDISCScript = (disc) => ({
   D: {
-    open:    "Langsung: 'Saya ingin bicara soal hasil kerja kamu secara spesifik.'",
-    body:    "Fokus pada dampak bisnis, bukan perasaan. Beri mereka kontrol atas solusi.",
-    avoid:   "Jangan micro-manage atau jelaskan terlalu panjang — mereka akan defensif.",
+    open: "Langsung dan tegas: 'Saya ingin bicara langsung soal hasil kerja kamu di [area spesifik]. Saya punya data yang perlu kita bahas bersama.'",
+    body: "Fokus 100% pada dampak bisnis — angka, target, dan konsekuensi nyata. Hindari bahasa emosional. Beri mereka ruang untuk menawarkan solusi sendiri: 'Menurut kamu, apa langkah terbaik untuk memperbaiki ini?' Tipe D tidak mau diatur cara kerjanya — mereka mau dipegang pada hasilnya. Sepakati target yang terukur dan beri mereka otonomi penuh untuk mencapainya.",
+    avoid: "Jangan pernah micro-manage atau mempertanyakan metode kerja mereka di depan orang lain — ini penghinaan bagi tipe D. Hindari percakapan yang berputar-putar atau terlalu banyak basa-basi. Jangan beri ultimatum emosional ('Saya kecewa dengan kamu') — ganti dengan konsekuensi faktual ('Jika target ini tidak tercapai minggu depan, kita perlu eskalasi ke level berikutnya').",
   },
   I: {
-    open:    "Hangat dulu: 'Kamu punya potensi besar, dan saya ingin bantu kamu shine.'",
-    body:    "Libatkan mereka dalam solusi. Puji progres sekecil apapun secara publik.",
-    avoid:   "Jangan langsung ke angka/data tanpa konteks emosional terlebih dahulu.",
+    open: "Mulai dengan koneksi personal: 'Sebelum kita mulai, saya ingin kamu tahu bahwa saya bicara ini justru karena saya percaya pada potensi kamu. Boleh kita ngobrol santai dulu?'",
+    body: "Libatkan mereka secara emosional sejak awal sebelum masuk ke fakta performa. Gunakan cerita dan analogi, bukan tabel angka semata. Puji progres sekecil apapun secara spesifik dan tulus — tipe I sangat sensitif terhadap ketulusan. Ajak mereka brainstorm solusi bersama: 'Kalau kamu yang jadi manajerku, apa yang akan kamu lakukan?' Mereka akan lebih berkomitmen pada solusi yang mereka ikut ciptakan. Tutup dengan visi positif tentang masa depan mereka di tim.",
+    avoid: "Jangan langsung buka dengan data dan angka tanpa konteks emosional — mereka akan defensif dan menutup diri. Hindari kritik di depan orang banyak; ini bisa merusak motivasi mereka secara permanen. Jangan biarkan percakapan terlalu panjang tanpa kesimpulan yang jelas — tipe I mudah terdistraksi dan keluar dari topik. Waspadai janji-janji manis dari mereka; pastikan semua komitmen ditulis dan ada deadline konkret.",
   },
   S: {
-    open:    "Tenang: 'Saya ingin kita ngobrol santai, tidak ada yang perlu dikhawatirkan.'",
-    body:    "Jelaskan perubahan bertahap. Tanya hambatan mereka sebelum memberi solusi.",
-    avoid:   "Jangan berikan keputusan mendadak atau deadline mepet tanpa penjelasan.",
+    open: "Ciptakan rasa aman terlebih dahulu: 'Saya ingin kita ngobrol berdua, dan saya ingin kamu tahu ini bukan sesi evaluasi formal. Saya hanya ingin memahami situasi kamu lebih baik, karena saya peduli dengan perkembangan kamu.'",
+    body: "Beri waktu yang cukup — jangan terburu-buru. Mulai dengan pertanyaan terbuka yang genuinely ingin kamu ketahui jawabannya: 'Apa yang paling membuat kamu kesulitan belakangan ini?' Dengarkan benar-benar sebelum berbicara. Tipe S sering menyimpan masalah jauh lebih dalam dari yang terlihat di permukaan. Jika ada perubahan yang perlu dilakukan, jelaskan secara bertahap dengan alasan yang logis dan manusiawi. Sepakati langkah kecil yang realistis, bukan lompatan besar yang mengintimidasi.",
+    avoid: "Jangan datang dengan agenda yang sudah kamu putuskan sendiri dan minta mereka 'setuju' — mereka akan setuju di permukaan tapi tidak berubah di dalam. Hindari perubahan mendadak tanpa penjelasan yang memadai. Jangan salahkan mereka di hadapan rekan kerja — ini luka yang lama sembuh bagi tipe S. Dan jangan terjebak oleh ketenangan mereka; 'baik-baik saja' dari mulut tipe S tidak selalu berarti baik-baik saja.",
   },
   C: {
-    open:    "Berbasis data: 'Ada beberapa angka yang ingin turnjukkan dan diskusikan.'",
-    body:    "Bawa bukti konkret. Beri waktu mereka untuk berpikir sebelum minta respons.",
-    avoid:   "Jangan beri feedback tanpa data pendukung — mereka akan menantang balik.",
+    open: "Buka dengan data dan konteks yang jelas: 'Saya ingin mendiskusikan beberapa temuan yang saya dokumentasikan selama [periode waktu]. Saya sudah siapkan datanya, dan saya ingin mendengar perspektif analitis kamu tentang ini.'",
+    body: "Bawa bukti konkret, tertulis, dan spesifik — tanpa data, percakapan ini tidak akan produktif bagi tipe C. Berikan mereka ruang untuk merespons secara analitis: 'Apa yang menurut kamu menjadi akar masalah dari pola ini?' Mereka sering sudah mengetahui masalahnya lebih dalam dari yang kamu kira. Hargai standar tinggi mereka sambil bantu mereka melihat kapan 'cukup baik' adalah pilihan strategis yang tepat. Beri waktu untuk berpikir — jangan paksa keputusan di tempat.",
+    avoid: "Jangan pernah memberikan feedback tanpa data pendukung yang solid — mereka akan menantang setiap klaim yang tidak berdasar dan percakapan akan berubah menjadi debat. Hindari generalisasi seperti 'kamu selalu...' atau 'kamu tidak pernah...' — tipe C akan langsung mencari kontra-contoh. Jangan tunjukkan ketidakpastian atau inkonsistensi dalam standar yang kamu terapkan — mereka sangat sensitif terhadap ketidakadilan sistemik. Dan jangan terburu-buru meminta komitmen; beri mereka waktu 24 jam untuk memproses jika keputusannya besar.",
   },
 }[disc]);
 
 const getActionPlan = (m) => {
+  // Safety: ensure notes are always arrays
+  m = { 
+    ...m, 
+    competencyNotes: Array.isArray(m.competencyNotes) ? m.competencyNotes : (m.competencyNotes ? [m.competencyNotes] : [""]),
+    commitmentNotes: Array.isArray(m.commitmentNotes) ? m.commitmentNotes : (m.commitmentNotes ? [m.commitmentNotes] : [""]),
+  };
+
+  const q = getQuadrant(m.competency, m.commitment);
+  const script = getDISCScript(m.disc || "S");
+  const discData = DISC_META[m.disc || "S"];
+  const plan = [];
+
+  // DISC Profile Analysis
+  plan.push({
+    type: "profile",
+    title: `Analisis Karakter: Tipe ${m.disc || "S"} — ${discData.label}`,
+    color: discData.color,
+    bg: "#F8FAFC",
+    border: "#E2E8F0",
+    icon: "info",
+    items: [
+      `KEKUATAN UTAMA YANG PERLU DIMANFAATKAN: ${discData.strengths}`,
+      `AREA BLIND SPOT YANG PERLU DIWASPADAI: ${discData.weaknesses}`,
+      `IMPLIKASI MANAJERIAL: Semua intervensi dalam dokumen ini — baik skill maupun motivasi — harus disesuaikan dengan gaya komunikasi tipe ${m.disc || "S"}. Menggunakan pendekatan yang salah bisa memperburuk situasi meskipun niatnya benar.`
+    ],
+  });
+
+  // Skill Intervention
+  if (m.competency < 3) {
+    plan.push({
+      type: "skill",
+      title: "Intervensi Kompetensi (Skill Gap)",
+      color: "#6366F1",
+      bg: "#EEF2FF",
+      border: "#C7D2FE",
+      icon: "wrench",
+      items: [
+        `DIAGNOSIS SPESIFIK: Berdasarkan observasi, gap kompetensi terpusat pada: "${m.competencyNotes?.[0] || "area tugas utama"}". Langkah pertama adalah memisahkan mana yang gap pengetahuan (tidak tahu caranya), gap keterampilan (tahu tapi belum terampil), dan gap sumber daya (tahu dan mau, tapi tidak punya tools/akses yang dibutuhkan).`,
+        m.disc === "C"
+          ? "PENDEKATAN UNTUK TIPE C: Buat panduan kerja tertulis yang sangat detail dengan standar output yang jelas — contoh pekerjaan yang 'benar' vs 'salah' secara visual. Tipe C belajar paling efektif dari sistem dan referensi yang bisa mereka pelajari secara mandiri. Hindari OJT yang terlalu informal."
+          : m.disc === "D"
+          ? "PENDEKATAN UNTUK TIPE D: Berikan proyek kecil dengan authority penuh dan biarkan mereka menemukan caranya sendiri. Tetapkan standar output yang jelas di awal, tapi jangan atur prosesnya. Debrief hasil dengan pertanyaan: 'Apa yang akan kamu lakukan berbeda?' — mereka belajar paling cepat dari refleksi atas pengalaman nyata."
+          : m.disc === "I"
+          ? "PENDEKATAN UNTUK TIPE I: Gunakan metode pembelajaran yang sosial dan experiential — roleplay, diskusi kelompok, atau shadowing dengan rekan yang mereka kagumi. Gamifikasi progres mereka dan berikan pengakuan publik atas setiap milestone yang tercapai. Hindari modul belajar mandiri yang terlalu kering."
+          : "PENDEKATAN UNTUK TIPE S: Dampingi secara langsung (OJT) dengan mentor yang sabar dan tidak intimidatif. Buat milestone yang kecil dan realistis — kesuksesan bertahap membangun kepercayaan diri mereka. Pastikan mereka tahu bahwa membuat kesalahan dalam proses belajar adalah sesuatu yang aman.",
+        "STRUKTUR MONITORING: Lakukan check-in mingguan yang singkat (15 menit) untuk membahas progres dan hambatan. Dokumentasikan setiap perkembangan — baik positif maupun negatif — sebagai baseline objektif untuk evaluasi bulan berikutnya.",
+        "TARGET 30-60-90 HARI: Bulan 1 — kuasai kompetensi dasar level minimal. Bulan 2 — bisa menjalankan tugas secara mandiri tanpa supervisi aktif. Bulan 3 — performa konsisten dan bisa menjelaskan proses kerjanya kepada rekan lain.",
+      ],
+    });
+  }
+
+  // Commitment/Will Intervention
+  if (m.commitment < 3) {
+    plan.push({
+      type: "will",
+      title: "Intervensi Motivasi (Will Gap)",
+      color: "#F59E0B",
+      bg: "#FFFBEB",
+      border: "#FDE68A",
+      icon: "message",
+      items: [
+        `DIAGNOSIS PENTING — TANYA SEBELUM ASUMSI: Komitmen rendah bisa berasal dari banyak sumber yang berbeda: merasa tidak dihargai, konflik interpersonal yang tidak terselesaikan, ketidakcocokan antara nilai pribadi dan budaya tim, masalah di luar pekerjaan, atau sekadar boredom karena merasa under-challenged. Jangan langsung intervensi sebelum tahu akar masalahnya. Fakta yang tercatat: "${m.commitmentNotes?.[0] || "pola komitmen rendah"}".`,
+        `PEMBUKA PERCAKAPAN YANG TEPAT (Sesuai DISC ${m.disc || "S"}): ${script.open}`,
+        `ISI PERCAKAPAN: ${script.body}`,
+        `YANG HARUS DIHINDARI: ${script.avoid}`,
+        "PERTANYAAN DIAGNOSTIK KUNCI untuk digali dalam sesi 1-on-1: (1) 'Apa bagian dari pekerjaan ini yang paling membuat kamu bersemangat — dan apa yang paling menguras energi kamu?' (2) 'Kalau ada satu hal yang bisa saya ubah sebagai manajermu untuk membuat kamu bisa bekerja lebih baik, apa itu?' (3) 'Di mana kamu melihat dirimu dalam 2 tahun ke depan — dan apakah posisi ini membantu kamu ke sana?'",
+      ],
+    });
+  }
+
+  // Q1 Specific: PIP Protocol
+  if (q.id === "Q1") {
+    plan.push({
+      type: "pip",
+      title: "Protokol PIP — Intervensi Ganda (Skill + Will)",
+      color: "#EF4444",
+      bg: "#FEF2F2",
+      border: "#FECACA",
+      icon: "shield",
+      items: [
+        "PERINGATAN MANAJERIAL: Q1 adalah situasi paling kompleks karena membutuhkan intervensi pada dua dimensi secara bersamaan. Kesalahan paling fatal adalah hanya fokus pada satu dimensi — memberi training kepada orang yang sebenarnya sudah tidak termotivasi, atau terus memberi penyemangat kepada orang yang memang tidak punya kapabilitas dasar.",
+        "MINGGU 1–2 (Klarifikasi): Lakukan percakapan diagnostik mendalam untuk memahami akar masalah dari KEDUA dimensi. Jangan langsung masuk ke mode 'perbaikan' — pemahaman yang salah akan menghasilkan intervensi yang salah. Dokumentasikan temuan secara tertulis.",
+        "BULAN 1–3 (Intervensi Aktif): Jalankan program skill-building yang terstruktur (lihat bagian Intervensi Kompetensi) BERSAMAAN dengan sesi coaching motivasional mingguan. Tetapkan target mingguan yang SMART dan lakukan review setiap Jumat. Semua target dan progres harus didokumentasikan secara tertulis dan ditandatangani bersama.",
+        "BULAN 3–6 (Evaluasi & Keputusan): Jika ada progres yang konsisten di kedua dimensi — lanjutkan dengan target yang ditingkatkan. Jika hanya progress di satu dimensi — identifikasi mana yang stagnan dan eskalasi intervensi di area tersebut. Jika tidak ada progres di kedua dimensi setelah intervensi yang sungguh-sungguh — pertimbangkan mutasi peran atau eskalasi ke proses formal HR.",
+        "CATATAN LEGAL & HR: Seluruh proses PIP harus didokumentasikan dengan baik — termasuk intervensi yang sudah diberikan, respons karyawan, dan keputusan yang diambil. Ini melindungi perusahaan dan memastikan proses yang adil bagi karyawan.",
+      ],
+    });
+  }
+
+  // Q2 Specific: Accelerated Development
+  if (q.id === "Q2") {
+    plan.push({
+      type: "development",
+      title: "Protokol Pengembangan Dipercepat — Golden Window 90 Hari",
+      color: "#F59E0B",
+      bg: "#FFFBEB",
+      border: "#FDE68A",
+      icon: "target",
+      items: [
+        "PERINGATAN KRITIS — JANGAN SIA-SIAKAN MOMENTUM: Antusiasme anggota Q2 adalah aset paling berharga yang bisa kamu miliki sebagai manajer. Penelitian menunjukkan bahwa jika skill tidak datang dalam 90 hari pertama, motivasi akan turun ke level Q1. Ini adalah window of opportunity yang tidak boleh terlewat.",
+        "STRATEGI UTAMA — STRUCTURED ACCELERATION: Jangan biarkan mereka 'belajar sendiri' hanya karena mereka terlihat bersemangat. Semangat tanpa struktur akan berujung frustrasi. Buat learning path yang jelas dengan milestone yang terukur setiap 2 minggu.",
+        "PASANGKAN DENGAN MENTOR YANG TEPAT: Pilih mentor dari anggota Q4 yang punya kesabaran mengajar (biasanya tipe S atau C). Hindari menugaskan tipe D sebagai mentor untuk anggota baru — ritme mereka bisa mengintimidasi dan merusak kepercayaan diri.",
+        "QUICK WINS STRATEGY: Di 30 hari pertama, berikan tugas-tugas yang dirancang untuk bisa diselesaikan dengan sukses. Quick wins membangun kepercayaan diri dan membuktikan kepada mereka bahwa investasi semangat mereka tidak sia-sia.",
+        "DANGER SIGN YANG HARUS DIWASPADAI: Jika di bulan ke-2 antusiasme mulai menurun tanpa alasan yang jelas, lakukan percakapan proaktif sebelum mereka menyeberang ke Q1. Lebih mudah menjaga motivasi daripada memulihkannya.",
+      ],
+    });
+  }
+
+  // Q3 Specific: Re-engagement — Most detailed because it's most often mishandled
+  if (q.id === "Q3") {
+    plan.push({
+      type: "reengagement",
+      title: "Protokol Re-engagement — Membangkitkan Kembali Api yang Padam",
+      color: "#3B82F6",
+      bg: "#EFF6FF",
+      border: "#BFDBFE",
+      icon: "refresh",
+      items: [
+        "PERINGATAN DIAGNOSIS: Ini adalah kuadran yang paling sering SALAH ditangani oleh manajer. Anggota Q3 BUKAN malas dan BUKAN tidak kompeten. Mereka adalah orang yang pernah sangat berdedikasi — dan sesuatu yang spesifik telah memadamkan api itu. Memperlakukan mereka seperti Q1 (training, monitoring ketat, PIP) adalah kesalahan yang bisa merusak hubungan kerja secara permanen dan mempercepat turnover.",
+        "LANGKAH PERTAMA — DENGARKAN, BUKAN EVALUASI: Jangan masuk dengan agenda perbaikan performa. Masuk dengan rasa ingin tahu yang tulus. Pertanyaan pembuka yang tepat: 'Saya perhatikan ada sesuatu yang berbeda dari kamu belakangan ini, dan sebagai manajermu saya ingin memahami, bukan menghakimi. Apakah ada sesuatu yang sedang kamu hadapi yang mungkin memengaruhi semangat kerjamu?' Kemudian — diam dan dengarkan.",
+        "AKAR MASALAH YANG PALING UMUM PADA Q3: (1) Merasa kontribusinya tidak dilihat atau dihargai oleh atasan. (2) Konflik dengan rekan kerja atau atasan yang tidak pernah diselesaikan secara tuntas. (3) Merasa stuck — tidak ada jalur karir yang jelas atau tantangan baru yang bermakna. (4) Masalah personal di luar pekerjaan yang meluber ke performa. (5) Nilai pribadi yang bergesekan dengan budaya atau keputusan organisasi.",
+        m.disc === "D" 
+          ? "INTERVENSI UNTUK TIPE D — Q3: Tipe D yang kehilangan motivasi hampir selalu karena merasa otonomi dan authority-nya dikebiri. Solusi: berikan proyek strategis baru dengan ruang gerak penuh. Biarkan mereka memimpin sesuatu yang bermakna. Jangan berikan ini sebagai 'reward' tapi sebagai 'investasi' — framing-nya penting untuk tipe D."
+          : m.disc === "I"
+          ? "INTERVENSI UNTUK TIPE I — Q3: Tipe I yang kehilangan motivasi hampir selalu karena merasa tidak dilihat, tidak diapresiasi, atau terisolasi secara sosial. Solusi: kembalikan mereka ke peran yang melibatkan banyak interaksi dan visibilitas. Berikan pengakuan yang tulus dan spesifik atas kontribusi masa lalu mereka. Libatkan mereka dalam proyek yang memiliki dampak sosial yang terlihat."
+          : m.disc === "S"
+          ? "INTERVENSI UNTUK TIPE S — Q3: Tipe S yang kehilangan motivasi hampir selalu karena ada konflik atau ketidakharmonisan dalam tim yang tidak pernah diselesaikan, atau karena merasa beban kerjanya tidak adil namun tidak bisa mengungkapkannya. Solusi: ciptakan ruang yang benar-benar aman untuk bicara, selesaikan sumber konflik yang ada, dan tunjukkan bahwa kontribusi diam-diam mereka selama ini dilihat dan dihargai."
+          : "INTERVENSI UNTUK TIPE C — Q3: Tipe C yang kehilangan motivasi hampir selalu karena melihat inkonsistensi, ketidakadilan, atau keputusan yang mereka anggap tidak logis dalam organisasi. Solusi: berikan penjelasan yang rasional dan transparan atas keputusan-keputusan yang selama ini membingungkan mereka. Libatkan mereka dalam penyusunan sistem atau standar baru — ini memberikan makna bagi tipe C.",
+        "TIMELINE RE-ENGAGEMENT: Jika setelah 4-6 minggu percakapan coaching yang konsisten dan intervensi yang tepat tidak ada perubahan, pertimbangkan apakah ini memang pilihan sadar mereka untuk tidak re-engage — dan diskusikan langkah selanjutnya secara terbuka dan hormat.",
+      ],
+    });
+  }
+
+  // Q4 Specific: Retention & Growth
+  if (q.id === "Q4") {
+    plan.push({
+      type: "growth",
+      title: "Protokol Retensi & Growth — Menjaga Aset Terbaik Tim",
+      color: "#10B981",
+      bg: "#ECFDF5",
+      border: "#A7F3D0",
+      icon: "award",
+      items: [
+        "PERINGATAN RETENSI: Anggota Q4 adalah yang paling rentan untuk direkrut oleh kompetitor — justru karena mereka yang paling dicari. Penelitian menunjukkan bahwa manajer adalah alasan nomor satu seseorang bertahan atau meninggalkan perusahaan. Investasikan waktu dan perhatian yang proporsional kepada mereka.",
+        m.disc === "D" 
+          ? "STRATEGI UNTUK TIPE D — Q4: Berikan proyek-proyek dengan tingkat kesulitan dan authority yang terus meningkat. Tipe D Q4 membutuhkan tantangan nyata — bukan sekedar tugas rutin yang lebih banyak. Diskusikan jalur menuju posisi kepemimpinan senior secara eksplisit dan konkret."
+          : m.disc === "I"
+          ? "STRATEGI UNTUK TIPE I — Q4: Berikan platform dan visibilitas — presentasi di depan manajemen senior, keterlibatan dalam proyek lintas divisi, atau peran sebagai brand ambassador tim. Tipe I Q4 membutuhkan panggung yang semakin besar untuk tetap engaged."
+          : m.disc === "S"
+          ? "STRATEGI UNTUK TIPE S — Q4: Jadikan mereka mentor resmi dan pilar budaya tim. Tipe S Q4 mendapat makna dari peran yang memungkinkan mereka mendukung orang lain berkembang. Pastikan beban kerja mereka adil — mereka jarang mengeluh meski sudah kelebihan beban, dan ini bisa menjadi bom waktu."
+          : "STRATEGI UNTUK TIPE C — Q4: Libatkan mereka dalam penyusunan sistem, standar, dan proses — ini adalah pekerjaan yang paling bermakna bagi tipe C. Berikan akses ke pembelajaran teknis yang mendalam dan kesempatan untuk menjadi subject matter expert yang diakui organisasi.",
+        "PERCAKAPAN KARIR YANG WAJIB DILAKUKAN (Minimal Kuartalan): (1) 'Di mana kamu ingin berada dalam 2-3 tahun ke depan, dan bagaimana saya bisa membantu kamu mencapainya?' (2) 'Apa yang paling membuat kamu engaged di pekerjaan ini saat ini?' (3) 'Adakah sesuatu yang membuatmu frustrasi yang belum pernah kamu sampaikan?' Pertanyaan ketiga adalah yang paling penting — dan paling jarang ditanyakan manajer.",
+        "DANGER SIGN TURNOVER YANG HARUS DIWASPADAI: Anggota Q4 yang mulai mengurangi kontribusi sukarela, menarik diri dari diskusi tim, atau tiba-tiba sangat tepat waktu pulang adalah sinyal awal bahwa mereka sedang mempertimbangkan opsi lain. Jangan tunggu sampai surat resign datang.",
+        "INVESTASI YANG TIDAK BOLEH DITUNDA: Pastikan kompensasi, benefit, dan pengakuan mereka setara dengan kontribusi nyata yang mereka berikan. Ketidakadilan kompensasi adalah pemicu turnover yang paling umum dan paling bisa dihindari.",
+      ],
+    });
+  }
+
+  return plan;
+};
   // Add these two safety lines
   m = { ...m, competencyNotes: m.competencyNotes || [], commitmentNotes: m.commitmentNotes || [] };
   const q = getQuadrant(m.competency, m.commitment);
@@ -285,31 +445,31 @@ const NoteInput = ({ label, type, notes, onAdd, onUpdate, onRemove, prompt }) =>
 const QUADRANT_GUIDE = [
   {
     q: "Q1", label: "Critical Area", color: "#EF4444", bg: "#FEF2F2",
-    diagnosis: "Anggota tim tidak memiliki kemampuan DAN motivasi yang cukup. Ini situasi paling berat.",
-    rootCause: "Bisa karena salah rekrut, burnout ekstrem, atau sudah terlalu lama di posisi yang salah.",
-    mistake: "Kesalahan umum: terus memberi training padahal masalah utamanya adalah motivasi — atau sebaliknya, terus memberi semangat padahal skill-nya memang tidak ada.",
-    urgency: "Butuh intervensi ganda: skill DAN will secara bersamaan. Jika tidak ada progres dalam 90 hari, eskalasi ke PIP.",
+    diagnosis: "Anggota tim tidak memiliki kemampuan DAN motivasi yang memadai secara bersamaan. Ini adalah situasi paling kompleks dan paling berisiko yang bisa dihadapi seorang manajer — dan sayangnya, juga yang paling sering ditangani dengan cara yang salah.",
+    rootCause: "Q1 jarang terjadi begitu saja. Ini biasanya hasil dari salah satu dari tiga skenario: (1) Salah rekrut — orang yang tepat di posisi yang salah, atau orang yang salah di posisi apapun. (2) Burnout ekstrem yang tidak pernah ditangani hingga menggerus kompetensi sekalipun. (3) Seseorang yang sudah lama berada di posisi yang salah dan sudah terlalu lama dibiarkan tanpa intervensi.",
+    mistake: "Kesalahan paling umum: manajer yang fokus pada satu dimensi saja. Mereka yang 'percaya pada potensi' terus memberi training kepada orang yang sebenarnya sudah tidak mau. Sementara manajer yang 'fokus pada hasil' terus memberi target tanpa menyadari bahwa kapabilitas dasarnya memang tidak ada. Keduanya salah. Q1 membutuhkan intervensi ganda yang terstruktur dan sabar.",
+    urgency: "Intervensi harus dimulai dalam 7 hari. Bukan karena harus buru-buru memecat, tapi karena membiarkan Q1 terlalu lama tanpa penanganan akan merusak moral seluruh tim yang melihat situasi ini dibiarkan. Mulai dengan percakapan diagnostik yang jujur — pahami akarnya dulu sebelum intervensi.",
   },
   {
     q: "Q2", label: "Potential Talent", color: "#F59E0B", bg: "#FFFBEB",
-    diagnosis: "Semangat tinggi tapi kemampuan belum cukup. Sering terjadi pada karyawan baru atau yang baru dipromosikan.",
-    rootCause: "Bukan masalah karakter — mereka belum punya tools yang tepat. Energinya ada, tinggal diarahkan.",
-    mistake: "Kesalahan umum: membiarkan mereka 'belajar sendiri' karena terlihat bersemangat. Tanpa struktur, antusiasme ini akan habis dalam 3–6 bulan.",
-    urgency: "Prioritas: berikan skill secepat mungkin sebelum motivasi turun. Golden window: 90 hari pertama.",
+    diagnosis: "Motivasi tinggi, kemampuan belum memadai. Paling sering terjadi pada karyawan baru, yang baru dipromosikan, atau yang baru pindah divisi. Ini sebenarnya situasi yang paling mudah ditangani — jika manajer bergerak cepat.",
+    rootCause: "Bukan masalah karakter atau attitude. Mereka belum memiliki tools, pengetahuan, atau pengalaman yang dibutuhkan untuk perform di level yang diharapkan. Energi dan kemauan ada — tinggal arahkan dengan struktur yang tepat.",
+    mistake: "Kesalahan paling mahal: membiarkan mereka 'sink or swim' karena manajer terlalu sibuk atau terlalu yakin bahwa antusiasme mereka akan menutupi gap skill-nya. Tanpa struktur pembelajaran yang jelas, antusiasme akan habis dalam 60-90 hari dan mereka akan menyeberang ke Q1 — kali ini dengan rasa kecewa yang sulit dipulihkan.",
+    urgency: "Golden window adalah 90 hari pertama. Buat learning plan yang konkret dalam minggu pertama, pasangkan dengan mentor yang tepat, dan jadwalkan check-in reguler. Investasi waktu di fase ini akan menghasilkan anggota Q4 dalam 6-12 bulan.",
   },
   {
     q: "Q3", label: "Expert in Slump", color: "#3B82F6", bg: "#EFF6FF",
-    diagnosis: "Kemampuan tinggi tapi motivasi turun drastis. Ini yang paling sering salah didiagnosis.",
-    rootCause: "Bukan malas. Ada sesuatu yang patah: tidak dihargai, bored, konflik dengan atasan/rekan, atau masalah pribadi.",
-    mistake: "Kesalahan terbesar: memperlakukan mereka seperti Q1 — memberi training atau monitoring ketat. Ini akan memperburuk keadaan karena terasa seperti penghinaan.",
-    urgency: "Prioritas: percakapan coaching yang dalam, bukan evaluasi performa. Gali dulu sebelum intervensi.",
+    diagnosis: "Kemampuan tinggi, motivasi turun drastis. Ini adalah kuadran yang paling sering salah didiagnosis dan paling sering ditangani dengan cara yang memperburuk keadaan. Anggota Q3 bukan orang bermasalah — mereka adalah aset yang sedang dalam krisis tersembunyi.",
+    rootCause: "Selalu ada sesuatu yang spesifik yang memadamkan motivasi mereka. Penyebab paling umum: merasa kontribusinya tidak dilihat atau dihargai oleh atasan. Konflik yang tidak pernah diselesaikan secara tuntas. Merasa stuck — tidak ada jalur karir yang jelas atau tantangan baru yang bermakna. Masalah personal di luar pekerjaan yang meluber ke performa. Nilai pribadi yang bergesekan dengan budaya atau keputusan organisasi yang dirasa tidak etis atau tidak adil.",
+    mistake: "Kesalahan yang paling merusak: memperlakukan Q3 seperti Q1. Memberikan training tambahan kepada orang yang sudah ahli terasa seperti penghinaan. Menerapkan monitoring ketat kepada orang yang sudah lama dipercaya akan menghancurkan sisa kepercayaan yang ada. Kedua pendekatan ini hampir pasti mempercepat keputusan mereka untuk resign.",
+    urgency: "Lakukan percakapan coaching yang dalam dalam 48 jam setelah Anda mengidentifikasi pola ini. Bukan evaluasi performa — percakapan manusia ke manusia. Setiap minggu yang terlewat tanpa penanganan adalah satu minggu lebih dekat ke surat resign.",
   },
   {
     q: "Q4", label: "Star Performer", color: "#10B981", bg: "#ECFDF5",
-    diagnosis: "Kemampuan dan motivasi sama-sama tinggi. Aset terbesar tim Anda.",
-    rootCause: "Risiko tersembunyi: mereka sering diabaikan karena 'tidak masalah'. Padahal mereka yang paling rentan keluar.",
-    mistake: "Kesalahan terbesar: tidak berinvestasi pada mereka karena sudah berjalan sendiri. Turnover satu Q4 bisa merusak tim selama berbulan-bulan.",
-    urgency: "Prioritas: retensi dan growth. Pastikan mereka punya tantangan baru, pengakuan, dan jalur karir yang jelas.",
+    diagnosis: "Kemampuan dan motivasi sama-sama tinggi. Mereka adalah 20% anggota tim yang menghasilkan 80% hasil terbaik. Kehilangan satu anggota Q4 — dalam hal produktivitas, pengetahuan institusional, dan dampak pada moral tim — bisa setara dengan kehilangan tiga anggota biasa.",
+    rootCause: "Risiko utama Q4 bukan performa — tapi retensi. Mereka sering diabaikan justru karena 'tidak perlu dikhawatirkan'. Padahal kebutuhan mereka untuk berkembang, diakui, dan ditantang terus bertumbuh. Ketika kebutuhan itu tidak terpenuhi, mereka tidak mengeluh — mereka langsung mencari peluang lain.",
+    mistake: "Dua kesalahan fatal: Pertama, membebani mereka dengan pekerjaan ekstra karena 'mereka pasti bisa' — tanpa kompensasi atau pengakuan yang setara. Kedua, tidak pernah membicarakan karir mereka secara proaktif karena asumsi bahwa mereka pasti puas. Dua kesalahan ini, jika terjadi bersamaan, hampir pasti berujung pada turnover dalam 12-18 bulan.",
+    urgency: "Jadwalkan percakapan karir formal minimal setiap kuartal. Ini bukan kemewahan — ini keharusan strategis. Manajer yang tidak punya waktu untuk anggota Q4-nya akan segera punya banyak waktu karena mereka sudah tidak ada.",
   },
 ];
 
