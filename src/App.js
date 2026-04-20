@@ -411,7 +411,17 @@ export default function App() {
     if (error) {
       console.error("Gagal menarik data dari Supabase:", error);
     } else {
-      setMembers(data || []);
+      // Fix: ensure array fields are actual arrays
+      const fixed = (data || []).map(m => ({
+        ...m,
+        competencyNotes: Array.isArray(m.competencyNotes) 
+          ? m.competencyNotes 
+          : (m.competencyNotes ? [m.competencyNotes] : [""]),
+        commitmentNotes: Array.isArray(m.commitmentNotes) 
+          ? m.commitmentNotes 
+          : (m.commitmentNotes ? [m.commitmentNotes] : [""]),
+      }));
+      setMembers(fixed);
     }
     setIsLoadingData(false);
   };
