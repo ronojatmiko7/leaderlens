@@ -364,74 +364,95 @@ const QUADRANT_GUIDE = [
 ];
 
 
-// ── KOMPONEN LOGIN GATE ───────────────────────────────────────────────────
-const LoginGate = ({ onLoginSuccess }) => {
-  const [code, setCode] = useState("");
-  const [error, setError] = useState(false);
+// ── KOMPONEN SUPABASE AUTH GATE ───────────────────────────────────────────────────
+const SupabaseAuthGate = ({ onLoginSuccess }) => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  
+  // Form State
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [title, setTitle] = useState("");
+  const [company, setCompany] = useState("");
 
-  // KODE AKSES YANG VALID
-  const VALID_CODES = ["LEADER-PRO-2026", "SCALEV-VIP"];
-
-  const handleLogin = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (VALID_CODES.includes(code.trim().toUpperCase())) {
-      setError(false);
-      localStorage.setItem("ll_auth_status", "verified");
-      onLoginSuccess();
+    setLoading(true);
+    setError("");
+
+    if (isLogin) {
+      // PROSES LOGIN
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) setError(error.message);
+      else onLoginSuccess(data.session);
     } else {
-      setError(true);
-      setCode(""); // Kosongkan input jika salah
+      // PROSES REGISTER
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      
+      if (error) {
+        setError(error.message);
+      } else if (data.user) {
+        // Setelah sukses buat akun auth, masukkan data ke tabel profiles
+        const { error: profileError } = await supabase.from('profiles').insert([
+          {
+            id: data.user.id, // ID ini otomatis sama dengan ID Auth
+            full_name: fullName,
+            title: title,
+            company: company
+          }
+        ]);
+        
+        if (profileError) setError("Akun dibuat, tapi gagal menyimpan profil: " + profileError.message);
+        else onLoginSuccess(data.session);
+      }
     }
+    setLoading(false);
   };
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-[32px] p-8 sm:p-10 shadow-2xl animate-in fade-in zoom-in duration-500">
-        
-        {/* Logo */}
-        <div className="flex flex-col items-center justify-center mb-10">
-          <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center shadow-lg mb-5">
-            <Users className="w-8 h-8 text-slate-900" />
-          </div>
-          <div className="text-2xl sm:text-3xl font-black tracking-tight leading-none uppercase text-white">LEADER<span className="text-slate-400">LENS</span></div>
-          <div className="text-xs text-slate-500 font-mono mt-2 text-center">People Diagnostics Premium</div>
+      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-[32px] p-8 sm:p-10 shadow-2xl">
+        <div className="text-center mb-8">
+          <div className="text-2xl sm:text-3xl font-black text-white">LEADER<span className="text-slate-400">LENS</span></div>
+          <div className="text-xs text-slate-500 font-mono mt-2">{isLogin ? "Silakan Masuk" : "Buat Akun Manajer"}</div>
         </div>
 
-        {/* Formulir */}
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div className="space-y-2">
-            <label className="block text-xs font-black text-slate-400 uppercase tracking-widest text-center">
-              Masukkan Kode Akses
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Key className="h-5 w-5 text-slate-500" />
-              </div>
-              <input 
-                type="text" 
-                required
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                className={`w-full pl-12 pr-4 py-4 bg-slate-950 border ${error ? 'border-red-500 focus:ring-red-500' : 'border-slate-800 focus:ring-indigo-500'} rounded-2xl text-base sm:text-lg font-bold text-white outline-none focus:ring-2 transition-all text-center uppercase tracking-wider placeholder:text-slate-700 placeholder:normal-case placeholder:tracking-normal`}
-                placeholder="Misal: LEADER-PRO-2026" 
-              />
-            </div>
-            {error && (
-              <p className="text-xs font-bold text-red-500 text-center animate-in slide-in-from-top-2">Kode akses tidak valid. Silakan periksa email Anda.</p>
-            )}
-          </div>
-
-          <button type="submit"
-            className="w-full bg-white text-slate-900 py-4 rounded-2xl font-black text-sm sm:text-base tracking-widest uppercase hover:bg-slate-200 active:scale-[0.98] transition-all shadow-xl flex items-center justify-center gap-2">
-            <Lock className="w-4 h-4" /> Buka Akses
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {!isLogin && (
+            <>
+              <input required type="text" placeholder="Nama Lengkap" value={fullName} onChange={(e) => setFullName(e.target.value)}
+                className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white outline-none focus:border-indigo-500" />
+              <input required type="text" placeholder="Jabatan (Misal: Sales Manager)" value={title} onChange={(e) => setTitle(e.target.value)}
+                className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white outline-none focus:border-indigo-500" />
+              <input required type="text" placeholder="Nama Perusahaan" value={company} onChange={(e) => setCompany(e.target.value)}
+                className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white outline-none focus:border-indigo-500" />
+            </>
+          )}
+          <input required type="email" placeholder="Alamat Email" value={email} onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white outline-none focus:border-indigo-500" />
+          <input required type="password" placeholder="Password (Min. 6 karakter)" value={password} onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white outline-none focus:border-indigo-500" />
+          
+          {error && <p className="text-xs text-red-500 font-bold text-center">{error}</p>}
+          
+          <button type="submit" disabled={loading}
+            className="w-full bg-white text-slate-900 py-3.5 rounded-xl font-black uppercase tracking-widest hover:bg-slate-200 transition-all disabled:opacity-50">
+            {loading ? "Memproses..." : (isLogin ? "Masuk" : "Daftar & Buat Profil")}
           </button>
         </form>
 
-        <div className="mt-8 text-center border-t border-slate-800 pt-6">
-          <p className="text-xs text-slate-500 leading-relaxed">
-            Belum punya kode akses? <br />
-            Silakan selesaikan pembelian di <span className="font-bold text-slate-300">halaman Scalev</span> untuk mendapatkan kode eksklusif Anda via email.
-          </p>
+        <div className="mt-6 text-center">
+          <button onClick={() => { setIsLogin(!isLogin); setError(""); }} className="text-xs text-slate-400 hover:text-white transition-colors">
+            {isLogin ? "Belum punya akun? Daftar di sini" : "Sudah punya akun? Masuk di sini"}
+          </button>
         </div>
       </div>
     </div>
@@ -443,7 +464,8 @@ const LoginGate = ({ onLoginSuccess }) => {
 const EMPTY_FORM = { name: "", role: "", competency: 2, commitment: 2, competencyNotes: [""], commitmentNotes: [""], disc: "S" };
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [session, setSession] = useState(null); // Menyimpan sesi login
+  const [managerProfile, setManagerProfile] = useState(null); // Menyimpan data Nama, Jabatan, Perusahaan
   const [members, setMembers] = useState([]);
   const [isMounted, setIsMounted] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
@@ -454,14 +476,29 @@ export default function App() {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [expandedPlan, setExpandedPlan] = useState(null);
 
+  // Fungsi untuk menarik profil manajer (Nama, Perusahaan)
+  const fetchManagerProfile = async (userId) => {
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
+    if (!error && data) {
+      setManagerProfile(data);
+    }
+  };
+
   // Fetch dari Supabase
   const fetchMembers = async () => {
+    if (!session?.user?.id) return;
     setIsLoadingData(true);
-    const { data, error } = await supabase.from('members').select('*');
+    
+    // FILTER: Hanya tarik data yang manager_id-nya sama dengan user yg login
+    const { data, error } = await supabase
+      .from('members')
+      .select('*')
+      .eq('manager_id', session.user.id);
+
     if (error) {
-      console.error("Gagal menarik data dari Supabase:", error);
+      console.error("Gagal menarik data:", error);
     } else {
-      // Fix: ensure array fields are actual arrays
+      // Logika array notes Anda tetap sama...
       const fixed = (data || []).map(m => ({
         ...m,
         competencyNotes: Array.isArray(m.competencyNotes) 
@@ -478,16 +515,31 @@ export default function App() {
 
   useEffect(() => {
     setIsMounted(true);
-    if (localStorage.getItem("ll_auth_status") === "verified") {
-      setIsAuthenticated(true);
-      fetchMembers();
-    }
+    
+    // Cek sesi login saat ini
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session) fetchManagerProfile(session.user.id);
+    });
+
+    // Dengarkan perubahan login/logout
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session) {
+        fetchManagerProfile(session.user.id);
+      } else {
+        setManagerProfile(null);
+        setMembers([]);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const handleLoginSuccess = () => {
-    setIsAuthenticated(true);
-    fetchMembers();
-  };
+  // Panggil fetchMembers setiap kali session berubah
+  useEffect(() => {
+    if (session) fetchMembers();
+  }, [session]);
 
   const closeModal = () => { setModal(false); setEditId(null); setForm(EMPTY_FORM); };
 
@@ -524,7 +576,7 @@ export default function App() {
       }
     } else {
       const newId = Date.now().toString();
-      const payload = { ...clean, id: newId, createdAt: Date.now(), updatedAt: Date.now() };
+      const payload = { ...clean, id: newId, manager_id: session.user.id, createdAt: Date.now(), updatedAt: Date.now() };
       
       // Insert ke Supabase
       const { error } = await supabase.from('members').insert([payload]);
@@ -569,8 +621,8 @@ export default function App() {
 
   if (!isMounted) return null;
 
-  if (!isAuthenticated) {
-    return <LoginGate onLoginSuccess={handleLoginSuccess} />;
+  if (!session) {
+    return <SupabaseAuthGate onLoginSuccess={(sess) => setSession(sess)} />;
   }
 
   return (
