@@ -930,11 +930,11 @@ export default function App() {
             </div>
           )}
 
-{/* GUIDE TAB - Rewritten */}
+{/* GUIDE TAB - With Enhanced DISC Section */}
 {tab === "guide" && (
   <div className="space-y-10 sm:space-y-12 pb-8">
     
-    {/* Welcome / Big Picture */}
+    {/* Welcome / Big Picture - unchanged from previous suggestion */}
     <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 sm:p-10 text-center">
       <div className="flex items-center justify-center gap-3 mb-6">
         <BookOpen className="w-8 h-8 text-emerald-400" />
@@ -946,7 +946,7 @@ export default function App() {
       <p className="text-emerald-400 font-medium mt-4">Tujuannya: Setiap anggota tim merasa didukung, bukan dinilai.</p>
     </div>
 
-    {/* 1. Cara Menggunakan LeaderLens (Workflow) */}
+    {/* 1. Alur Kerja - unchanged */}
     <section>
       <h3 className="text-xl sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
         <Lightbulb className="w-7 h-7 text-amber-400" /> 
@@ -1001,7 +1001,7 @@ export default function App() {
       </div>
     </section>
 
-    {/* 2. Matriks Kompetensi vs Komitmen */}
+    {/* 2. Matriks - unchanged from previous */}
     <section>
       <h3 className="text-xl sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
         <LayoutGrid className="w-7 h-7 text-slate-400" /> 
@@ -1037,38 +1037,78 @@ export default function App() {
       </div>
     </section>
 
-    {/* 3. Profil Komunikasi DISC (Simplified) */}
+    {/* 3. ENHANCED DISC SECTION - This is the only part we expanded */}
     <section>
       <h3 className="text-xl sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
         <Users className="w-7 h-7 text-slate-400" /> 
-        3. Gaya Komunikasi DISC (Opsional tapi Sangat Membantu)
+        3. Memahami Profil Komunikasi DISC
       </h3>
-      <p className="text-slate-400 mb-8 max-w-2xl">
-        Pilih tipe DISC membantu Anda menyesuaikan cara bicara agar pesan lebih mudah diterima. 
-        Tidak perlu akurat 100% — gunakan sebagai panduan saja.
+      <p className="text-slate-400 mb-8 max-w-3xl">
+        DISC membantu Anda menyesuaikan gaya komunikasi agar pesan lebih mudah diterima. 
+        Pilih tipe yang paling mendekati perilaku karyawan. Gunakan ini sebagai panduan fleksibel, bukan label tetap.
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        {[
-          { id: "D", label: "Dominance", color: "border-red-500", dot: "bg-red-500", sub: "Langsung & Hasil-oriented" },
-          { id: "I", label: "Influence", color: "border-amber-400", dot: "bg-amber-400", sub: "Antusias & Orang-oriented" },
-          { id: "S", label: "Steadiness", color: "border-emerald-500", dot: "bg-emerald-500", sub: "Sabar & Tim-oriented" },
-          { id: "C", label: "Compliance", color: "border-blue-500", dot: "bg-blue-500", sub: "Akurat & Detail-oriented" },
-        ].map(d => (
-          <div key={d.id} className={`bg-white rounded-3xl p-7 border-l-8 ${d.color} shadow-sm`}>
-            <div className="flex items-center gap-4 mb-5">
-              <div className={`w-12 h-12 rounded-2xl ${d.dot} text-white font-black text-3xl flex items-center justify-center`}>{d.id}</div>
-              <div>
-                <h4 className="font-black text-xl text-slate-900">{d.label}</h4>
-                <p className="text-sm text-slate-500">{d.sub}</p>
+
+      <div className="grid grid-cols-1 gap-8">
+        {Object.entries(DISC_META).map(([id, data]) => (
+          <div key={id} className="bg-white rounded-3xl p-8 border-l-8 shadow-sm" style={{ borderColor: data.color }}>
+            <div className="flex items-start gap-6 mb-8">
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-4xl font-black text-white flex-shrink-0`} 
+                   style={{ backgroundColor: data.color }}>
+                {id}
+              </div>
+              <div className="pt-1">
+                <h4 className="font-black text-2xl text-slate-900">{data.label}</h4>
+                <p className="text-slate-500 mt-1">{data.desc}</p>
               </div>
             </div>
-            <p className="text-xs text-slate-600 italic">Gunakan script pembuka di Action Plan sesuai tipe ini agar diskusi lebih nyaman.</p>
+
+            <div className="grid sm:grid-cols-2 gap-8">
+              {/* Strengths */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+                  <span className="font-bold uppercase tracking-widest text-emerald-600 text-sm">Kekuatan Utama</span>
+                </div>
+                <p className="text-slate-700 leading-relaxed">{data.strengths}</p>
+              </div>
+
+              {/* Weaknesses */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <AlertTriangle className="w-6 h-6 text-amber-500" />
+                  <span className="font-bold uppercase tracking-widest text-amber-600 text-sm">Area yang Perlu Diwaspadai</span>
+                </div>
+                <p className="text-slate-700 leading-relaxed">{data.weaknesses}</p>
+              </div>
+            </div>
+
+            {/* Practical Tips */}
+            <div className="mt-10 pt-8 border-t border-slate-100">
+              <div className="flex items-center gap-2 mb-5">
+                <MessageCircle className="w-6 h-6 text-indigo-500" />
+                <span className="font-bold uppercase tracking-widest text-indigo-600 text-sm">Cara Berkomunikasi Efektif</span>
+              </div>
+              <ul className="space-y-4 text-sm text-slate-700">
+                <li className="flex gap-4">
+                  <span className="text-emerald-500 font-black mt-1">→</span>
+                  <span><strong>Buka percakapan dengan:</strong> "{getDISCScript(id).open}"</span>
+                </li>
+                <li className="flex gap-4">
+                  <span className="text-emerald-500 font-black mt-1">→</span>
+                  <span><strong>Isi diskusi yang paling efektif:</strong> {getDISCScript(id).body}</span>
+                </li>
+                <li className="flex gap-4">
+                  <span className="text-rose-500 font-black mt-1">→</span>
+                  <span><strong>Hindari:</strong> {getDISCScript(id).avoid}</span>
+                </li>
+              </ul>
+            </div>
           </div>
         ))}
       </div>
     </section>
 
-    {/* 4. Cara Mengisi & Diskusi */}
+    {/* 4. Cara Mengisi & Diskusi - unchanged */}
     <section>
       <h3 className="text-xl sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
         <FileText className="w-7 h-7 text-slate-400" /> 
