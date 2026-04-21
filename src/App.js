@@ -808,7 +808,7 @@ export default function App() {
                             <Printer className="w-4 h-4" /> Simpan ke PDF
                           </button>
                         </div>
-                        <div className="bg-white text-slate-900 rounded-sm shadow-2xl mx-auto max-w-4xl print-area">
+<div className="bg-white text-slate-900 rounded-sm shadow-2xl mx-auto max-w-4xl print-area">
                           <div className="p-6 sm:p-8">
                             
                             {/* HEADER - Rapat & Hemat Ruang */}
@@ -902,6 +902,12 @@ export default function App() {
                             </div>
                           </div>
                         </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* GUIDE TAB */}
           {tab === "guide" && (
