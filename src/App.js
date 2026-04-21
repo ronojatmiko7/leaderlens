@@ -918,8 +918,6 @@ export default function App() {
                                 <div className="border-b border-slate-400 h-10 mx-6"></div>
                                 <p className="mt-1.5 text-xs font-black text-slate-900">{m.name}</p>
                                 <p className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Karyawan</p>
-                                  </div>
-                                </div>
                               </div>
                             </div>
                           </div>
