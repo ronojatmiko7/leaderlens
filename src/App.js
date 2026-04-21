@@ -808,10 +808,10 @@ export default function App() {
                             <Printer className="w-4 h-4" /> Simpan ke PDF
                           </button>
                         </div>
-<div className="bg-white text-slate-900 rounded-sm shadow-2xl mx-auto max-w-4xl print-area">
+<div className="bg-white text-slate-900 rounded-sm shadow-2xl mx-auto max-w-3xl print-area">
                           
                           {/* ========================================================= */}
-                          {/* HALAMAN 1: KHUSUS MANAJER (Kembali ke Versi Sebelumnya)   */}
+                          {/* HALAMAN 1: KHUSUS MANAJER (Tetap Lega seperti asli)       */}
                           {/* ========================================================= */}
                           <div className="p-8 sm:p-12">
                             <div className="border-b-2 border-slate-900 pb-4 mb-6 text-center">
@@ -847,74 +847,77 @@ export default function App() {
                           </div>
 
                           {/* ========================================================= */}
-                          {/* HALAMAN 2: UNTUK ANGGOTA TIM (Desain 2-Kolom Hemat Tempat)*/}
+                          {/* HALAMAN 2: UNTUK ANGGOTA TIM (1-Kolom, Padat & Rapi)        */}
                           {/* ========================================================= */}
-                          <div className="p-8 sm:p-12 border-t-8 border-slate-900" style={{ pageBreakBefore: 'always' }}>
-                            <div className="border-b-2 border-slate-900 pb-6 mb-8 text-center">
-                              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-tight text-slate-900 mb-2">{getDocumentTitle(q.id)}</h1>
+                          <div className="p-6 sm:p-10 border-t-8 border-slate-900" style={{ pageBreakBefore: 'always' }}>
+                            
+                            {/* Header - Diperkecil Marginnya */}
+                            <div className="border-b-2 border-slate-900 pb-3 mb-5 text-center">
+                              <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-slate-900 mb-1">{getDocumentTitle(q.id)}</h1>
                               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Kolaboratif — Diskusikan & Sepakati Bersama</p>
                             </div>
                             
-                            <div className="grid grid-cols-4 gap-4 mb-8 text-sm sm:text-base bg-slate-50 p-6 rounded-xl border border-slate-200">
-                              <div className="col-span-2">
-                                <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Nama Karyawan</p>
+                            {/* Info Grid - Lebih Rapat */}
+                            <div className="grid grid-cols-2 gap-3 mb-5 text-xs sm:text-sm bg-slate-50 p-4 rounded-xl border border-slate-200">
+                              <div>
+                                <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-0.5">Nama Karyawan</p>
                                 <p className="font-black text-slate-900">{m.name} <span className="font-medium text-slate-600">{m.role ? `— ${m.role}` : ""}</span></p>
                               </div>
                               <div>
-                                <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Tanggal</p>
+                                <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-0.5">Tanggal</p>
                                 <p className="font-black text-slate-900">{formatDate(Date.now())}</p>
                               </div>
-                              <div>
-                                <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Fokus</p>
+                              <div className="mt-1">
+                                <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-0.5">Disiapkan Oleh</p>
+                                <p className="font-black text-slate-900">{managerProfile?.full_name}</p>
+                              </div>
+                              <div className="mt-1">
+                                <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-0.5">Fokus Pengembangan</p>
                                 <p className="font-black" style={{ color: q.color }}>{q.label}</p>
                               </div>
                             </div>
 
-                            <div className="grid sm:grid-cols-2 gap-8 mb-6">
-                              {/* Kolom Kiri: Observasi */}
-                              <div>
-                                <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 mb-4 border-b border-slate-300 pb-2">I. Observasi Kinerja Terkini</h3>
-                                
-                                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6 break-inside-avoid">
-                                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Fakta Kompetensi Teknis</p>
-                                  <ul className="list-disc pl-4 text-sm text-slate-700 space-y-1">
+                            {/* Section I - Digabung dalam 1 kotak agar hemat tempat */}
+                            <div className="mb-5 break-inside-avoid">
+                              <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-900 mb-2">I. Observasi Kinerja Terkini</h3>
+                              <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                <div className="mb-4">
+                                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Fakta Kompetensi Teknis</p>
+                                  <ul className="list-disc pl-4 text-xs sm:text-sm text-slate-700 space-y-1">
                                     {m.competencyNotes.map((note, i) => <li key={i}>{note || "-"}</li>)}
                                   </ul>
                                 </div>
-                                
-                                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm break-inside-avoid">
-                                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Fakta Komitmen & Sikap</p>
-                                  <ul className="list-disc pl-4 text-sm text-slate-700 space-y-1">
+                                <div>
+                                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Fakta Komitmen & Sikap</p>
+                                  <ul className="list-disc pl-4 text-xs sm:text-sm text-slate-700 space-y-1">
                                     {m.commitmentNotes.map((note, i) => <li key={i}>{note || "-"}</li>)}
                                   </ul>
                                 </div>
                               </div>
+                            </div>
 
-                              {/* Kolom Kanan: Rencana Tindakan & Tanda Tangan */}
-                              <div className="flex flex-col">
-                                <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 mb-4 border-b border-slate-300 pb-2">II. Rencana Tindakan (Disepakati)</h3>
-                                
-                                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex-1 flex flex-col mb-8 break-inside-avoid">
-                                  <p className="text-xs text-slate-500 mb-6 italic">Tindakan spesifik, target terukur, dan tenggat waktu:</p>
-                                  <div className="space-y-8 flex-1">
-                                    <div className="border-b border-slate-400 h-6"><span className="text-sm font-bold text-slate-800">1.</span></div>
-                                    <div className="border-b border-slate-400 h-6"><span className="text-sm font-bold text-slate-800">2.</span></div>
-                                    <div className="border-b border-slate-400 h-6"><span className="text-sm font-bold text-slate-800">3.</span></div>
-                                    <div className="border-b border-slate-400 h-6"><span className="text-sm font-bold text-slate-800">4.</span></div>
-                                  </div>
-                                </div>
+                            {/* Section II - Jarak antar garis dirapatkan */}
+                            <div className="break-inside-avoid">
+                              <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-900 mb-1">II. Rencana Tindakan (Disepakati Bersama)</h3>
+                              <p className="text-[10px] sm:text-xs text-slate-500 mb-4 italic">Tindakan spesifik, target terukur, dan tenggat waktu.</p>
+                              <div className="space-y-6">
+                                <div className="border-b border-slate-400 h-5 flex items-end"><span className="text-xs font-bold text-slate-800 ml-2">1.</span></div>
+                                <div className="border-b border-slate-400 h-5 flex items-end"><span className="text-xs font-bold text-slate-800 ml-2">2.</span></div>
+                                <div className="border-b border-slate-400 h-5 flex items-end"><span className="text-xs font-bold text-slate-800 ml-2">3.</span></div>
+                              </div>
+                            </div>
 
-                                {/* Tanda Tangan */}
-                                <div className="grid grid-cols-2 gap-6 text-center mt-auto break-inside-avoid">
-                                  <div>
-                                    <div className="border-b border-slate-400 h-10 mx-4"></div>
-                                    <p className="mt-2 text-sm font-black text-slate-900">{managerProfile?.full_name || "Manajer"}</p>
-                                    <p className="text-[10px] text-slate-500 uppercase tracking-wider">Atasan</p>
-                                  </div>
-                                  <div>
-                                    <div className="border-b border-slate-400 h-10 mx-4"></div>
-                                    <p className="mt-2 text-sm font-black text-slate-900">{m.name}</p>
-                                    <p className="text-[10px] text-slate-500 uppercase tracking-wider">Karyawan</p>
+                            {/* Area Tanda Tangan - Dikurangi margin atasnya */}
+                            <div className="mt-10 pt-4 grid grid-cols-2 gap-8 text-center break-inside-avoid">
+                              <div>
+                                <div className="border-b border-slate-400 h-10 mx-6"></div>
+                                <p className="mt-1.5 text-xs font-black text-slate-900">{managerProfile?.full_name || "Manajer"}</p>
+                                <p className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Atasan</p>
+                              </div>
+                              <div>
+                                <div className="border-b border-slate-400 h-10 mx-6"></div>
+                                <p className="mt-1.5 text-xs font-black text-slate-900">{m.name}</p>
+                                <p className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Karyawan</p>
                                   </div>
                                 </div>
                               </div>
