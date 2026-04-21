@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@supabase/supabase-js";
 import {
   Plus, Users, LayoutGrid, BookOpen, Trash2, Edit3, TrendingUp,
   Target, Award, X, PlusCircle, CheckCircle2, AlertTriangle,
   Wrench, ShieldAlert, MessageCircle, ChevronDown, Calendar,
   BarChart3, Lightbulb, ArrowRight, Clock, RefreshCw, Info, Lock, Key,
-  Printer, FileText, CheckCircle, XCircle
+  Printer, FileText, CheckCircle, XCircle, LogOut
 } from "lucide-react";
 
 // ── Inisialisasi Supabase ────────────────────────────────────────────────────
@@ -92,7 +92,6 @@ const getDISCScript = (disc) => ({
 }[disc]);
 
 const getActionPlan = (m) => {
-  // Safety: ensure notes are always arrays
   m = { 
     ...m, 
     competencyNotes: Array.isArray(m.competencyNotes) ? m.competencyNotes : (m.competencyNotes ? [m.competencyNotes] : [""]),
@@ -104,7 +103,6 @@ const getActionPlan = (m) => {
   const discData = DISC_META[m.disc || "S"];
   const plan = [];
 
-  // DISC Profile Analysis
   plan.push({
     type: "profile",
     title: `Analisis Karakter: Tipe ${m.disc || "S"} — ${discData.label}`,
@@ -119,7 +117,6 @@ const getActionPlan = (m) => {
     ],
   });
 
-  // Skill Intervention
   if (m.competency < 3) {
     plan.push({
       type: "skill",
@@ -143,7 +140,6 @@ const getActionPlan = (m) => {
     });
   }
 
-  // Commitment/Will Intervention
   if (m.commitment < 3) {
     plan.push({
       type: "will",
@@ -162,7 +158,6 @@ const getActionPlan = (m) => {
     });
   }
 
-  // Q1 Specific: PIP Protocol
   if (q.id === "Q1") {
     plan.push({
       type: "pip",
@@ -181,7 +176,6 @@ const getActionPlan = (m) => {
     });
   }
 
-  // Q2 Specific: Accelerated Development
   if (q.id === "Q2") {
     plan.push({
       type: "development",
@@ -200,7 +194,6 @@ const getActionPlan = (m) => {
     });
   }
 
-  // Q3 Specific: Re-engagement — Most detailed because it's most often mishandled
   if (q.id === "Q3") {
     plan.push({
       type: "reengagement",
@@ -225,7 +218,6 @@ const getActionPlan = (m) => {
     });
   }
 
-  // Q4 Specific: Retention & Growth
   if (q.id === "Q4") {
     plan.push({
       type: "growth",
@@ -253,6 +245,7 @@ const getActionPlan = (m) => {
   return plan;
 };
 
+// teamHealthScore: divides by 8 because max possible sum of compAvg + commAvg = 4 + 4 = 8
 const teamHealthScore = (members) => {
   if (!members.length) return null;
   const avg = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
@@ -369,8 +362,8 @@ const SupabaseAuthGate = ({ onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
   
-  // Form State
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -381,37 +374,36 @@ const SupabaseAuthGate = ({ onLoginSuccess }) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccessMsg("");
 
     if (isLogin) {
-      // PROSES LOGIN
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) setError(error.message);
       else onLoginSuccess(data.session);
     } else {
-      // PROSES REGISTER
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
+      const { data, error } = await supabase.auth.signUp({ email, password });
       
       if (error) {
         setError(error.message);
       } else if (data.user) {
-        // Setelah sukses buat akun auth, masukkan data ke tabel profiles
-        const { error: profileError } = await supabase.from('profiles').insert([
-          {
-            id: data.user.id, // ID ini otomatis sama dengan ID Auth
-            full_name: fullName,
-            title: title,
-            company: company
-          }
-        ]);
+        // Insert profile data
+        const { error: profileError } = await supabase.from('profiles').insert([{
+          id: data.user.id,
+          full_name: fullName,
+          title: title,
+          company: company
+        }]);
         
-        if (profileError) setError("Akun dibuat, tapi gagal menyimpan profil: " + profileError.message);
-        else onLoginSuccess(data.session);
+        if (profileError) {
+          setError("Akun dibuat, tapi gagal menyimpan profil: " + profileError.message);
+        } else if (data.session) {
+          // Session exists → email confirmation disabled, log in directly
+          onLoginSuccess(data.session);
+        } else {
+          // Session is null → email confirmation required
+          setSuccessMsg("Akun berhasil dibuat! Silakan cek email Anda untuk konfirmasi sebelum login.");
+          setIsLogin(true);
+        }
       }
     }
     setLoading(false);
@@ -442,6 +434,7 @@ const SupabaseAuthGate = ({ onLoginSuccess }) => {
             className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white outline-none focus:border-indigo-500" />
           
           {error && <p className="text-xs text-red-500 font-bold text-center">{error}</p>}
+          {successMsg && <p className="text-xs text-emerald-400 font-bold text-center">{successMsg}</p>}
           
           <button type="submit" disabled={loading}
             className="w-full bg-white text-slate-900 py-3.5 rounded-xl font-black uppercase tracking-widest hover:bg-slate-200 transition-all disabled:opacity-50">
@@ -450,7 +443,7 @@ const SupabaseAuthGate = ({ onLoginSuccess }) => {
         </form>
 
         <div className="mt-6 text-center">
-          <button onClick={() => { setIsLogin(!isLogin); setError(""); }} className="text-xs text-slate-400 hover:text-white transition-colors">
+          <button onClick={() => { setIsLogin(!isLogin); setError(""); setSuccessMsg(""); }} className="text-xs text-slate-400 hover:text-white transition-colors">
             {isLogin ? "Belum punya akun? Daftar di sini" : "Sudah punya akun? Masuk di sini"}
           </button>
         </div>
@@ -461,100 +454,104 @@ const SupabaseAuthGate = ({ onLoginSuccess }) => {
 
 
 // ── MAIN APP ──────────────────────────────────────────────────────────────
-const EMPTY_FORM = { name: "", role: "", competency: 2, commitment: 2, competencyNotes: [""], commitmentNotes: [""], disc: "S" };
+// FIX #13: Default competency/commitment to 3 so new members start outside Q1
+const EMPTY_FORM = { name: "", role: "", competency: 3, commitment: 3, competencyNotes: [""], commitmentNotes: [""], disc: "S" };
 
 export default function App() {
-  const [session, setSession] = useState(null); // Menyimpan sesi login
-  const [managerProfile, setManagerProfile] = useState(null); // Menyimpan data Nama, Jabatan, Perusahaan
+  const [session, setSession] = useState(null);
+  const [managerProfile, setManagerProfile] = useState(null);
   const [members, setMembers] = useState([]);
   const [isMounted, setIsMounted] = useState(false);
-  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [isLoadingData, setIsLoadingData] = useState(false); // FIX #10: start false, only true during active fetch
   const [tab, setTab] = useState("matrix");
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
-  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null); // FIX #2: used by delete dialog
   const [expandedPlan, setExpandedPlan] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false); // FIX #8: submit loading state
 
-  // Fungsi untuk menarik profil manajer (Nama, Perusahaan)
   const fetchManagerProfile = async (userId) => {
     const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
-    if (!error && data) {
-      setManagerProfile(data);
-    }
+    if (!error && data) setManagerProfile(data);
   };
 
-  // Fetch dari Supabase
-  const fetchMembers = async () => {
-    if (!session?.user?.id) return;
+  // FIX #1 & #11: useCallback so fetchMembers can be called directly with a userId
+  const fetchMembersForUser = useCallback(async (userId) => {
+    if (!userId) return;
     setIsLoadingData(true);
     
-    // FILTER: Hanya tarik data yang manager_id-nya sama dengan user yg login
     const { data, error } = await supabase
       .from('members')
       .select('*')
-      .eq('manager_id', session.user.id);
+      .eq('manager_id', userId);
 
     if (error) {
       console.error("Gagal menarik data:", error);
     } else {
-      // Logika array notes Anda tetap sama...
       const fixed = (data || []).map(m => ({
         ...m,
-        competencyNotes: Array.isArray(m.competencyNotes) 
-          ? m.competencyNotes 
-          : (m.competencyNotes ? [m.competencyNotes] : [""]),
-        commitmentNotes: Array.isArray(m.commitmentNotes) 
-          ? m.commitmentNotes 
-          : (m.commitmentNotes ? [m.commitmentNotes] : [""]),
+        competencyNotes: Array.isArray(m.competencyNotes) ? m.competencyNotes : (m.competencyNotes ? [m.competencyNotes] : [""]),
+        commitmentNotes: Array.isArray(m.commitmentNotes) ? m.commitmentNotes : (m.commitmentNotes ? [m.commitmentNotes] : [""]),
       }));
       setMembers(fixed);
     }
     setIsLoadingData(false);
-  };
+  }, []);
 
   useEffect(() => {
     setIsMounted(true);
     
-    // Cek sesi login saat ini
+    // FIX #1: Call fetch directly inside .then() to avoid race condition
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      if (session) fetchManagerProfile(session.user.id);
+      if (session) {
+        fetchManagerProfile(session.user.id);
+        fetchMembersForUser(session.user.id);
+      }
     });
 
-    // Dengarkan perubahan login/logout
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (session) {
         fetchManagerProfile(session.user.id);
+        fetchMembersForUser(session.user.id);
       } else {
         setManagerProfile(null);
         setMembers([]);
+        setIsLoadingData(false); // FIX #10: reset loading on logout
       }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [fetchMembersForUser]);
 
-  // Panggil fetchMembers setiap kali session berubah
-  useEffect(() => {
-    if (session) fetchMembers();
-  }, [session]);
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
 
   const closeModal = () => { setModal(false); setEditId(null); setForm(EMPTY_FORM); };
 
   const openEdit = (m) => {
+    // FIX #7: Filter empty strings when opening edit so they don't appear in printed docs
+    const cleanNotes = (arr) => {
+      const filtered = (Array.isArray(arr) ? arr : [arr || ""]).filter(n => n.trim());
+      return filtered.length ? filtered : [""];
+    };
     setForm({ 
       ...m, 
-      competencyNotes: Array.isArray(m.competencyNotes) && m.competencyNotes.length ? m.competencyNotes : [""], 
-      commitmentNotes: Array.isArray(m.commitmentNotes) && m.commitmentNotes.length ? m.commitmentNotes : [""] 
+      competencyNotes: cleanNotes(m.competencyNotes),
+      commitmentNotes: cleanNotes(m.commitmentNotes),
     });
     setEditId(m.id); setModal(true);
   };
 
-  // Push ke Supabase
+  // FIX #3 & #8: Let Supabase generate the ID; add submit loading state
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     const clean = { 
       ...form, 
       competencyNotes: form.competencyNotes.filter(n => n.trim()), 
@@ -563,8 +560,6 @@ export default function App() {
 
     if (editId) {
       const payload = { ...clean, updatedAt: Date.now() };
-      
-      // Update di Supabase
       const { error } = await supabase.from('members').update(payload).eq('id', editId);
       
       if (error) {
@@ -575,23 +570,32 @@ export default function App() {
         closeModal();
       }
     } else {
-      const newId = Date.now().toString();
-      const payload = { ...clean, id: newId, manager_id: session.user.id, createdAt: Date.now(), updatedAt: Date.now() };
+      // FIX #3: Remove manual id field; let Supabase auto-generate UUID
+      const payload = { 
+        ...clean, 
+        manager_id: session.user.id, 
+        createdAt: Date.now(), 
+        updatedAt: Date.now() 
+      };
       
-      // Insert ke Supabase
-      const { error } = await supabase.from('members').insert([payload]);
+      const { data, error } = await supabase.from('members').insert([payload]).select();
       
       if (error) {
         console.error("Gagal simpan data baru:", error);
         alert("Gagal menambahkan data ke database.");
-      } else {
-        setMembers(ms => [...ms, payload]);
+      } else if (data && data[0]) {
+        setMembers(ms => [...ms, {
+          ...data[0],
+          competencyNotes: Array.isArray(data[0].competencyNotes) ? data[0].competencyNotes : [data[0].competencyNotes || ""],
+          commitmentNotes: Array.isArray(data[0].commitmentNotes) ? data[0].commitmentNotes : [data[0].commitmentNotes || ""],
+        }]);
         closeModal();
       }
     }
+    setIsSubmitting(false);
   };
 
-  // Hapus dari Supabase
+  // FIX #2: confirmDelete is now called from the delete confirmation dialog
   const confirmDelete = async (id) => {
     const { error } = await supabase.from('members').delete().eq('id', id);
     if (error) {
@@ -615,9 +619,7 @@ export default function App() {
     { id: "guide", label: "Panduan" },
   ];
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const handlePrint = () => window.print();
 
   if (!isMounted) return null;
 
@@ -632,30 +634,22 @@ export default function App() {
         * { -webkit-font-smoothing: antialiased; }
         .fade-in { animation: fadeIn 0.4s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        /* Kustom scrollbar */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        /* CSS KHUSUS UNTUK FITUR PRINT PDF - PENYEMPURNAAN */
         @media print {
-          /* Me-reset background hitam bawaan root aplikasi menjadi putih */
           body, html, #root, .bg-slate-950, .min-h-screen { 
             background-color: white !important; 
             color: black !important; 
           }
-          
-          /* Menyembunyikan elemen UI yang tidak perlu di cetak */
-          header, .hide-on-print { display: none !important; }
-          
-          /* Menghilangkan background pembungkus akordion yang berwarna gelap */
+          /* FIX #12: Use .app-header instead of generic header tag */
+          .app-header, .hide-on-print { display: none !important; }
           .bg-slate-900 {
             background-color: transparent !important;
             border: none !important;
           }
-          
-          /* Memastikan Kertas Dokumen terisi penuh tanpa terpotong margin UI */
           .print-area {
             position: relative !important;
             background-color: white !important;
@@ -665,21 +659,14 @@ export default function App() {
             padding: 0 !important;
             width: 100% !important;
           }
-          
-          /* Memaksa seluruh teks di dalam dokumen menjadi warna hitam (khusus saat print) */
-          .print-area * {
-            color: black !important;
-          }
-          
-          /* Mengizinkan warna elemen grafis (seperti ikon dan border abu) tetap tercetak */
+          .print-area * { color: black !important; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          
           @page { margin: 1.5cm; }
         }
       `}</style>
 
-      {/* Header */}
-      <header className="border-b border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-40 bg-slate-950/95 backdrop-blur hide-on-print">
+      {/* FIX #12: Changed from <header> to <div className="app-header"> */}
+      <div className="app-header border-b border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-40 bg-slate-950/95 backdrop-blur hide-on-print">
         <div className="max-w-4xl lg:max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white flex items-center justify-center">
@@ -701,9 +688,15 @@ export default function App() {
               className="bg-white text-slate-900 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-black text-[10px] sm:text-xs lg:text-sm tracking-widest uppercase hover:bg-slate-100 transition-all active:scale-95 shadow-lg">
               + Tambah
             </button>
+            {/* FIX #9: Logout button */}
+            <button onClick={handleLogout}
+              title="Keluar"
+              className="p-2 sm:p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-400 hover:text-red-400 hover:border-red-400/50 transition-all">
+              <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
           </div>
         </div>
-      </header>
+      </div>
 
       <main className="max-w-4xl lg:max-w-5xl mx-auto px-4 py-6">
         {/* Team Health Banner */}
@@ -756,7 +749,6 @@ export default function App() {
                 </div>
               ) : (
                 <div className="w-full max-w-lg lg:max-w-2xl flex gap-2 sm:gap-4 mt-4">
-                  {/* Y Axis Container */}
                   <div className="flex items-center">
                     <span 
                       className="text-[10px] sm:text-xs lg:text-sm font-black text-slate-400 uppercase tracking-widest whitespace-nowrap" 
@@ -764,38 +756,26 @@ export default function App() {
                       ← Komitmen
                     </span>
                   </div>
-
-                  {/* Matrix Box + X Axis Container */}
                   <div className="flex-1 flex flex-col gap-2 sm:gap-4">
-                    {/* Matrix Square */}
                     <div className="w-full aspect-square relative bg-slate-900 rounded-3xl sm:rounded-[32px] border border-slate-800 overflow-hidden shadow-2xl">
-                      
-                      {/* Grid lines */}
                       <div className="absolute top-1/2 left-0 w-full h-[2px] bg-slate-500/80 z-0"></div>
                       <div className="absolute top-0 left-1/2 w-[2px] h-full bg-slate-500/80 z-0"></div>
-                      
-                      {/* KETERANGAN KUADRAN BACKGROUND */}
                       <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 text-center text-slate-700/50 z-0 pointer-events-none select-none flex flex-col items-center justify-center w-full">
                         <div className="text-2xl sm:text-4xl font-black mb-1">Q2</div>
                         <div className="text-[9px] sm:text-xs font-bold uppercase tracking-widest">Potential Talent</div>
                       </div>
-                      
                       <div className="absolute top-1/4 left-3/4 -translate-x-1/2 -translate-y-1/2 text-center text-slate-700/50 z-0 pointer-events-none select-none flex flex-col items-center justify-center w-full">
                         <div className="text-2xl sm:text-4xl font-black mb-1">Q4</div>
                         <div className="text-[9px] sm:text-xs font-bold uppercase tracking-widest">Star Performer</div>
                       </div>
-
                       <div className="absolute top-3/4 left-1/4 -translate-x-1/2 -translate-y-1/2 text-center text-slate-700/50 z-0 pointer-events-none select-none flex flex-col items-center justify-center w-full">
                         <div className="text-[9px] sm:text-xs font-bold uppercase tracking-widest mb-1">Critical Area</div>
                         <div className="text-2xl sm:text-4xl font-black">Q1</div>
                       </div>
-
                       <div className="absolute top-3/4 left-3/4 -translate-x-1/2 -translate-y-1/2 text-center text-slate-700/50 z-0 pointer-events-none select-none flex flex-col items-center justify-center w-full">
                         <div className="text-[9px] sm:text-xs font-bold uppercase tracking-widest mb-1">Expert in Slump</div>
                         <div className="text-2xl sm:text-4xl font-black">Q3</div>
                       </div>
-                      
-                      {/* Member dots */}
                       {members.map(m => {
                         const q = getQuadrant(m.competency, m.commitment);
                         const left = ((m.competency - 1) / 3) * 80 + 10;
@@ -813,8 +793,6 @@ export default function App() {
                         );
                       })}
                     </div>
-                    
-                    {/* X Axis Label */}
                     <div className="text-center">
                       <span className="text-[10px] sm:text-xs lg:text-sm font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">
                         Kompetensi →
@@ -861,14 +839,13 @@ export default function App() {
             </div>
           )}
 
-          {/* ACTION PLANS TAB / DOKUMEN */}
+          {/* ACTION PLANS TAB */}
           {tab === "plans" && (
             <div className="space-y-4">
                {members.map(m => {
                   const q = getQuadrant(m.competency, m.commitment);
                   return (
                   <div key={m.id} className={`bg-slate-900 rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-800 shadow-sm transition-all ${expandedPlan !== m.id ? 'hide-on-print' : ''}`}>
-                    {/* Header Akordion - Disembunyikan saat print */}
                     <button onClick={() => setExpandedPlan(expandedPlan === m.id ? null : m.id)}
                       className="w-full flex items-center justify-between p-5 sm:p-6 hover:bg-slate-800 transition-all text-white hide-on-print">
                       <div className="flex items-center gap-4">
@@ -883,153 +860,132 @@ export default function App() {
                       <ChevronDown className={`w-5 h-5 sm:w-6 sm:h-6 text-slate-500 transition-transform ${expandedPlan === m.id ? "rotate-180" : ""}`} />
                     </button>
                     
-                    {/* Kertas A4 View (Area yang di Print) */}
                     {expandedPlan === m.id && (
                       <div className="p-4 sm:p-8 bg-slate-950 border-t border-slate-800">
-                        
-                        {/* Tombol Print (Sembunyi saat di-print) */}
                         <div className="flex justify-end mb-4 hide-on-print">
                           <button onClick={handlePrint} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-colors">
                             <Printer className="w-4 h-4" /> Simpan ke PDF
                           </button>
                         </div>
 
-                        {/* MOCKUP KERTAS A4 FORMAL - INI AREA YANG AKAN MUNCUL SAAT PRINT */}
-                        {/* AREA CETAK (PRINT AREA) KESELURUHAN */}
-<div className={`bg-white text-slate-900 rounded-sm shadow-2xl mx-auto max-w-3xl print-area`}>
-  
-  {/* =========================================================================
-      PART 1: MANAGER'S BRIEFING (PANDUAN RAHASIA MANAJER)
-      ========================================================================= */}
-  <div className="p-8 sm:p-12">
-    {/* Kop Dokumen Internal */}
-    <div className="border-b-2 border-slate-900 pb-4 mb-6 text-center">
-      <h1 className="text-lg sm:text-xl font-black uppercase tracking-tight text-slate-900 mb-1">
-        Leader's Pre-Flight Briefing
-      </h1>
-      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">
-        {managerProfile?.company || "Internal Management Document"}
-      </p>
-      <p className="text-xs font-bold text-red-600 uppercase tracking-widest mt-2">
-        Strictly Confidential — Do Not Share With Employee
-      </p>
-    </div>
+                        <div className={`bg-white text-slate-900 rounded-sm shadow-2xl mx-auto max-w-3xl print-area`}>
+                          <div className="p-8 sm:p-12">
+                            <div className="border-b-2 border-slate-900 pb-4 mb-6 text-center">
+                              <h1 className="text-lg sm:text-xl font-black uppercase tracking-tight text-slate-900 mb-1">
+                                Leader's Pre-Flight Briefing
+                              </h1>
+                              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">
+                                {managerProfile?.company || "Internal Management Document"}
+                              </p>
+                              <p className="text-xs font-bold text-red-600 uppercase tracking-widest mt-2">
+                                Strictly Confidential — Do Not Share With Employee
+                              </p>
+                            </div>
 
-    {/* Info Singkat */}
-    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-8 flex justify-between items-center">
-      <div>
-        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Target Diskusi</p>
-        <p className="font-black text-slate-900 text-lg">{m.name}</p>
-      </div>
-      <div className="text-right">
-        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Profil & Kuadran</p>
-        <p className="font-black" style={{ color: q.color }}>DISC {m.disc} | {q.id}</p>
-      </div>
-    </div>
+                            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-8 flex justify-between items-center">
+                              <div>
+                                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Target Diskusi</p>
+                                <p className="font-black text-slate-900 text-lg">{m.name}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Profil & Kuadran</p>
+                                <p className="font-black" style={{ color: q.color }}>DISC {m.disc} | {q.id}</p>
+                              </div>
+                            </div>
 
-    {/* Panduan Manajerial (Dari getActionPlan) */}
-    <div className="space-y-6">
-      {getActionPlan(m).map((item, idx) => (
-        <div key={idx} className="break-inside-avoid bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 mb-3 flex items-center gap-2 border-b border-slate-100 pb-2" style={{ color: item.color }}>
-            <span className="w-6 h-6 rounded flex items-center justify-center text-xs text-white" style={{ background: item.color }}>
-              {idx + 1}
-            </span>
-            {item.title}
-          </h3>
-          <ul className="space-y-2 pl-6">
-            {item.items.map((act, i) => (
-              <li key={i} className="text-xs sm:text-sm text-slate-700 leading-relaxed list-disc">
-                {act}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
-  </div>
+                            <div className="space-y-6">
+                              {getActionPlan(m).map((item, idx) => (
+                                <div key={idx} className="break-inside-avoid bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+                                  <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 mb-3 flex items-center gap-2 border-b border-slate-100 pb-2" style={{ color: item.color }}>
+                                    <span className="w-6 h-6 rounded flex items-center justify-center text-xs text-white" style={{ background: item.color }}>
+                                      {idx + 1}
+                                    </span>
+                                    {item.title}
+                                  </h3>
+                                  <ul className="space-y-2 pl-6">
+                                    {item.items.map((act, i) => (
+                                      <li key={i} className="text-xs sm:text-sm text-slate-700 leading-relaxed list-disc">
+                                        {act}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
 
-  {/* =========================================================================
-      PART 2: JOINT AGREEMENT (DOKUMEN KESEPAKATAN KARYAWAN)
-      ========================================================================= */}
-  <div className="p-8 sm:p-12 border-t-8 border-slate-900" style={{ pageBreakBefore: 'always' }}>
-    
-    {/* Kop Dokumen Resmi */}
-    <div className="border-b-2 border-slate-900 pb-6 mb-8 text-center">
-      <h1 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-tight text-slate-900 mb-2">
-        {getDocumentTitle(q.id)}
-      </h1>
-      <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">
-        Prepared by: {managerProfile?.full_name} | {managerProfile?.title}
-      </p>
-    </div>
+                          <div className="p-8 sm:p-12 border-t-8 border-slate-900" style={{ pageBreakBefore: 'always' }}>
+                            <div className="border-b-2 border-slate-900 pb-6 mb-8 text-center">
+                              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-tight text-slate-900 mb-2">
+                                {getDocumentTitle(q.id)}
+                              </h1>
+                              <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">
+                                Prepared by: {managerProfile?.full_name} | {managerProfile?.title}
+                              </p>
+                            </div>
 
-    {/* Info Karyawan */}
-    <div className="grid grid-cols-2 gap-4 mb-8 text-sm sm:text-base bg-slate-50 p-6 rounded-xl border border-slate-200">
-      <div>
-        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Nama Karyawan</p>
-        <p className="font-black text-slate-900">{m.name}</p>
-      </div>
-      <div>
-        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Tanggal Dokumen</p>
-        <p className="font-black text-slate-900">{formatDate(Date.now())}</p>
-      </div>
-      <div className="mt-4">
-        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Jabatan / Peran</p>
-        <p className="font-black text-slate-900">{m.role || "-"}</p>
-      </div>
-      <div className="mt-4">
-        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Fokus Pengembangan</p>
-        <p className="font-black" style={{ color: q.color }}>{q.label}</p>
-      </div>
-    </div>
+                            <div className="grid grid-cols-2 gap-4 mb-8 text-sm sm:text-base bg-slate-50 p-6 rounded-xl border border-slate-200">
+                              <div>
+                                <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Nama Karyawan</p>
+                                <p className="font-black text-slate-900">{m.name}</p>
+                              </div>
+                              <div>
+                                <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Tanggal Dokumen</p>
+                                <p className="font-black text-slate-900">{formatDate(Date.now())}</p>
+                              </div>
+                              <div className="mt-4">
+                                <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Jabatan / Peran</p>
+                                <p className="font-black text-slate-900">{m.role || "-"}</p>
+                              </div>
+                              <div className="mt-4">
+                                <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Fokus Pengembangan</p>
+                                <p className="font-black" style={{ color: q.color }}>{q.label}</p>
+                              </div>
+                            </div>
 
-    {/* Fakta Kinerja Berdasarkan Observasi */}
-    <div className="mb-8 break-inside-avoid">
-      <h3 className="text-sm sm:text-base font-black uppercase tracking-wider text-slate-900 mb-4">I. Observasi Kinerja Terkini</h3>
-      <div className="grid sm:grid-cols-2 gap-6">
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Fakta Kompetensi Teknis</p>
-          <ul className="list-disc pl-4 text-sm text-slate-700 space-y-1">
-            {m.competencyNotes.map((note, i) => <li key={i}>{note || "-"}</li>)}
-          </ul>
-        </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Fakta Komitmen & Sikap</p>
-          <ul className="list-disc pl-4 text-sm text-slate-700 space-y-1">
-            {m.commitmentNotes.map((note, i) => <li key={i}>{note || "-"}</li>)}
-          </ul>
-        </div>
-      </div>
-    </div>
+                            <div className="mb-8 break-inside-avoid">
+                              <h3 className="text-sm sm:text-base font-black uppercase tracking-wider text-slate-900 mb-4">I. Observasi Kinerja Terkini</h3>
+                              <div className="grid sm:grid-cols-2 gap-6">
+                                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Fakta Kompetensi Teknis</p>
+                                  <ul className="list-disc pl-4 text-sm text-slate-700 space-y-1">
+                                    {m.competencyNotes.map((note, i) => <li key={i}>{note || "-"}</li>)}
+                                  </ul>
+                                </div>
+                                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Fakta Komitmen & Sikap</p>
+                                  <ul className="list-disc pl-4 text-sm text-slate-700 space-y-1">
+                                    {m.commitmentNotes.map((note, i) => <li key={i}>{note || "-"}</li>)}
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
 
-    {/* Kolom Kesepakatan Tindakan */}
-    <div className="break-inside-avoid">
-      <h3 className="text-sm sm:text-base font-black uppercase tracking-wider text-slate-900 mb-2">II. Rencana Tindakan Lanjutan (Disepakati Bersama)</h3>
-      <p className="text-xs text-slate-500 mb-8 italic">Poin-poin di bawah ini diisi bersama antara Manajer dan Karyawan, mencakup tindakan spesifik, target terukur, dan tenggat waktu.</p>
-      <div className="space-y-8">
-        <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">1.</span></div>
-        <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">2.</span></div>
-        <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">3.</span></div>
-        <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">4.</span></div>
-      </div>
-    </div>
+                            <div className="break-inside-avoid">
+                              <h3 className="text-sm sm:text-base font-black uppercase tracking-wider text-slate-900 mb-2">II. Rencana Tindakan Lanjutan (Disepakati Bersama)</h3>
+                              <p className="text-xs text-slate-500 mb-8 italic">Poin-poin di bawah ini diisi bersama antara Manajer dan Karyawan, mencakup tindakan spesifik, target terukur, dan tenggat waktu.</p>
+                              <div className="space-y-8">
+                                <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">1.</span></div>
+                                <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">2.</span></div>
+                                <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">3.</span></div>
+                                <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">4.</span></div>
+                              </div>
+                            </div>
 
-    {/* Tanda Tangan */}
-    <div className="mt-16 pt-8 grid grid-cols-2 gap-8 text-center break-inside-avoid">
-      <div>
-        <div className="border-b border-slate-400 h-16 mx-8"></div>
-        <p className="mt-2 text-sm font-black text-slate-900">{managerProfile?.full_name || "Manajer / Atasan"}</p>
-        <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{managerProfile?.title || "Leadership Role"}</p>
-      </div>
-      <div>
-        <div className="border-b border-slate-400 h-16 mx-8"></div>
-        <p className="mt-2 text-sm font-black text-slate-900">{m.name}</p>
-        <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Karyawan / Anggota Tim</p>
-      </div>
-    </div>
-  </div>
-</div>
+                            <div className="mt-16 pt-8 grid grid-cols-2 gap-8 text-center break-inside-avoid">
+                              <div>
+                                <div className="border-b border-slate-400 h-16 mx-8"></div>
+                                <p className="mt-2 text-sm font-black text-slate-900">{managerProfile?.full_name || "Manajer / Atasan"}</p>
+                                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{managerProfile?.title || "Leadership Role"}</p>
+                              </div>
+                              <div>
+                                <div className="border-b border-slate-400 h-16 mx-8"></div>
+                                <p className="mt-2 text-sm font-black text-slate-900">{m.name}</p>
+                                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Karyawan / Anggota Tim</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -1038,11 +994,9 @@ export default function App() {
             </div>
           )}
           
-          {/* GUIDE TAB (URUTAN DIUBAH) */}
+          {/* GUIDE TAB */}
           {tab === "guide" && (
             <div className="space-y-10 sm:space-y-12 pb-8">
-              
-              {/* Intro Banner */}
               <div className="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8">
                 <div className="flex items-center gap-3 mb-4">
                   <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-400" />
@@ -1053,14 +1007,11 @@ export default function App() {
                 </p>
               </div>
 
-              {/* SECTION 1: PANDUAN PENGISIAN FORM */}
               <section>
                 <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
                   <Edit3 className="w-6 h-6 text-slate-400" /> 1. Cara Mengisi Form Penilaian
                 </h3>
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8 space-y-8">
-                  
-                  {/* Panduan Kompetensi & Komitmen */}
                   <div className="grid sm:grid-cols-2 gap-8">
                     <div>
                       <h4 className="font-black text-indigo-400 uppercase tracking-widest text-sm mb-3">Penilaian Kompetensi (Skill)</h4>
@@ -1090,7 +1041,6 @@ export default function App() {
 
                   <div className="border-t border-slate-800 pt-8"></div>
 
-                  {/* Panduan Menulis Bukti Perilaku */}
                   <div>
                     <h4 className="font-black text-white uppercase tracking-widest text-sm mb-3 flex items-center gap-2">
                       <Target className="w-5 h-5 text-emerald-400" /> Cara Menulis "Bukti Perilaku"
@@ -1100,7 +1050,6 @@ export default function App() {
                     </p>
 
                     <div className="grid sm:grid-cols-2 gap-4">
-                      {/* Contoh Buruk */}
                       <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-5">
                         <div className="flex items-center gap-2 text-red-400 font-bold mb-3">
                           <XCircle className="w-5 h-5" /> SALAH (Berbasis Opini)
@@ -1111,8 +1060,6 @@ export default function App() {
                           <li>"Kelihatannya dia nggak niat kerja."</li>
                         </ul>
                       </div>
-                      
-                      {/* Contoh Baik */}
                       <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-5">
                         <div className="flex items-center gap-2 text-emerald-400 font-bold mb-3">
                           <CheckCircle className="w-5 h-5" /> BENAR (Berbasis Fakta)
@@ -1125,11 +1072,9 @@ export default function App() {
                       </div>
                     </div>
                   </div>
-
                 </div>
               </section>
 
-              {/* SECTION 2: 4 Kuadran */}
               <section>
                 <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
                   <LayoutGrid className="w-6 h-6 text-slate-400" /> 2. Matriks Skill vs Will (4 Kuadran)
@@ -1154,13 +1099,11 @@ export default function App() {
                 </div>
               </section>
 
-              {/* SECTION 3: Profil DISC */}
               <section>
                 <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
                   <Users className="w-6 h-6 text-slate-400" /> 3. Memahami Profil DISC
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                  {/* D - Dominance */}
                   <div className="bg-white rounded-2xl p-6 border-l-8 border-red-500 text-slate-800 shadow-sm">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-10 h-10 rounded-full bg-red-500 text-white font-black text-xl flex items-center justify-center">D</div>
@@ -1175,8 +1118,6 @@ export default function App() {
                       <li><strong>Cara Komunikasi:</strong> Bicaralah langsung ke inti masalah (to the point). Jangan bertele-tele atau menjelaskan detail yang tidak perlu.</li>
                     </ul>
                   </div>
-
-                  {/* I - Influence */}
                   <div className="bg-white rounded-2xl p-6 border-l-8 border-amber-400 text-slate-800 shadow-sm">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-10 h-10 rounded-full bg-amber-400 text-white font-black text-xl flex items-center justify-center">I</div>
@@ -1191,8 +1132,6 @@ export default function App() {
                       <li><strong>Cara Komunikasi:</strong> Libatkan mereka secara emosional. Berikan apresiasi publik. Jangan langsung fokus pada angka tanpa basa-basi yang hangat.</li>
                     </ul>
                   </div>
-
-                  {/* S - Steadiness */}
                   <div className="bg-white rounded-2xl p-6 border-l-8 border-emerald-500 text-slate-800 shadow-sm">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-10 h-10 rounded-full bg-emerald-500 text-white font-black text-xl flex items-center justify-center">S</div>
@@ -1207,8 +1146,6 @@ export default function App() {
                       <li><strong>Cara Komunikasi:</strong> Pendekatan harus santai dan ramah. Jika ada perubahan sistem/aturan, jelaskan alasannya secara bertahap dan logis.</li>
                     </ul>
                   </div>
-
-                  {/* C - Compliance */}
                   <div className="bg-white rounded-2xl p-6 border-l-8 border-blue-500 text-slate-800 shadow-sm">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-10 h-10 rounded-full bg-blue-500 text-white font-black text-xl flex items-center justify-center">C</div>
@@ -1226,7 +1163,6 @@ export default function App() {
                 </div>
               </section>
 
-              {/* SECTION 4: Panduan PIP (BARU) */}
               <section>
                 <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
                   <FileText className="w-6 h-6 text-slate-400" /> 4. Mengisi Dokumen Tindak Lanjut (PIP)
@@ -1245,12 +1181,36 @@ export default function App() {
                   </p>
                 </div>
               </section>
-
             </div>
           )}
 
         </div>
       </main>
+
+      {/* FIX #2: Delete Confirmation Dialog */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-700 rounded-3xl p-8 max-w-sm w-full shadow-2xl">
+            <div className="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-5">
+              <Trash2 className="w-7 h-7 text-red-400" />
+            </div>
+            <h3 className="text-lg font-black text-white text-center mb-2">Hapus Anggota?</h3>
+            <p className="text-sm text-slate-400 text-center mb-8">
+              Data anggota ini akan dihapus permanen dari database dan tidak bisa dikembalikan.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteConfirm(null)}
+                className="flex-1 py-3 rounded-xl font-black text-sm uppercase tracking-widest bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all">
+                Batal
+              </button>
+              <button onClick={() => confirmDelete(deleteConfirm)}
+                className="flex-1 py-3 rounded-xl font-black text-sm uppercase tracking-widest bg-red-500 text-white hover:bg-red-600 transition-all">
+                Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal Input Form */}
       {modal && (
@@ -1283,9 +1243,10 @@ export default function App() {
                   </div>
                 </div>
                 <div className="pt-4">
-                  <button type="submit"
-                    className="w-full bg-slate-900 text-white py-4 sm:py-5 rounded-2xl font-black text-sm sm:text-base tracking-widest uppercase hover:bg-slate-800 active:scale-[0.98] transition-all shadow-xl">
-                    Simpan Analisis
+                  {/* FIX #8: Disable button and show loading state during submit */}
+                  <button type="submit" disabled={isSubmitting}
+                    className="w-full bg-slate-900 text-white py-4 sm:py-5 rounded-2xl font-black text-sm sm:text-base tracking-widest uppercase hover:bg-slate-800 active:scale-[0.98] transition-all shadow-xl disabled:opacity-50 disabled:cursor-not-allowed">
+                    {isSubmitting ? "Menyimpan..." : "Simpan Analisis"}
                   </button>
                 </div>
               </form>
