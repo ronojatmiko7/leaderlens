@@ -572,12 +572,18 @@ export default function App() {
 } else {
       // FIX: Kembalikan pembuatan ID manual agar sesuai dengan tabel id TEXT di Supabase
       const payload = { 
-        ...clean, 
-        id: Date.now().toString(), // TAMBAHKAN BARIS INI KEMBALI
-        manager_id: session.user.id, 
-        createdAt: Date.now(), 
-        updatedAt: Date.now() 
-      };
+  id: Date.now().toString(),
+  manager_id: session.user.id,
+  name: clean.name,
+  role: clean.role,
+  disc: clean.disc,
+  competency: Number(clean.competency),
+  commitment: Number(clean.commitment),
+  competencyNotes: clean.competencyNotes,
+  commitmentNotes: clean.commitmentNotes,
+  createdAt: Date.now(),
+  updatedAt: Date.now()
+};
       
       const { data, error } = await supabase.from('members').insert([payload]).select();
       
