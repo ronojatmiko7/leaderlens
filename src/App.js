@@ -930,126 +930,197 @@ export default function App() {
             </div>
           )}
 
-          {/* GUIDE TAB */}
-          {tab === "guide" && (
-            <div className="space-y-10 sm:space-y-12 pb-8">
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-400" />
-                  <span className="text-sm sm:text-lg font-black text-white uppercase tracking-widest">Panduan LeaderLens</span>
-                </div>
-                <p className="text-sm sm:text-base text-slate-400 leading-relaxed">
-                  LeaderLens dirancang berdasarkan metodologi manajemen SDM modern. Ia menggabungkan pemahaman gaya komunikasi dari <strong>Profil Perilaku DISC</strong> dengan diagnosis kinerja berbasis <strong>Matriks Skill vs Will (Kompetensi vs Komitmen)</strong>.
-                </p>
-              </div>
-              <section>
-                <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
-                  <Edit3 className="w-6 h-6 text-slate-400" /> 1. Cara Mengisi Form Penilaian
-                </h3>
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8 space-y-8">
-                  <div className="grid sm:grid-cols-2 gap-8">
-                    <div>
-                      <h4 className="font-black text-indigo-400 uppercase tracking-widest text-sm mb-3">Penilaian Kompetensi (Skill)</h4>
-                      <ul className="text-sm text-slate-300 space-y-2">
-                        <li><strong>1:</strong> Sering salah, sangat bergantung pada bantuan orang lain.</li>
-                        <li><strong>2:</strong> Bisa melakukan tugas dasar, tapi tugas kompleks harus dibimbing.</li>
-                        <li><strong>3:</strong> Mandiri, jarang membuat kesalahan fatal.</li>
-                        <li><strong>4:</strong> Ahli, bisa bekerja lebih cepat dari target dan bisa mengajari junior.</li>
-                      </ul>
-                    </div>
-                    <div>
-                      <h4 className="font-black text-amber-400 uppercase tracking-widest text-sm mb-3">Penilaian Komitmen (Will)</h4>
-                      <ul className="text-sm text-slate-300 space-y-2">
-                        <li><strong>1:</strong> Sering menunda, banyak alasan, terlihat tidak peduli.</li>
-                        <li><strong>2:</strong> Bekerja seadanya (bare minimum), tidak mau mengambil tugas ekstra.</li>
-                        <li><strong>3:</strong> Rajin, menyelesaikan tugas tepat waktu tanpa perlu ditagih.</li>
-                        <li><strong>4:</strong> Proaktif mencari solusi, antusias, menularkan semangat positif.</li>
-                      </ul>
-                    </div>
-                  </div>
-                  <div className="border-t border-slate-800 pt-8">
-                    <h4 className="font-black text-white uppercase tracking-widest text-sm mb-3 flex items-center gap-2">
-                      <Target className="w-5 h-5 text-emerald-400" /> Cara Menulis "Bukti Perilaku"
-                    </h4>
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-5">
-                        <div className="flex items-center gap-2 text-red-400 font-bold mb-3"><XCircle className="w-5 h-5" /> SALAH (Berbasis Opini)</div>
-                        <ul className="text-sm text-slate-300 space-y-3">
-                          <li>"Dia itu orangnya pemalas banget."</li>
-                          <li>"Kerjaannya nggak pernah bener."</li>
-                        </ul>
-                      </div>
-                      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-5">
-                        <div className="flex items-center gap-2 text-emerald-400 font-bold mb-3"><CheckCircle className="w-5 h-5" /> BENAR (Berbasis Fakta)</div>
-                        <ul className="text-sm text-slate-300 space-y-3">
-                          <li>"Terlambat laporan mingguan 3 kali bulan ini."</li>
-                          <li>"5 kesalahan input data pada laporan Q3."</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-              <section>
-                <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
-                  <LayoutGrid className="w-6 h-6 text-slate-400" /> 2. Matriks Skill vs Will (4 Kuadran)
-                </h3>
-                <div className="space-y-4 sm:space-y-6">
-                  {QUADRANT_GUIDE.map(g => (
-                    <div key={g.q} className="bg-white rounded-2xl sm:rounded-3xl border border-slate-100 overflow-hidden shadow-sm text-slate-800">
-                      <div className="p-5 sm:p-6 flex items-center gap-4 font-black sm:text-xl lg:text-2xl" style={{ background: g.bg }}>
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white" style={{ background: g.color }}>{g.q}</div>
-                        {g.label}
-                      </div>
-                      <div className="p-5 sm:p-6 space-y-4 text-sm sm:text-base">
-                        <p><strong>Diagnosis:</strong> {g.diagnosis}</p>
-                        <div className="grid sm:grid-cols-2 gap-4">
-                          <p className="text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100"><strong>Akar Masalah:</strong><br/>{g.rootCause}</p>
-                          <p className="text-red-700 bg-red-50 p-4 rounded-xl border border-red-100"><strong>Kesalahan Manajer:</strong><br/>{g.mistake}</p>
-                        </div>
-                        <p className="text-indigo-800 bg-indigo-50 p-4 rounded-xl border border-indigo-100 font-medium"><strong>Prioritas Tindakan:</strong> {g.urgency}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-              <section>
-                <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
-                  <Users className="w-6 h-6 text-slate-400" /> 3. Memahami Profil DISC
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                  {[
-                    { id: "D", label: "Dominance", color: "border-red-500", dot: "bg-red-500", sub: "Fokus: Hasil & Kontrol", subColor: "text-red-600", tips: ["Termotivasi oleh tantangan, pencapaian, dan otoritas.", "Mengambil keputusan cepat dan berani mengambil risiko.", "Bicara langsung ke inti masalah. Hindari basa-basi."] },
-                    { id: "I", label: "Influence", color: "border-amber-400", dot: "bg-amber-400", sub: "Fokus: Orang & Antusiasme", subColor: "text-amber-600", tips: ["Termotivasi oleh pengakuan sosial dan kerja tim.", "Sangat persuasif dan pandai mencairkan suasana.", "Libatkan secara emosional. Berikan apresiasi publik."] },
-                    { id: "S", label: "Steadiness", color: "border-emerald-500", dot: "bg-emerald-500", sub: "Fokus: Kerja Sama & Konsistensi", subColor: "text-emerald-600", tips: ["Termotivasi oleh keamanan, harmoni, stabilitas.", "Pendengar baik, sabar, tidak suka perubahan mendadak.", "Pendekatan santai. Jelaskan perubahan secara bertahap."] },
-                    { id: "C", label: "Compliance", color: "border-blue-500", dot: "bg-blue-500", sub: "Fokus: Akurasi & Kualitas", subColor: "text-blue-600", tips: ["Termotivasi oleh keahlian, standar tinggi, dan logika.", "Sangat analitis dan detail-oriented.", "Gunakan data dan fakta. Jangan feedback tanpa bukti."] },
-                  ].map(d => (
-                    <div key={d.id} className={`bg-white rounded-2xl p-6 border-l-8 ${d.color} text-slate-800 shadow-sm`}>
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className={`w-10 h-10 rounded-full ${d.dot} text-white font-black text-xl flex items-center justify-center`}>{d.id}</div>
-                        <div>
-                          <h4 className="font-black text-lg uppercase tracking-tight text-slate-900">{d.label}</h4>
-                          <p className={`text-xs font-bold uppercase tracking-wider ${d.subColor}`}>{d.sub}</p>
-                        </div>
-                      </div>
-                      <ul className="text-sm text-slate-600 space-y-2 list-disc pl-4">
-                        {d.tips.map((t, i) => <li key={i}>{t}</li>)}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </section>
-              <section>
-                <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
-                  <FileText className="w-6 h-6 text-slate-400" /> 4. Mengisi Dokumen Tindak Lanjut
-                </h3>
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8 space-y-4 text-sm sm:text-base text-slate-400 leading-relaxed">
-                  <p>Pada tab <strong>Action Plan</strong>, Anda dapat mencetak dokumen tindak lanjut formal untuk setiap anggota tim.</p>
-                  <p><strong>Cara menggunakannya:</strong> Cetak dokumen, duduk bersama anggota tim, sepakati 3-4 langkah perbaikan, tulis secara manual di garis yang tersedia, lalu tanda tangan bersama sebagai komitmen.</p>
-                </div>
-              </section>
+{/* GUIDE TAB - Rewritten */}
+{tab === "guide" && (
+  <div className="space-y-10 sm:space-y-12 pb-8">
+    
+    {/* Welcome / Big Picture */}
+    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 sm:p-10 text-center">
+      <div className="flex items-center justify-center gap-3 mb-6">
+        <BookOpen className="w-8 h-8 text-emerald-400" />
+        <span className="text-2xl sm:text-3xl font-black text-white">Selamat Datang di LeaderLens</span>
+      </div>
+      <p className="max-w-2xl mx-auto text-slate-300 text-lg leading-relaxed">
+        LeaderLens membantu Anda memahami tim dengan cepat dan membangun rencana pengembangan yang <strong>kolaboratif</strong>, bukan sekadar evaluasi.
+      </p>
+      <p className="text-emerald-400 font-medium mt-4">Tujuannya: Setiap anggota tim merasa didukung, bukan dinilai.</p>
+    </div>
+
+    {/* 1. Cara Menggunakan LeaderLens (Workflow) */}
+    <section>
+      <h3 className="text-xl sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
+        <Lightbulb className="w-7 h-7 text-amber-400" /> 
+        1. Alur Kerja yang Direkomendasikan
+      </h3>
+      <div className="grid sm:grid-cols-2 gap-6">
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-7 space-y-6">
+          <div className="flex gap-4">
+            <div className="w-8 h-8 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 font-black flex-shrink-0">1</div>
+            <div>
+              <div className="font-semibold text-white">Update Penilaian</div>
+              <p className="text-sm text-slate-400 mt-1">Lakukan rating Kompetensi & Komitmen setiap 4–6 minggu. Tulis bukti fakta (bukan opini).</p>
             </div>
-          )}
+          </div>
+          <div className="flex gap-4">
+            <div className="w-8 h-8 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 font-black flex-shrink-0">2</div>
+            <div>
+              <div className="font-semibold text-white">Buka Action Plan</div>
+              <p className="text-sm text-slate-400 mt-1">Pilih mode “Kolaboratif” lalu cetak halaman kedua untuk didiskusikan bersama karyawan.</p>
+            </div>
+          </div>
+          <div className="flex gap-4">
+            <div className="w-8 h-8 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 font-black flex-shrink-0">3</div>
+            <div>
+              <div className="font-semibold text-white">Diskusi 1-on-1</div>
+              <p className="text-sm text-slate-400 mt-1">Gunakan script pembuka yang disediakan. Dengarkan lebih banyak daripada bicara.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-7">
+          <h4 className="font-bold text-emerald-400 mb-4">Tips Cepat untuk Manajer Sibuk</h4>
+          <ul className="space-y-4 text-sm text-slate-300">
+            <li className="flex gap-3">
+              <CheckCircle className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" />
+              Mulai dengan 1–2 orang dulu, jangan langsung seluruh tim.
+            </li>
+            <li className="flex gap-3">
+              <CheckCircle className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" />
+              Catatan bukti boleh singkat — yang penting faktual.
+            </li>
+            <li className="flex gap-3">
+              <CheckCircle className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" />
+              Rayakan kemajuan kecil. Ini membangun kepercayaan.
+            </li>
+            <li className="flex gap-3">
+              <CheckCircle className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" />
+              Jadwalkan review bulanan singkat (15 menit per orang).
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    {/* 2. Matriks Kompetensi vs Komitmen */}
+    <section>
+      <h3 className="text-xl sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
+        <LayoutGrid className="w-7 h-7 text-slate-400" /> 
+        2. Memahami 4 Kuadran Tim Anda
+      </h3>
+      <div className="grid gap-6 sm:gap-8">
+        {QUADRANT_GUIDE.map(g => (
+          <div key={g.q} className="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm text-slate-800">
+            <div className="p-6 flex items-center gap-5 font-bold text-lg" style={{ background: g.bg }}>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white text-2xl" style={{ background: g.color }}>
+                {g.q}
+              </div>
+              <div>{g.label}</div>
+            </div>
+            <div className="p-6 space-y-5 text-sm">
+              <p className="font-medium">{g.diagnosis}</p>
+              <div className="grid sm:grid-cols-2 gap-5 text-xs sm:text-sm">
+                <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                  <strong className="block text-slate-500 mb-2">Mengapa terjadi?</strong>
+                  {g.rootCause}
+                </div>
+                <div className="bg-rose-50 p-5 rounded-2xl border border-rose-100">
+                  <strong className="block text-rose-600 mb-2">Kesalahan yang sering dilakukan</strong>
+                  {g.mistake}
+                </div>
+              </div>
+              <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-100">
+                <strong className="text-emerald-700">Langkah pertama yang paling penting:</strong> {g.urgency}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {/* 3. Profil Komunikasi DISC (Simplified) */}
+    <section>
+      <h3 className="text-xl sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
+        <Users className="w-7 h-7 text-slate-400" /> 
+        3. Gaya Komunikasi DISC (Opsional tapi Sangat Membantu)
+      </h3>
+      <p className="text-slate-400 mb-8 max-w-2xl">
+        Pilih tipe DISC membantu Anda menyesuaikan cara bicara agar pesan lebih mudah diterima. 
+        Tidak perlu akurat 100% — gunakan sebagai panduan saja.
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        {[
+          { id: "D", label: "Dominance", color: "border-red-500", dot: "bg-red-500", sub: "Langsung & Hasil-oriented" },
+          { id: "I", label: "Influence", color: "border-amber-400", dot: "bg-amber-400", sub: "Antusias & Orang-oriented" },
+          { id: "S", label: "Steadiness", color: "border-emerald-500", dot: "bg-emerald-500", sub: "Sabar & Tim-oriented" },
+          { id: "C", label: "Compliance", color: "border-blue-500", dot: "bg-blue-500", sub: "Akurat & Detail-oriented" },
+        ].map(d => (
+          <div key={d.id} className={`bg-white rounded-3xl p-7 border-l-8 ${d.color} shadow-sm`}>
+            <div className="flex items-center gap-4 mb-5">
+              <div className={`w-12 h-12 rounded-2xl ${d.dot} text-white font-black text-3xl flex items-center justify-center`}>{d.id}</div>
+              <div>
+                <h4 className="font-black text-xl text-slate-900">{d.label}</h4>
+                <p className="text-sm text-slate-500">{d.sub}</p>
+              </div>
+            </div>
+            <p className="text-xs text-slate-600 italic">Gunakan script pembuka di Action Plan sesuai tipe ini agar diskusi lebih nyaman.</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {/* 4. Cara Mengisi & Diskusi */}
+    <section>
+      <h3 className="text-xl sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
+        <FileText className="w-7 h-7 text-slate-400" /> 
+        4. Cara Mengisi & Melakukan Diskusi
+      </h3>
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-8 text-slate-300">
+        <div>
+          <h4 className="font-semibold text-white mb-3">Tips Menulis Bukti Perilaku</h4>
+          <div className="grid sm:grid-cols-2 gap-6">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-6">
+              <div className="text-red-400 font-bold mb-3">Hindari</div>
+              <ul className="space-y-2 text-sm">
+                <li>• "Dia pemalas"</li>
+                <li>• "Kerjanya tidak pernah bagus"</li>
+              </ul>
+            </div>
+            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-6">
+              <div className="text-emerald-400 font-bold mb-3">Gunakan</div>
+              <ul className="space-y-2 text-sm">
+                <li>• "Terlambat laporan 3 kali bulan ini"</li>
+                <li>• "Proaktif membantu rekan saat deadline ketat"</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div className="pt-6 border-t border-slate-700">
+          <h4 className="font-semibold text-white mb-4">Saat Diskusi dengan Anggota Tim</h4>
+          <ul className="space-y-4 text-sm">
+            <li className="flex gap-4">
+              <div className="text-emerald-400 mt-1">✓</div>
+              <div>Mulai dengan apresiasi atau rasa ingin tahu, bukan kritik.</div>
+            </li>
+            <li className="flex gap-4">
+              <div className="text-emerald-400 mt-1">✓</div>
+              <div>Dengarkan 70–80% waktu. Tanyakan pendapat mereka terlebih dahulu.</div>
+            </li>
+            <li className="flex gap-4">
+              <div className="text-emerald-400 mt-1">✓</div>
+              <div>Gunakan halaman kedua dokumen (yang lebih ringkas) sebagai panduan bersama.</div>
+            </li>
+            <li className="flex gap-4">
+              <div className="text-emerald-400 mt-1">✓</div>
+              <div>Akhiri dengan kesepakatan tertulis dan jadwal review berikutnya.</div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </div>
+)}
 
         </div>
       </main>
