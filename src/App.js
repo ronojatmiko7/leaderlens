@@ -609,10 +609,10 @@ export default function App() {
                         <div className="bg-white text-slate-900 rounded-sm shadow-2xl mx-auto max-w-3xl print-area">
                           <div className="p-8 sm:p-12">
                             <div className="border-b-2 border-slate-900 pb-4 mb-6 text-center">
-                              <h1 className="text-lg sm:text-xl font-black uppercase tracking-tight text-slate-900 mb-1">Leader's Pre-Flight Briefing</h1>
-                              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">{managerProfile?.company || "Internal Management Document"}</p>
-                              <p className="text-xs font-bold text-red-600 uppercase tracking-widest mt-2">Strictly Confidential — Do Not Share With Employee</p>
-                            </div>
+    <h1 className="text-lg sm:text-xl font-black uppercase tracking-tight text-slate-900 mb-1">1-on-1 Alignment Guide</h1>
+    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">{managerProfile?.company || "Dokumen Pengembangan Tim"}</p>
+    <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest mt-2">Kolaboratif — Diskusikan Bersama Karyawan</p>
+</div>
                             <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-8 flex justify-between items-center">
                               <div>
                                 <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Target Diskusi</p>
