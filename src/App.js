@@ -13,7 +13,6 @@ const supabaseUrl = 'https://bervlosjswfmqhxisikn.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJlcnZsb3Nqc3dmbXFoeGlzaWtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyODkyMjEsImV4cCI6MjA5MTg2NTIyMX0.IHTyFaCz7ExiHs7KSGaOnK3jdXXU7c47tcGHxOlKtME';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-
 // ── helpers ──────────────────────────────────────────────────────────────────
 const getQuadrant = (comp, comm) => {
   const hi = v => v >= 3;
@@ -245,7 +244,7 @@ const getActionPlan = (m) => {
   return plan;
 };
 
-// teamHealthScore: divides by 8 because max possible sum of compAvg + commAvg = 4 + 4 = 8
+// teamHealthScore: max compAvg + commAvg = 4 + 4 = 8
 const teamHealthScore = (members) => {
   if (!members.length) return null;
   const avg = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
@@ -356,7 +355,6 @@ const QUADRANT_GUIDE = [
   },
 ];
 
-
 // ── KOMPONEN SUPABASE AUTH GATE ───────────────────────────────────────────────────
 const SupabaseAuthGate = ({ onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -382,25 +380,20 @@ const SupabaseAuthGate = ({ onLoginSuccess }) => {
       else onLoginSuccess(data.session);
     } else {
       const { data, error } = await supabase.auth.signUp({ email, password });
-      
       if (error) {
         setError(error.message);
       } else if (data.user) {
-        // Insert profile data
         const { error: profileError } = await supabase.from('profiles').insert([{
           id: data.user.id,
           full_name: fullName,
           title: title,
           company: company
         }]);
-        
         if (profileError) {
           setError("Akun dibuat, tapi gagal menyimpan profil: " + profileError.message);
         } else if (data.session) {
-          // Session exists → email confirmation disabled, log in directly
           onLoginSuccess(data.session);
         } else {
-          // Session is null → email confirmation required
           setSuccessMsg("Akun berhasil dibuat! Silakan cek email Anda untuk konfirmasi sebelum login.");
           setIsLogin(true);
         }
@@ -416,7 +409,6 @@ const SupabaseAuthGate = ({ onLoginSuccess }) => {
           <div className="text-2xl sm:text-3xl font-black text-white">LEADER<span className="text-slate-400">LENS</span></div>
           <div className="text-xs text-slate-500 font-mono mt-2">{isLogin ? "Silakan Masuk" : "Buat Akun Manajer"}</div>
         </div>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
             <>
@@ -432,16 +424,13 @@ const SupabaseAuthGate = ({ onLoginSuccess }) => {
             className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white outline-none focus:border-indigo-500" />
           <input required type="password" placeholder="Password (Min. 6 karakter)" value={password} onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white outline-none focus:border-indigo-500" />
-          
           {error && <p className="text-xs text-red-500 font-bold text-center">{error}</p>}
           {successMsg && <p className="text-xs text-emerald-400 font-bold text-center">{successMsg}</p>}
-          
           <button type="submit" disabled={loading}
             className="w-full bg-white text-slate-900 py-3.5 rounded-xl font-black uppercase tracking-widest hover:bg-slate-200 transition-all disabled:opacity-50">
             {loading ? "Memproses..." : (isLogin ? "Masuk" : "Daftar & Buat Profil")}
           </button>
         </form>
-
         <div className="mt-6 text-center">
           <button onClick={() => { setIsLogin(!isLogin); setError(""); setSuccessMsg(""); }} className="text-xs text-slate-400 hover:text-white transition-colors">
             {isLogin ? "Belum punya akun? Daftar di sini" : "Sudah punya akun? Masuk di sini"}
@@ -452,9 +441,7 @@ const SupabaseAuthGate = ({ onLoginSuccess }) => {
   );
 };
 
-
 // ── MAIN APP ──────────────────────────────────────────────────────────────
-// FIX #13: Default competency/commitment to 3 so new members start outside Q1
 const EMPTY_FORM = { name: "", role: "", competency: 3, commitment: 3, competencyNotes: [""], commitmentNotes: [""], disc: "S" };
 
 export default function App() {
@@ -462,30 +449,27 @@ export default function App() {
   const [managerProfile, setManagerProfile] = useState(null);
   const [members, setMembers] = useState([]);
   const [isMounted, setIsMounted] = useState(false);
-  const [isLoadingData, setIsLoadingData] = useState(false); // FIX #10: start false, only true during active fetch
+  const [isLoadingData, setIsLoadingData] = useState(false);
   const [tab, setTab] = useState("matrix");
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
-  const [deleteConfirm, setDeleteConfirm] = useState(null); // FIX #2: used by delete dialog
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [expandedPlan, setExpandedPlan] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false); // FIX #8: submit loading state
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchManagerProfile = async (userId) => {
     const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
     if (!error && data) setManagerProfile(data);
   };
 
-  // FIX #1 & #11: useCallback so fetchMembers can be called directly with a userId
   const fetchMembersForUser = useCallback(async (userId) => {
     if (!userId) return;
     setIsLoadingData(true);
-    
     const { data, error } = await supabase
       .from('members')
       .select('*')
       .eq('manager_id', userId);
-
     if (error) {
       console.error("Gagal menarik data:", error);
     } else {
@@ -501,8 +485,6 @@ export default function App() {
 
   useEffect(() => {
     setIsMounted(true);
-    
-    // FIX #1: Call fetch directly inside .then() to avoid race condition
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session) {
@@ -510,7 +492,6 @@ export default function App() {
         fetchMembersForUser(session.user.id);
       }
     });
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (session) {
@@ -519,21 +500,17 @@ export default function App() {
       } else {
         setManagerProfile(null);
         setMembers([]);
-        setIsLoadingData(false); // FIX #10: reset loading on logout
+        setIsLoadingData(false);
       }
     });
-
     return () => subscription.unsubscribe();
   }, [fetchMembersForUser]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-  };
+  const handleLogout = async () => { await supabase.auth.signOut(); };
 
   const closeModal = () => { setModal(false); setEditId(null); setForm(EMPTY_FORM); };
 
   const openEdit = (m) => {
-    // FIX #7: Filter empty strings when opening edit so they don't appear in printed docs
     const cleanNotes = (arr) => {
       const filtered = (Array.isArray(arr) ? arr : [arr || ""]).filter(n => n.trim());
       return filtered.length ? filtered : [""];
@@ -543,10 +520,10 @@ export default function App() {
       competencyNotes: cleanNotes(m.competencyNotes),
       commitmentNotes: cleanNotes(m.commitmentNotes),
     });
-    setEditId(m.id); setModal(true);
+    setEditId(m.id);
+    setModal(true);
   };
 
-  // FIX #3 & #8: Let Supabase generate the ID; add submit loading state
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isSubmitting) return;
@@ -559,37 +536,51 @@ export default function App() {
     };
 
     if (editId) {
-      const payload = { ...clean, updatedAt: Date.now() };
+      // ── UPDATE existing member ──────────────────────────────────────────
+      const payload = {
+        name: clean.name,
+        role: clean.role || "",
+        disc: clean.disc,
+        competency: Number(clean.competency),
+        commitment: Number(clean.commitment),
+        competencyNotes: clean.competencyNotes,
+        commitmentNotes: clean.commitmentNotes,
+        updatedAt: Date.now(),
+      };
       const { error } = await supabase.from('members').update(payload).eq('id', editId);
-      
       if (error) {
         console.error("Gagal update data:", error);
-        alert("Gagal menyimpan perubahan ke database.");
+        alert("Gagal menyimpan perubahan.\n\n" + (error.message || JSON.stringify(error)));
       } else {
-        setMembers(ms => ms.map(m => m.id === editId ? { ...payload, id: editId, createdAt: m.createdAt } : m));
+        setMembers(ms => ms.map(m => m.id === editId ? { ...m, ...payload } : m));
         closeModal();
       }
-} else {
-      // FIX: Kembalikan pembuatan ID manual agar sesuai dengan tabel id TEXT di Supabase
-      const payload = { 
-  id: Date.now().toString(),
-  manager_id: session.user.id,
-  name: clean.name,
-  role: clean.role,
-  disc: clean.disc,
-  competency: Number(clean.competency),
-  commitment: Number(clean.commitment),
-  competencyNotes: clean.competencyNotes,
-  commitmentNotes: clean.commitmentNotes,
-  createdAt: Date.now(),
-  updatedAt: Date.now()
-};
-      
+    } else {
+      // ── INSERT new member ───────────────────────────────────────────────
+      // KUNCI: buat id sebagai variabel terpisah SEBELUM payload object
+      const newId = String(Date.now());
+      const managerId = session.user.id;
+
+      const payload = {
+        id: newId,
+        manager_id: managerId,
+        name: String(clean.name),
+        role: String(clean.role || ""),
+        disc: String(clean.disc),
+        competency: Number(clean.competency),
+        commitment: Number(clean.commitment),
+        competencyNotes: Array.isArray(clean.competencyNotes) ? clean.competencyNotes : [],
+        commitmentNotes: Array.isArray(clean.commitmentNotes) ? clean.commitmentNotes : [],
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
+
+      console.log("INSERT payload:", JSON.stringify(payload)); // debug — hapus setelah berhasil
+
       const { data, error } = await supabase.from('members').insert([payload]).select();
-      
       if (error) {
         console.error("Gagal simpan data baru:", error);
-        alert("Gagal menambahkan data ke database.");
+        alert("Gagal menambahkan data.\n\n" + (error.message || JSON.stringify(error)));
       } else if (data && data[0]) {
         setMembers(ms => [...ms, {
           ...data[0],
@@ -602,7 +593,6 @@ export default function App() {
     setIsSubmitting(false);
   };
 
-  // FIX #2: confirmDelete is now called from the delete confirmation dialog
   const confirmDelete = async (id) => {
     const { error } = await supabase.from('members').delete().eq('id', id);
     if (error) {
@@ -629,10 +619,7 @@ export default function App() {
   const handlePrint = () => window.print();
 
   if (!isMounted) return null;
-
-  if (!session) {
-    return <SupabaseAuthGate onLoginSuccess={(sess) => setSession(sess)} />;
-  }
+  if (!session) return <SupabaseAuthGate onLoginSuccess={(sess) => setSession(sess)} />;
 
   return (
     <div className="min-h-screen bg-slate-950 text-white pb-24" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
@@ -645,34 +632,18 @@ export default function App() {
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
         @media print {
-          body, html, #root, .bg-slate-950, .min-h-screen { 
-            background-color: white !important; 
-            color: black !important; 
-          }
-          /* FIX #12: Use .app-header instead of generic header tag */
+          body, html, #root, .bg-slate-950, .min-h-screen { background-color: white !important; color: black !important; }
           .app-header, .hide-on-print { display: none !important; }
-          .bg-slate-900 {
-            background-color: transparent !important;
-            border: none !important;
-          }
-          .print-area {
-            position: relative !important;
-            background-color: white !important;
-            color: black !important;
-            box-shadow: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 100% !important;
-          }
+          .bg-slate-900 { background-color: transparent !important; border: none !important; }
+          .print-area { position: relative !important; background-color: white !important; color: black !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
           .print-area * { color: black !important; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           @page { margin: 1.5cm; }
         }
       `}</style>
 
-      {/* FIX #12: Changed from <header> to <div className="app-header"> */}
+      {/* Header */}
       <div className="app-header border-b border-slate-800 px-4 sm:px-6 py-4 sticky top-0 z-40 bg-slate-950/95 backdrop-blur hide-on-print">
         <div className="max-w-4xl lg:max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -695,9 +666,7 @@ export default function App() {
               className="bg-white text-slate-900 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-black text-[10px] sm:text-xs lg:text-sm tracking-widest uppercase hover:bg-slate-100 transition-all active:scale-95 shadow-lg">
               + Tambah
             </button>
-            {/* FIX #9: Logout button */}
-            <button onClick={handleLogout}
-              title="Keluar"
+            <button onClick={handleLogout} title="Keluar"
               className="p-2 sm:p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-400 hover:text-red-400 hover:border-red-400/50 transition-all">
               <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
@@ -757,9 +726,7 @@ export default function App() {
               ) : (
                 <div className="w-full max-w-lg lg:max-w-2xl flex gap-2 sm:gap-4 mt-4">
                   <div className="flex items-center">
-                    <span 
-                      className="text-[10px] sm:text-xs lg:text-sm font-black text-slate-400 uppercase tracking-widest whitespace-nowrap" 
-                      style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
+                    <span className="text-[10px] sm:text-xs lg:text-sm font-black text-slate-400 uppercase tracking-widest whitespace-nowrap" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
                       ← Komitmen
                     </span>
                   </div>
@@ -801,9 +768,7 @@ export default function App() {
                       })}
                     </div>
                     <div className="text-center">
-                      <span className="text-[10px] sm:text-xs lg:text-sm font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">
-                        Kompetensi →
-                      </span>
+                      <span className="text-[10px] sm:text-xs lg:text-sm font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Kompetensi →</span>
                     </div>
                   </div>
                 </div>
@@ -823,8 +788,7 @@ export default function App() {
                 return (
                   <div key={m.id} className="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 group">
                     <div className="flex items-center gap-4 sm:gap-6 w-full sm:w-auto">
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-white font-black text-lg sm:text-xl flex-shrink-0"
-                        style={{ background: q.color }}>
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-white font-black text-lg sm:text-xl flex-shrink-0" style={{ background: q.color }}>
                         {m.name.charAt(0)}
                       </div>
                       <div className="flex-1">
@@ -849,9 +813,9 @@ export default function App() {
           {/* ACTION PLANS TAB */}
           {tab === "plans" && (
             <div className="space-y-4">
-               {members.map(m => {
-                  const q = getQuadrant(m.competency, m.commitment);
-                  return (
+              {members.map(m => {
+                const q = getQuadrant(m.competency, m.commitment);
+                return (
                   <div key={m.id} className={`bg-slate-900 rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-800 shadow-sm transition-all ${expandedPlan !== m.id ? 'hide-on-print' : ''}`}>
                     <button onClick={() => setExpandedPlan(expandedPlan === m.id ? null : m.id)}
                       className="w-full flex items-center justify-between p-5 sm:p-6 hover:bg-slate-800 transition-all text-white hide-on-print">
@@ -866,7 +830,6 @@ export default function App() {
                       </div>
                       <ChevronDown className={`w-5 h-5 sm:w-6 sm:h-6 text-slate-500 transition-transform ${expandedPlan === m.id ? "rotate-180" : ""}`} />
                     </button>
-                    
                     {expandedPlan === m.id && (
                       <div className="p-4 sm:p-8 bg-slate-950 border-t border-slate-800">
                         <div className="flex justify-end mb-4 hide-on-print">
@@ -874,21 +837,13 @@ export default function App() {
                             <Printer className="w-4 h-4" /> Simpan ke PDF
                           </button>
                         </div>
-
-                        <div className={`bg-white text-slate-900 rounded-sm shadow-2xl mx-auto max-w-3xl print-area`}>
+                        <div className="bg-white text-slate-900 rounded-sm shadow-2xl mx-auto max-w-3xl print-area">
                           <div className="p-8 sm:p-12">
                             <div className="border-b-2 border-slate-900 pb-4 mb-6 text-center">
-                              <h1 className="text-lg sm:text-xl font-black uppercase tracking-tight text-slate-900 mb-1">
-                                Leader's Pre-Flight Briefing
-                              </h1>
-                              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">
-                                {managerProfile?.company || "Internal Management Document"}
-                              </p>
-                              <p className="text-xs font-bold text-red-600 uppercase tracking-widest mt-2">
-                                Strictly Confidential — Do Not Share With Employee
-                              </p>
+                              <h1 className="text-lg sm:text-xl font-black uppercase tracking-tight text-slate-900 mb-1">Leader's Pre-Flight Briefing</h1>
+                              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">{managerProfile?.company || "Internal Management Document"}</p>
+                              <p className="text-xs font-bold text-red-600 uppercase tracking-widest mt-2">Strictly Confidential — Do Not Share With Employee</p>
                             </div>
-
                             <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-8 flex justify-between items-center">
                               <div>
                                 <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Target Diskusi</p>
@@ -899,38 +854,27 @@ export default function App() {
                                 <p className="font-black" style={{ color: q.color }}>DISC {m.disc} | {q.id}</p>
                               </div>
                             </div>
-
                             <div className="space-y-6">
                               {getActionPlan(m).map((item, idx) => (
                                 <div key={idx} className="break-inside-avoid bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-                                  <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 mb-3 flex items-center gap-2 border-b border-slate-100 pb-2" style={{ color: item.color }}>
-                                    <span className="w-6 h-6 rounded flex items-center justify-center text-xs text-white" style={{ background: item.color }}>
-                                      {idx + 1}
-                                    </span>
+                                  <h3 className="text-sm font-black uppercase tracking-wider mb-3 flex items-center gap-2 border-b border-slate-100 pb-2" style={{ color: item.color }}>
+                                    <span className="w-6 h-6 rounded flex items-center justify-center text-xs text-white" style={{ background: item.color }}>{idx + 1}</span>
                                     {item.title}
                                   </h3>
                                   <ul className="space-y-2 pl-6">
                                     {item.items.map((act, i) => (
-                                      <li key={i} className="text-xs sm:text-sm text-slate-700 leading-relaxed list-disc">
-                                        {act}
-                                      </li>
+                                      <li key={i} className="text-xs sm:text-sm text-slate-700 leading-relaxed list-disc">{act}</li>
                                     ))}
                                   </ul>
                                 </div>
                               ))}
                             </div>
                           </div>
-
                           <div className="p-8 sm:p-12 border-t-8 border-slate-900" style={{ pageBreakBefore: 'always' }}>
                             <div className="border-b-2 border-slate-900 pb-6 mb-8 text-center">
-                              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-tight text-slate-900 mb-2">
-                                {getDocumentTitle(q.id)}
-                              </h1>
-                              <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">
-                                Prepared by: {managerProfile?.full_name} | {managerProfile?.title}
-                              </p>
+                              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-tight text-slate-900 mb-2">{getDocumentTitle(q.id)}</h1>
+                              <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">Prepared by: {managerProfile?.full_name} | {managerProfile?.title}</p>
                             </div>
-
                             <div className="grid grid-cols-2 gap-4 mb-8 text-sm sm:text-base bg-slate-50 p-6 rounded-xl border border-slate-200">
                               <div>
                                 <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Nama Karyawan</p>
@@ -949,7 +893,6 @@ export default function App() {
                                 <p className="font-black" style={{ color: q.color }}>{q.label}</p>
                               </div>
                             </div>
-
                             <div className="mb-8 break-inside-avoid">
                               <h3 className="text-sm sm:text-base font-black uppercase tracking-wider text-slate-900 mb-4">I. Observasi Kinerja Terkini</h3>
                               <div className="grid sm:grid-cols-2 gap-6">
@@ -967,7 +910,6 @@ export default function App() {
                                 </div>
                               </div>
                             </div>
-
                             <div className="break-inside-avoid">
                               <h3 className="text-sm sm:text-base font-black uppercase tracking-wider text-slate-900 mb-2">II. Rencana Tindakan Lanjutan (Disepakati Bersama)</h3>
                               <p className="text-xs text-slate-500 mb-8 italic">Poin-poin di bawah ini diisi bersama antara Manajer dan Karyawan, mencakup tindakan spesifik, target terukur, dan tenggat waktu.</p>
@@ -978,7 +920,6 @@ export default function App() {
                                 <div className="border-b border-slate-400 h-6 flex items-end"><span className="text-sm font-bold text-slate-800 ml-2">4.</span></div>
                               </div>
                             </div>
-
                             <div className="mt-16 pt-8 grid grid-cols-2 gap-8 text-center break-inside-avoid">
                               <div>
                                 <div className="border-b border-slate-400 h-16 mx-8"></div>
@@ -996,11 +937,11 @@ export default function App() {
                       </div>
                     )}
                   </div>
-                  );
-               })}
+                );
+              })}
             </div>
           )}
-          
+
           {/* GUIDE TAB */}
           {tab === "guide" && (
             <div className="space-y-10 sm:space-y-12 pb-8">
@@ -1010,10 +951,9 @@ export default function App() {
                   <span className="text-sm sm:text-lg font-black text-white uppercase tracking-widest">Panduan LeaderLens</span>
                 </div>
                 <p className="text-sm sm:text-base text-slate-400 leading-relaxed">
-                  LeaderLens dirancang berdasarkan metodologi manajemen SDM modern. Ia menggabungkan pemahaman gaya komunikasi dari <strong>Profil Perilaku DISC</strong> dengan diagnosis kinerja berbasis <strong>Matriks Skill vs Will (Kompetensi vs Komitmen)</strong>. Gunakan panduan ini untuk memahami cara mengelola setiap tipe anggota tim Anda.
+                  LeaderLens dirancang berdasarkan metodologi manajemen SDM modern. Ia menggabungkan pemahaman gaya komunikasi dari <strong>Profil Perilaku DISC</strong> dengan diagnosis kinerja berbasis <strong>Matriks Skill vs Will (Kompetensi vs Komitmen)</strong>.
                 </p>
               </div>
-
               <section>
                 <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
                   <Edit3 className="w-6 h-6 text-slate-400" /> 1. Cara Mengisi Form Penilaian
@@ -1022,9 +962,6 @@ export default function App() {
                   <div className="grid sm:grid-cols-2 gap-8">
                     <div>
                       <h4 className="font-black text-indigo-400 uppercase tracking-widest text-sm mb-3">Penilaian Kompetensi (Skill)</h4>
-                      <p className="text-sm text-slate-400 leading-relaxed mb-4">
-                        Nilai kemampuan teknis karyawan dalam menjalankan <strong>tugas utama</strong> mereka saat ini. Jangan nilai potensi masa depan, nilailah apa yang bisa mereka lakukan hari ini.
-                      </p>
                       <ul className="text-sm text-slate-300 space-y-2">
                         <li><strong>1:</strong> Sering salah, sangat bergantung pada bantuan orang lain.</li>
                         <li><strong>2:</strong> Bisa melakukan tugas dasar, tapi tugas kompleks harus dibimbing.</li>
@@ -1034,9 +971,6 @@ export default function App() {
                     </div>
                     <div>
                       <h4 className="font-black text-amber-400 uppercase tracking-widest text-sm mb-3">Penilaian Komitmen (Will)</h4>
-                      <p className="text-sm text-slate-400 leading-relaxed mb-4">
-                        Nilai motivasi, rasa tanggung jawab, dan inisiatif karyawan. Apakah mereka peduli dengan hasil kerja mereka?
-                      </p>
                       <ul className="text-sm text-slate-300 space-y-2">
                         <li><strong>1:</strong> Sering menunda, banyak alasan, terlihat tidak peduli.</li>
                         <li><strong>2:</strong> Bekerja seadanya (bare minimum), tidak mau mengambil tugas ekstra.</li>
@@ -1045,49 +979,35 @@ export default function App() {
                       </ul>
                     </div>
                   </div>
-
-                  <div className="border-t border-slate-800 pt-8"></div>
-
-                  <div>
+                  <div className="border-t border-slate-800 pt-8">
                     <h4 className="font-black text-white uppercase tracking-widest text-sm mb-3 flex items-center gap-2">
                       <Target className="w-5 h-5 text-emerald-400" /> Cara Menulis "Bukti Perilaku"
                     </h4>
-                    <p className="text-sm text-slate-400 leading-relaxed mb-6">
-                      Kolom Bukti Perilaku <strong>sangat krusial</strong> karena tulisan Anda akan dicetak ke dalam Dokumen Action Plan (PDF). <strong>Gunakan FAKTA, bukan OPINI.</strong> Fakta bisa diukur dan diamati, opini bisa diperdebatkan.
-                    </p>
-
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-5">
-                        <div className="flex items-center gap-2 text-red-400 font-bold mb-3">
-                          <XCircle className="w-5 h-5" /> SALAH (Berbasis Opini)
-                        </div>
+                        <div className="flex items-center gap-2 text-red-400 font-bold mb-3"><XCircle className="w-5 h-5" /> SALAH (Berbasis Opini)</div>
                         <ul className="text-sm text-slate-300 space-y-3">
                           <li>"Dia itu orangnya pemalas banget."</li>
                           <li>"Kerjaannya nggak pernah bener."</li>
-                          <li>"Kelihatannya dia nggak niat kerja."</li>
                         </ul>
                       </div>
                       <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-5">
-                        <div className="flex items-center gap-2 text-emerald-400 font-bold mb-3">
-                          <CheckCircle className="w-5 h-5" /> BENAR (Berbasis Fakta)
-                        </div>
+                        <div className="flex items-center gap-2 text-emerald-400 font-bold mb-3"><CheckCircle className="w-5 h-5" /> BENAR (Berbasis Fakta)</div>
                         <ul className="text-sm text-slate-300 space-y-3">
-                          <li>"Terlambat mengumpulkan laporan mingguan sebanyak 3 kali bulan ini."</li>
-                          <li>"Terdapat 5 kesalahan input data pada laporan Q3."</li>
-                          <li>"Menolak saat diminta membantu proyek X pada hari Selasa."</li>
+                          <li>"Terlambat laporan mingguan 3 kali bulan ini."</li>
+                          <li>"5 kesalahan input data pada laporan Q3."</li>
                         </ul>
                       </div>
                     </div>
                   </div>
                 </div>
               </section>
-
               <section>
                 <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
                   <LayoutGrid className="w-6 h-6 text-slate-400" /> 2. Matriks Skill vs Will (4 Kuadran)
                 </h3>
                 <div className="space-y-4 sm:space-y-6">
-                   {QUADRANT_GUIDE.map(g => (
+                  {QUADRANT_GUIDE.map(g => (
                     <div key={g.q} className="bg-white rounded-2xl sm:rounded-3xl border border-slate-100 overflow-hidden shadow-sm text-slate-800">
                       <div className="p-5 sm:p-6 flex items-center gap-4 font-black sm:text-xl lg:text-2xl" style={{ background: g.bg }}>
                         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white" style={{ background: g.color }}>{g.q}</div>
@@ -1096,96 +1016,48 @@ export default function App() {
                       <div className="p-5 sm:p-6 space-y-4 text-sm sm:text-base">
                         <p><strong>Diagnosis:</strong> {g.diagnosis}</p>
                         <div className="grid sm:grid-cols-2 gap-4">
-                          <p className="text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100"><strong>Akar Masalah (Root Cause):</strong><br/>{g.rootCause}</p>
+                          <p className="text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100"><strong>Akar Masalah:</strong><br/>{g.rootCause}</p>
                           <p className="text-red-700 bg-red-50 p-4 rounded-xl border border-red-100"><strong>Kesalahan Manajer:</strong><br/>{g.mistake}</p>
                         </div>
                         <p className="text-indigo-800 bg-indigo-50 p-4 rounded-xl border border-indigo-100 font-medium"><strong>Prioritas Tindakan:</strong> {g.urgency}</p>
                       </div>
                     </div>
-                   ))}
+                  ))}
                 </div>
               </section>
-
               <section>
                 <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
                   <Users className="w-6 h-6 text-slate-400" /> 3. Memahami Profil DISC
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                  <div className="bg-white rounded-2xl p-6 border-l-8 border-red-500 text-slate-800 shadow-sm">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-10 h-10 rounded-full bg-red-500 text-white font-black text-xl flex items-center justify-center">D</div>
-                      <div>
-                        <h4 className="font-black text-lg uppercase tracking-tight text-slate-900">Dominance</h4>
-                        <p className="text-xs font-bold text-red-600 uppercase tracking-wider">Fokus: Hasil & Kontrol</p>
+                  {[
+                    { id: "D", label: "Dominance", color: "border-red-500", dot: "bg-red-500", sub: "Fokus: Hasil & Kontrol", subColor: "text-red-600", tips: ["Termotivasi oleh tantangan, pencapaian, dan otoritas.", "Mengambil keputusan cepat dan berani mengambil risiko.", "Bicara langsung ke inti masalah. Hindari basa-basi."] },
+                    { id: "I", label: "Influence", color: "border-amber-400", dot: "bg-amber-400", sub: "Fokus: Orang & Antusiasme", subColor: "text-amber-600", tips: ["Termotivasi oleh pengakuan sosial dan kerja tim.", "Sangat persuasif dan pandai mencairkan suasana.", "Libatkan secara emosional. Berikan apresiasi publik."] },
+                    { id: "S", label: "Steadiness", color: "border-emerald-500", dot: "bg-emerald-500", sub: "Fokus: Kerja Sama & Konsistensi", subColor: "text-emerald-600", tips: ["Termotivasi oleh keamanan, harmoni, stabilitas.", "Pendengar baik, sabar, tidak suka perubahan mendadak.", "Pendekatan santai. Jelaskan perubahan secara bertahap."] },
+                    { id: "C", label: "Compliance", color: "border-blue-500", dot: "bg-blue-500", sub: "Fokus: Akurasi & Kualitas", subColor: "text-blue-600", tips: ["Termotivasi oleh keahlian, standar tinggi, dan logika.", "Sangat analitis dan detail-oriented.", "Gunakan data dan fakta. Jangan feedback tanpa bukti."] },
+                  ].map(d => (
+                    <div key={d.id} className={`bg-white rounded-2xl p-6 border-l-8 ${d.color} text-slate-800 shadow-sm`}>
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className={`w-10 h-10 rounded-full ${d.dot} text-white font-black text-xl flex items-center justify-center`}>{d.id}</div>
+                        <div>
+                          <h4 className="font-black text-lg uppercase tracking-tight text-slate-900">{d.label}</h4>
+                          <p className={`text-xs font-bold uppercase tracking-wider ${d.subColor}`}>{d.sub}</p>
+                        </div>
                       </div>
+                      <ul className="text-sm text-slate-600 space-y-2 list-disc pl-4">
+                        {d.tips.map((t, i) => <li key={i}>{t}</li>)}
+                      </ul>
                     </div>
-                    <ul className="text-sm text-slate-600 space-y-2 list-disc pl-4">
-                      <li>Sangat termotivasi oleh tantangan, pencapaian, dan otoritas.</li>
-                      <li>Mengambil keputusan dengan cepat dan berani mengambil risiko.</li>
-                      <li><strong>Cara Komunikasi:</strong> Bicaralah langsung ke inti masalah (to the point). Jangan bertele-tele atau menjelaskan detail yang tidak perlu.</li>
-                    </ul>
-                  </div>
-                  <div className="bg-white rounded-2xl p-6 border-l-8 border-amber-400 text-slate-800 shadow-sm">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-10 h-10 rounded-full bg-amber-400 text-white font-black text-xl flex items-center justify-center">I</div>
-                      <div>
-                        <h4 className="font-black text-lg uppercase tracking-tight text-slate-900">Influence</h4>
-                        <p className="text-xs font-bold text-amber-600 uppercase tracking-wider">Fokus: Orang & Antusiasme</p>
-                      </div>
-                    </div>
-                    <ul className="text-sm text-slate-600 space-y-2 list-disc pl-4">
-                      <li>Termotivasi oleh pengakuan sosial, kerja tim, dan popularitas.</li>
-                      <li>Sangat persuasif, optimis, dan pandai mencairkan suasana.</li>
-                      <li><strong>Cara Komunikasi:</strong> Libatkan mereka secara emosional. Berikan apresiasi publik. Jangan langsung fokus pada angka tanpa basa-basi yang hangat.</li>
-                    </ul>
-                  </div>
-                  <div className="bg-white rounded-2xl p-6 border-l-8 border-emerald-500 text-slate-800 shadow-sm">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-10 h-10 rounded-full bg-emerald-500 text-white font-black text-xl flex items-center justify-center">S</div>
-                      <div>
-                        <h4 className="font-black text-lg uppercase tracking-tight text-slate-900">Steadiness</h4>
-                        <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider">Fokus: Kerja Sama & Konsistensi</p>
-                      </div>
-                    </div>
-                    <ul className="text-sm text-slate-600 space-y-2 list-disc pl-4">
-                      <li>Termotivasi oleh keamanan, harmoni, dan lingkungan yang stabil.</li>
-                      <li>Pendengar yang sangat baik, sabar, namun tidak menyukai perubahan mendadak.</li>
-                      <li><strong>Cara Komunikasi:</strong> Pendekatan harus santai dan ramah. Jika ada perubahan sistem/aturan, jelaskan alasannya secara bertahap dan logis.</li>
-                    </ul>
-                  </div>
-                  <div className="bg-white rounded-2xl p-6 border-l-8 border-blue-500 text-slate-800 shadow-sm">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-10 h-10 rounded-full bg-blue-500 text-white font-black text-xl flex items-center justify-center">C</div>
-                      <div>
-                        <h4 className="font-black text-lg uppercase tracking-tight text-slate-900">Compliance</h4>
-                        <p className="text-xs font-bold text-blue-600 uppercase tracking-wider">Fokus: Akurasi & Kualitas</p>
-                      </div>
-                    </div>
-                    <ul className="text-sm text-slate-600 space-y-2 list-disc pl-4">
-                      <li>Termotivasi oleh keahlian, standar tinggi, dan logika.</li>
-                      <li>Sangat analitis, detail-oriented, namun terkadang terlalu perfeksionis.</li>
-                      <li><strong>Cara Komunikasi:</strong> Gunakan data, fakta, dan angka. Jangan berikan feedback kritis tanpa bukti tertulis atau metrik yang jelas.</li>
-                    </ul>
-                  </div>
+                  ))}
                 </div>
               </section>
-
               <section>
                 <h3 className="text-lg sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
-                  <FileText className="w-6 h-6 text-slate-400" /> 4. Mengisi Dokumen Tindak Lanjut (PIP)
+                  <FileText className="w-6 h-6 text-slate-400" /> 4. Mengisi Dokumen Tindak Lanjut
                 </h3>
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8 space-y-4 text-sm sm:text-base text-slate-400 leading-relaxed">
-                  <p>
-                    Pada tab <strong>Action Plan</strong>, Anda dapat mengekspor atau mencetak dokumen tindak lanjut formal. Di bagian bawah dokumen tersebut, terdapat kolom kosong <strong>"Rencana Tindakan Lanjutan (Disepakati Bersama)"</strong>.
-                  </p>
-                  <p>
-                    <strong>Mengapa kolom durasi tidak disediakan untuk diketik di aplikasi?</strong><br/>
-                    Durasi dan tenggat waktu (<em>deadline</em>) adalah bagian dari komitmen psikologis yang harus disepakati secara langsung saat sesi tatap muka (1-on-1) dengan anggota tim Anda. Menuliskan kesepakatan target beserta durasinya secara bersama-sama di atas kertas cetak akan memicu tingkat pertanggungjawaban yang jauh lebih kuat bagi karyawan, ketimbang tenggat waktu yang sekadar "ditetapkan secara sepihak" oleh manajer di dalam aplikasi.
-                  </p>
-                  <p>
-                    <strong>Cara menggunakannya:</strong><br/>
-                    Setelah Anda menekan tombol "Simpan ke PDF" dan mencetaknya, duduklah bersama anggota tim Anda. Buka percakapan dengan panduan DISC yang tersedia, sepakati 3-4 langkah perbaikan nyata, lalu <strong>tuliskan secara manual target perbaikan beserta durasinya</strong> di atas garis yang disediakan. Terakhir, bubuhkan tanda tangan bersama sebagai bukti komitmen legal.
-                  </p>
+                  <p>Pada tab <strong>Action Plan</strong>, Anda dapat mencetak dokumen tindak lanjut formal untuk setiap anggota tim.</p>
+                  <p><strong>Cara menggunakannya:</strong> Cetak dokumen, duduk bersama anggota tim, sepakati 3-4 langkah perbaikan, tulis secara manual di garis yang tersedia, lalu tanda tangan bersama sebagai komitmen.</p>
                 </div>
               </section>
             </div>
@@ -1194,7 +1066,7 @@ export default function App() {
         </div>
       </main>
 
-      {/* FIX #2: Delete Confirmation Dialog */}
+      {/* Delete Confirmation Dialog */}
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
           <div className="bg-slate-900 border border-slate-700 rounded-3xl p-8 max-w-sm w-full shadow-2xl">
@@ -1202,9 +1074,7 @@ export default function App() {
               <Trash2 className="w-7 h-7 text-red-400" />
             </div>
             <h3 className="text-lg font-black text-white text-center mb-2">Hapus Anggota?</h3>
-            <p className="text-sm text-slate-400 text-center mb-8">
-              Data anggota ini akan dihapus permanen dari database dan tidak bisa dikembalikan.
-            </p>
+            <p className="text-sm text-slate-400 text-center mb-8">Data ini akan dihapus permanen dan tidak bisa dikembalikan.</p>
             <div className="flex gap-3">
               <button onClick={() => setDeleteConfirm(null)}
                 className="flex-1 py-3 rounded-xl font-black text-sm uppercase tracking-widest bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all">
@@ -1221,7 +1091,7 @@ export default function App() {
 
       {/* Modal Input Form */}
       {modal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-6 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-6 bg-black/80 backdrop-blur-sm">
           <div className="bg-white w-full h-full sm:h-auto sm:max-h-[90vh] max-w-2xl rounded-none sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden">
             <div className="px-6 py-5 sm:px-8 border-b border-slate-100 flex justify-between items-center bg-white z-10 flex-shrink-0 shadow-sm">
               <h2 className="text-xl sm:text-2xl font-black text-slate-900">{editId ? "Edit Mapping" : "Mapping Baru"}</h2>
@@ -1229,13 +1099,14 @@ export default function App() {
                 <X className="w-5 h-5 text-slate-500" />
               </button>
             </div>
-            
             <div className="flex-1 overflow-y-auto custom-scrollbar p-6 sm:p-8">
               <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-10">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <input required className="w-full px-4 py-3 sm:py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm sm:text-base font-bold outline-none text-slate-900 focus:ring-2 focus:ring-slate-900 placeholder:text-slate-400"
+                  <input required
+                    className="w-full px-4 py-3 sm:py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm sm:text-base font-bold outline-none text-slate-900 focus:ring-2 focus:ring-slate-900 placeholder:text-slate-400"
                     placeholder="Nama Anggota" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-                  <input className="w-full px-4 py-3 sm:py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm sm:text-base font-bold outline-none text-slate-900 focus:ring-2 focus:ring-slate-900 placeholder:text-slate-400"
+                  <input
+                    className="w-full px-4 py-3 sm:py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm sm:text-base font-bold outline-none text-slate-900 focus:ring-2 focus:ring-slate-900 placeholder:text-slate-400"
                     placeholder="Jabatan" value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} />
                 </div>
                 <DISCSelector value={form.disc} onChange={v => setForm({ ...form, disc: v })} />
@@ -1250,7 +1121,6 @@ export default function App() {
                   </div>
                 </div>
                 <div className="pt-4">
-                  {/* FIX #8: Disable button and show loading state during submit */}
                   <button type="submit" disabled={isSubmitting}
                     className="w-full bg-slate-900 text-white py-4 sm:py-5 rounded-2xl font-black text-sm sm:text-base tracking-widest uppercase hover:bg-slate-800 active:scale-[0.98] transition-all shadow-xl disabled:opacity-50 disabled:cursor-not-allowed">
                     {isSubmitting ? "Menyimpan..." : "Simpan Analisis"}
