@@ -569,10 +569,11 @@ export default function App() {
         setMembers(ms => ms.map(m => m.id === editId ? { ...payload, id: editId, createdAt: m.createdAt } : m));
         closeModal();
       }
-    } else {
-      // FIX #3: Remove manual id field; let Supabase auto-generate UUID
+} else {
+      // FIX: Kembalikan pembuatan ID manual agar sesuai dengan tabel id TEXT di Supabase
       const payload = { 
         ...clean, 
+        id: Date.now().toString(), // TAMBAHKAN BARIS INI KEMBALI
         manager_id: session.user.id, 
         createdAt: Date.now(), 
         updatedAt: Date.now() 
