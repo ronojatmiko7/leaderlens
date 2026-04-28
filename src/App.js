@@ -9,10 +9,9 @@ import {
 } from "lucide-react";
 
 // ── Inisialisasi Supabase ────────────────────────────────────────────────────
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
-const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+const supabaseUrl = 'https://bervlosjswfmqhxisikn.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJlcnZsb3Nqc3dmbXFoeGlzaWtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyODkyMjEsImV4cCI6MjA5MTg2NTIyMX0.IHTyFaCz7ExiHs7KSGaOnK3jdXXU7c47tcGHxOlKtME';
 const supabase = createClient(supabaseUrl, supabaseKey);
-
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 const getQuadrant = (comp, comm) => {
@@ -328,6 +327,10 @@ const QUADRANT_GUIDE = [
 ];
 
 // ── KOMPONEN SUPABASE AUTH GATE ───────────────────────────────────────────────────
+// PRODUCTION MODE: signup ditutup — akun hanya dibuat via admin/webhook Scalev
+// Untuk membuka signup kembali (saat onboarding manual), ubah ke: true
+const SIGNUP_OPEN = false;
+
 const SupabaseAuthGate = ({ onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -382,7 +385,7 @@ const SupabaseAuthGate = ({ onLoginSuccess }) => {
           <div className="text-xs text-slate-500 font-mono mt-2">{isLogin ? "Silakan Masuk" : "Buat Akun Manajer"}</div>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && (
+          {!isLogin && SIGNUP_OPEN && (
             <>
               <input required type="text" placeholder="Nama Lengkap" value={fullName} onChange={(e) => setFullName(e.target.value)}
                 className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white outline-none focus:border-indigo-500" />
@@ -404,9 +407,15 @@ const SupabaseAuthGate = ({ onLoginSuccess }) => {
           </button>
         </form>
         <div className="mt-6 text-center">
-          <button onClick={() => { setIsLogin(!isLogin); setError(""); setSuccessMsg(""); }} className="text-xs text-slate-400 hover:text-white transition-colors">
-            {isLogin ? "Belum punya akun? Daftar di sini" : "Sudah punya akun? Masuk di sini"}
-          </button>
+          {SIGNUP_OPEN ? (
+            <button onClick={() => { setIsLogin(!isLogin); setError(""); setSuccessMsg(""); }} className="text-xs text-slate-400 hover:text-white transition-colors">
+              {isLogin ? "Belum punya akun? Daftar di sini" : "Sudah punya akun? Masuk di sini"}
+            </button>
+          ) : (
+            <p className="text-xs text-slate-600">
+              Akses diberikan setelah pembelian. Hubungi kami jika ada kendala.
+            </p>
+          )}
         </div>
       </div>
     </div>
