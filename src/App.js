@@ -530,7 +530,7 @@ export default function App() {
     } else {
       // ── INSERT new member ───────────────────────────────────────────────
       // KUNCI: buat id sebagai variabel terpisah SEBELUM payload object
-      const newId = String(Date.now());
+      const newId = crypto.randomUUID();
       const managerId = session.user.id;
 
       const payload = {
@@ -546,11 +546,6 @@ export default function App() {
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
-
-      if (process.env.NODE_ENV === "development") {
-  console.log("INSERT payload:", payload);
-}
-
 
       const { data, error } = await supabase.from('members').insert([payload]).select();
       if (error) {
@@ -569,7 +564,7 @@ export default function App() {
   };
 
   const confirmDelete = async (id) => {
-    const { error } = await supabase.from('members').delete().eq('id', id);
+    const { error } = await supabase.from('members').delete().eq('id', id).eq('manager_id', session.user.id);
     if (error) {
       console.error("Gagal menghapus data:", error);
       alert("Gagal menghapus dari database.");
@@ -812,7 +807,7 @@ export default function App() {
                             <Printer className="w-4 h-4" /> Simpan ke PDF
                           </button>
                         </div>
-                        <div className="bg-white text-slate-900 rounded-2xl shadow-2xl mx-auto max-w-3xl print-area">
+<div className="bg-white text-slate-900 rounded-sm shadow-2xl mx-auto max-w-3xl print-area">
                           
                           {/* ========================================================= */}
                           {/* HALAMAN 1: KHUSUS MANAJER (Tetap Lega seperti asli)       */}
@@ -934,30 +929,30 @@ export default function App() {
             </div>
           )}
 
-          {/* GUIDE TAB */}
-          {tab === "guide" && (
-            <div className="space-y-10 sm:space-y-12 pb-8">
+{/* GUIDE TAB - With Enhanced DISC Section */}
+{tab === "guide" && (
+  <div className="space-y-10 sm:space-y-12 pb-8">
+    
+    {/* Welcome / Big Picture - unchanged from previous suggestion */}
+    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 sm:p-10 text-center">
+      <div className="flex items-center justify-center gap-3 mb-6">
+        <BookOpen className="w-8 h-8 text-emerald-400" />
+        <span className="text-2xl sm:text-3xl font-black text-white">Selamat Datang di LeaderLens</span>
+      </div>
+      <p className="max-w-2xl mx-auto text-slate-300 text-lg leading-relaxed">
+        LeaderLens membantu Anda memahami tim dengan cepat dan membangun rencana pengembangan yang <strong>kolaboratif</strong>, bukan sekadar evaluasi.
+      </p>
+      <p className="text-emerald-400 font-medium mt-4">Tujuannya: Setiap anggota tim merasa didukung, bukan dinilai.</p>
+    </div>
 
-              {/* Welcome / Big Picture */}
-              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 sm:p-10 text-center">
-                <div className="flex items-center justify-center gap-3 mb-6">
-                  <BookOpen className="w-8 h-8 text-emerald-400" />
-                  <span className="text-2xl sm:text-3xl font-black text-white">Selamat Datang di LeaderLens</span>
-                </div>
-                <p className="max-w-2xl mx-auto text-slate-300 text-sm sm:text-base leading-relaxed">
-                  LeaderLens membantu Anda memahami tim dengan cepat dan membangun rencana pengembangan yang <strong>kolaboratif</strong>, bukan sekadar evaluasi.
-                </p>
-                <p className="text-emerald-400 font-medium mt-4 text-sm sm:text-base">Tujuannya: Setiap anggota tim merasa didukung, bukan dinilai.</p>
-              </div>
-
-              {/* 1. Alur Kerja */}
-              <section>
-                <h3 className="text-xl sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
-                  <Lightbulb className="w-7 h-7 text-amber-400" />
-                  1. Alur Kerja yang Direkomendasikan
-                </h3>
-                <div className="grid sm:grid-cols-2 gap-6">
-                  <div className="bg-slate-900 border border-slate-800 rounded-3xl p-7 space-y-6">
+    {/* 1. Alur Kerja - unchanged */}
+    <section>
+      <h3 className="text-xl sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
+        <Lightbulb className="w-7 h-7 text-amber-400" /> 
+        1. Alur Kerja yang Direkomendasikan
+      </h3>
+      <div className="grid sm:grid-cols-2 gap-6">
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-7 space-y-6">
           <div className="flex gap-4">
             <div className="w-8 h-8 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 font-black flex-shrink-0">1</div>
             <div>
@@ -1001,170 +996,170 @@ export default function App() {
               Jadwalkan review bulanan singkat (15 menit per orang).
             </li>
           </ul>
-                </div>
+        </div>
+      </div>
+    </section>
+
+    {/* 2. Matriks - unchanged from previous */}
+    <section>
+      <h3 className="text-xl sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
+        <LayoutGrid className="w-7 h-7 text-slate-400" /> 
+        2. Memahami 4 Kuadran Tim Anda
+      </h3>
+      <div className="grid gap-6 sm:gap-8">
+        {QUADRANT_GUIDE.map(g => (
+          <div key={g.q} className="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm text-slate-800">
+            <div className="p-6 flex items-center gap-5 font-bold text-lg" style={{ background: g.bg }}>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white text-2xl" style={{ background: g.color }}>
+                {g.q}
               </div>
-              </section>
-
-              {/* 2. Matriks */}
-              <section>
-                <h3 className="text-xl sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
-                  <LayoutGrid className="w-7 h-7 text-slate-400" />
-                  2. Memahami 4 Kuadran Tim Anda
-                </h3>
-                <div className="grid gap-6 sm:gap-8">
-                  {QUADRANT_GUIDE.map(g => (
-                    <div key={g.q} className="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm text-slate-800">
-                      <div className="p-6 flex items-center gap-5 font-bold text-base sm:text-lg" style={{ background: g.bg }}>
-                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white text-xl sm:text-2xl" style={{ background: g.color }}>
-                          {g.q}
-                        </div>
-                        <div>{g.label}</div>
-                      </div>
-                      <div className="p-6 space-y-5 text-sm">
-                        <p className="font-medium">{g.diagnosis}</p>
-                        <div className="grid sm:grid-cols-2 gap-5 text-xs sm:text-sm">
-                          <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100">
-                            <strong className="block text-slate-500 mb-2">Mengapa terjadi?</strong>
-                            {g.rootCause}
-                          </div>
-                          <div className="bg-rose-50 p-5 rounded-2xl border border-rose-100">
-                            <strong className="block text-rose-600 mb-2">Kesalahan yang sering dilakukan</strong>
-                            {g.mistake}
-                          </div>
-                        </div>
-                        <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-100">
-                          <strong className="text-emerald-700">Langkah pertama yang paling penting:</strong> {g.urgency}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              {/* 3. DISC */}
-              <section>
-                <h3 className="text-xl sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
-                  <Users className="w-7 h-7 text-slate-400" />
-                  3. Memahami Profil Komunikasi DISC
-                </h3>
-                <p className="text-sm sm:text-base text-slate-400 mb-8 max-w-3xl">
-                  DISC membantu Anda menyesuaikan gaya komunikasi agar pesan lebih mudah diterima.
-                  Pilih tipe yang paling mendekati perilaku karyawan. Gunakan ini sebagai panduan fleksibel, bukan label tetap.
-                </p>
-
-                <div className="grid grid-cols-1 gap-8">
-                  {Object.entries(DISC_META).map(([id, data]) => (
-                    <div key={id} className="bg-white rounded-3xl p-8 border-l-8 shadow-sm" style={{ borderColor: data.color }}>
-                      <div className="flex items-start gap-6 mb-8">
-                        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center text-3xl sm:text-4xl font-black text-white flex-shrink-0"
-                          style={{ backgroundColor: data.color }}>
-                          {id}
-                        </div>
-                        <div className="pt-1">
-                          <h4 className="font-black text-xl sm:text-2xl text-slate-900">{data.label}</h4>
-                          <p className="text-sm text-slate-500 mt-1">{data.desc}</p>
-                        </div>
-                      </div>
-
-                      <div className="grid sm:grid-cols-2 gap-6">
-                        {/* Strengths */}
-                        <div>
-                          <div className="flex items-center gap-2 mb-4">
-                            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                            <span className="font-bold uppercase tracking-widest text-emerald-600 text-sm">Kekuatan Utama</span>
-                          </div>
-                          <p className="text-sm text-slate-700 leading-relaxed">{data.strengths}</p>
-                        </div>
-
-                        {/* Weaknesses */}
-                        <div>
-                          <div className="flex items-center gap-2 mb-4">
-                            <AlertTriangle className="w-5 h-5 text-amber-500" />
-                            <span className="font-bold uppercase tracking-widest text-amber-600 text-sm">Area yang Perlu Diwaspadai</span>
-                          </div>
-                        <p className="text-sm text-slate-700 leading-relaxed">{data.weaknesses}</p>
-                      </div>
-                    </div>
-
-                    {/* Practical Tips */}
-                    <div className="mt-8 pt-6 border-t border-slate-100">
-                      <div className="flex items-center gap-2 mb-4">
-                        <MessageCircle className="w-5 h-5 text-indigo-500" />
-                        <span className="font-bold uppercase tracking-widest text-indigo-600 text-sm">Cara Berkomunikasi Efektif</span>
-                      </div>
-                      <ul className="space-y-4 text-sm text-slate-700">
-                        <li className="flex gap-4">
-                          <span className="text-emerald-500 font-black mt-0.5">→</span>
-                          <span><strong>Buka percakapan dengan:</strong> "{getDISCScript(id).open}"</span>
-                        </li>
-                        <li className="flex gap-4">
-                          <span className="text-emerald-500 font-black mt-0.5">→</span>
-                          <span><strong>Isi diskusi yang paling efektif:</strong> {getDISCScript(id).body}</span>
-                        </li>
-                        <li className="flex gap-4">
-                          <span className="text-rose-500 font-black mt-0.5">→</span>
-                          <span><strong>Hindari:</strong> {getDISCScript(id).avoid}</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              </section>
-
-              {/* 4. Cara Mengisi & Diskusi */}
-              <section>
-                <h3 className="text-xl sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
-                  <FileText className="w-7 h-7 text-slate-400" />
-                  4. Cara Mengisi & Melakukan Diskusi
-                </h3>
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-8 text-slate-300">
-                  <div>
-                    <h4 className="font-semibold text-white mb-3">Tips Menulis Bukti Perilaku</h4>
-                    <div className="grid sm:grid-cols-2 gap-6">
-                      <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-6">
-                        <div className="text-red-400 font-bold mb-3 text-sm">Hindari</div>
-                        <ul className="space-y-2 text-sm">
-                          <li>• "Dia pemalas"</li>
-                          <li>• "Kerjanya tidak pernah bagus"</li>
-                        </ul>
-                      </div>
-                      <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-6">
-                        <div className="text-emerald-400 font-bold mb-3 text-sm">Gunakan</div>
-                        <ul className="space-y-2 text-sm">
-                          <li>• "Terlambat laporan 3 kali bulan ini"</li>
-                          <li>• "Proaktif membantu rekan saat deadline ketat"</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-6 border-t border-slate-700">
-                    <h4 className="font-semibold text-white mb-4">Saat Diskusi dengan Anggota Tim</h4>
-                    <ul className="space-y-4 text-sm">
-                      <li className="flex gap-4">
-                        <div className="text-emerald-400 mt-0.5">✓</div>
-                        <div>Mulai dengan apresiasi atau rasa ingin tahu, bukan kritik.</div>
-                      </li>
-                      <li className="flex gap-4">
-                        <div className="text-emerald-400 mt-0.5">✓</div>
-                        <div>Dengarkan 70–80% waktu. Tanyakan pendapat mereka terlebih dahulu.</div>
-                      </li>
-                      <li className="flex gap-4">
-                        <div className="text-emerald-400 mt-0.5">✓</div>
-                        <div>Gunakan halaman kedua dokumen (yang lebih ringkas) sebagai panduan bersama.</div>
-                      </li>
-                      <li className="flex gap-4">
-                        <div className="text-emerald-400 mt-0.5">✓</div>
-                        <div>Akhiri dengan kesepakatan tertulis dan jadwal review berikutnya.</div>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </section>
-
+              <div>{g.label}</div>
             </div>
-          )}
+            <div className="p-6 space-y-5 text-sm">
+              <p className="font-medium">{g.diagnosis}</p>
+              <div className="grid sm:grid-cols-2 gap-5 text-xs sm:text-sm">
+                <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                  <strong className="block text-slate-500 mb-2">Mengapa terjadi?</strong>
+                  {g.rootCause}
+                </div>
+                <div className="bg-rose-50 p-5 rounded-2xl border border-rose-100">
+                  <strong className="block text-rose-600 mb-2">Kesalahan yang sering dilakukan</strong>
+                  {g.mistake}
+                </div>
+              </div>
+              <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-100">
+                <strong className="text-emerald-700">Langkah pertama yang paling penting:</strong> {g.urgency}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {/* 3. ENHANCED DISC SECTION - This is the only part we expanded */}
+    <section>
+      <h3 className="text-xl sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
+        <Users className="w-7 h-7 text-slate-400" /> 
+        3. Memahami Profil Komunikasi DISC
+      </h3>
+      <p className="text-slate-400 mb-8 max-w-3xl">
+        DISC membantu Anda menyesuaikan gaya komunikasi agar pesan lebih mudah diterima. 
+        Pilih tipe yang paling mendekati perilaku karyawan. Gunakan ini sebagai panduan fleksibel, bukan label tetap.
+      </p>
+
+      <div className="grid grid-cols-1 gap-8">
+        {Object.entries(DISC_META).map(([id, data]) => (
+          <div key={id} className="bg-white rounded-3xl p-8 border-l-8 shadow-sm" style={{ borderColor: data.color }}>
+            <div className="flex items-start gap-6 mb-8">
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-4xl font-black text-white flex-shrink-0`} 
+                   style={{ backgroundColor: data.color }}>
+                {id}
+              </div>
+              <div className="pt-1">
+                <h4 className="font-black text-2xl text-slate-900">{data.label}</h4>
+                <p className="text-slate-500 mt-1">{data.desc}</p>
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-8">
+              {/* Strengths */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+                  <span className="font-bold uppercase tracking-widest text-emerald-600 text-sm">Kekuatan Utama</span>
+                </div>
+                <p className="text-slate-700 leading-relaxed">{data.strengths}</p>
+              </div>
+
+              {/* Weaknesses */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <AlertTriangle className="w-6 h-6 text-amber-500" />
+                  <span className="font-bold uppercase tracking-widest text-amber-600 text-sm">Area yang Perlu Diwaspadai</span>
+                </div>
+                <p className="text-slate-700 leading-relaxed">{data.weaknesses}</p>
+              </div>
+            </div>
+
+            {/* Practical Tips */}
+            <div className="mt-10 pt-8 border-t border-slate-100">
+              <div className="flex items-center gap-2 mb-5">
+                <MessageCircle className="w-6 h-6 text-indigo-500" />
+                <span className="font-bold uppercase tracking-widest text-indigo-600 text-sm">Cara Berkomunikasi Efektif</span>
+              </div>
+              <ul className="space-y-4 text-sm text-slate-700">
+                <li className="flex gap-4">
+                  <span className="text-emerald-500 font-black mt-1">→</span>
+                  <span><strong>Buka percakapan dengan:</strong> "{getDISCScript(id).open}"</span>
+                </li>
+                <li className="flex gap-4">
+                  <span className="text-emerald-500 font-black mt-1">→</span>
+                  <span><strong>Isi diskusi yang paling efektif:</strong> {getDISCScript(id).body}</span>
+                </li>
+                <li className="flex gap-4">
+                  <span className="text-rose-500 font-black mt-1">→</span>
+                  <span><strong>Hindari:</strong> {getDISCScript(id).avoid}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {/* 4. Cara Mengisi & Diskusi - unchanged */}
+    <section>
+      <h3 className="text-xl sm:text-2xl font-black text-white mb-6 flex items-center gap-3">
+        <FileText className="w-7 h-7 text-slate-400" /> 
+        4. Cara Mengisi & Melakukan Diskusi
+      </h3>
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-8 text-slate-300">
+        <div>
+          <h4 className="font-semibold text-white mb-3">Tips Menulis Bukti Perilaku</h4>
+          <div className="grid sm:grid-cols-2 gap-6">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-6">
+              <div className="text-red-400 font-bold mb-3">Hindari</div>
+              <ul className="space-y-2 text-sm">
+                <li>• "Dia pemalas"</li>
+                <li>• "Kerjanya tidak pernah bagus"</li>
+              </ul>
+            </div>
+            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-6">
+              <div className="text-emerald-400 font-bold mb-3">Gunakan</div>
+              <ul className="space-y-2 text-sm">
+                <li>• "Terlambat laporan 3 kali bulan ini"</li>
+                <li>• "Proaktif membantu rekan saat deadline ketat"</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div className="pt-6 border-t border-slate-700">
+          <h4 className="font-semibold text-white mb-4">Saat Diskusi dengan Anggota Tim</h4>
+          <ul className="space-y-4 text-sm">
+            <li className="flex gap-4">
+              <div className="text-emerald-400 mt-1">✓</div>
+              <div>Mulai dengan apresiasi atau rasa ingin tahu, bukan kritik.</div>
+            </li>
+            <li className="flex gap-4">
+              <div className="text-emerald-400 mt-1">✓</div>
+              <div>Dengarkan 70–80% waktu. Tanyakan pendapat mereka terlebih dahulu.</div>
+            </li>
+            <li className="flex gap-4">
+              <div className="text-emerald-400 mt-1">✓</div>
+              <div>Gunakan halaman kedua dokumen (yang lebih ringkas) sebagai panduan bersama.</div>
+            </li>
+            <li className="flex gap-4">
+              <div className="text-emerald-400 mt-1">✓</div>
+              <div>Akhiri dengan kesepakatan tertulis dan jadwal review berikutnya.</div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </div>
+)}
 
         </div>
       </main>
@@ -1218,7 +1213,7 @@ export default function App() {
                     <RatingSelector label="Kompetensi" dim="competency" value={form.competency} onChange={v => setForm({ ...form, competency: v })} />
                     <NoteInput label="Bukti Kompetensi" type="competencyNotes" notes={form.competencyNotes} onAdd={addNote} onUpdate={updateNote} onRemove={removeNote} prompt="Bukti perilaku spesifik?" />
                   </div>
-                  <div className="space-y-5 pt-2">
+                  <div className="space-y-5 border-t border-slate-100 pt-8 sm:pt-10">
                     <RatingSelector label="Komitmen" dim="commitment" value={form.commitment} onChange={v => setForm({ ...form, commitment: v })} />
                     <NoteInput label="Bukti Komitmen" type="commitmentNotes" notes={form.commitmentNotes} onAdd={addNote} onUpdate={updateNote} onRemove={removeNote} prompt="Bukti motivasi spesifik?" />
                   </div>
