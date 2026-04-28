@@ -547,7 +547,10 @@ export default function App() {
         updatedAt: Date.now(),
       };
 
-      console.log("INSERT payload:", JSON.stringify(payload)); // debug — hapus setelah berhasil
+      if (process.env.NODE_ENV === "development") {
+  console.log("INSERT payload:", payload);
+}
+
 
       const { data, error } = await supabase.from('members').insert([payload]).select();
       if (error) {
