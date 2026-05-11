@@ -601,6 +601,7 @@ export default function App() {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("AUTH EVENT:", event, session?.user?.email);
       setSession(session);
 
       // PASSWORD_RECOVERY = user klik link reset password
