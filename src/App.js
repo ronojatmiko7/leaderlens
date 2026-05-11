@@ -584,14 +584,30 @@ export default function App() {
         setAppFlow("login");
       }
     });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
-      if (event === "PASSWORD_RECOVERY" || event === "USER_UPDATED") {
-        // User just clicked invite link — need to set password
-        if (session) setAppFlow("setPassword");
+      if (event === "PASSWORD_RECOVERY") {
+        setAppFlow("setPassword");
         return;
       }
       if (session) {
+        // Cek apakah user baru (dari invite link) — belum punya password
+        // Tandanya: provider adalah 'email' dan created_at sangat baru (< 5 menit)
+        const createdAt = new Date(session.user.created_at).getTime();
+        const now = Date.now();
+        const isNewUser = (now - createdAt) < 5 * 60 * 1000; // < 5 menit
+        const hasNoPassword = session.user.identities?.every(i => i.provider === 'email') &&
+          session.user.app_metadata?.provider === 'email';
+
+        if (isNewUser && hasNoPassword) {
+          // Cek apakah sudah punya profil
+          const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', session.user.id).single();
+          if (!profile?.full_name) {
+            setAppFlow("setPassword");
+            return;
+          }
+        }
+
         fetchManagerProfile(session.user.id).then(hasProfile => {
           setAppFlow(hasProfile ? "app" : "onboarding");
           fetchMembersForUser(session.user.id);
@@ -1055,6 +1071,7 @@ export default function App() {
                               <div>
                                 <div className="border-b border-slate-400 h-10 mx-6"></div>
                                 <p className="mt-1.5 text-xs font-black text-slate-900">{managerProfile?.full_name || "Manajer"}</p>
+                                {managerProfile?.title && <p className="text-[9px] text-slate-600 font-medium">{managerProfile.title}</p>}
                                 <p className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Atasan</p>
                               </div>
                               <div>
