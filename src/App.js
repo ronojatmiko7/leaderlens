@@ -13,6 +13,10 @@ const supabaseUrl = 'https://bervlosjswfmqhxisikn.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJlcnZsb3Nqc3dmbXFoeGlzaWtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyODkyMjEsImV4cCI6MjA5MTg2NTIyMX0.IHTyFaCz7ExiHs7KSGaOnK3jdXXU7c47tcGHxOlKtME';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// ── WhatsApp Support ─────────────────────────────────────────────────────────
+const WA_NUMBER = '6287770781950';
+const WA_URL = `https://wa.me/${WA_NUMBER}?text=Halo%2C%20saya%20butuh%20bantuan%20dengan%20LeaderLens.`;
+
 // ── helpers ──────────────────────────────────────────────────────────────────
 const getQuadrant = (comp, comm) => {
   const hi = v => v >= 3;
@@ -327,10 +331,6 @@ const QUADRANT_GUIDE = [
 ];
 
 // ── KOMPONEN SUPABASE AUTH GATE ───────────────────────────────────────────────────
-// PRODUCTION MODE: signup ditutup — akun hanya dibuat via admin/webhook Scalev
-// Untuk membuka signup kembali (saat onboarding manual), ubah ke: true
-const SIGNUP_OPEN = false;
-
 const SupabaseAuthGate = ({ onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -385,7 +385,7 @@ const SupabaseAuthGate = ({ onLoginSuccess }) => {
           <div className="text-xs text-slate-500 font-mono mt-2">{isLogin ? "Silakan Masuk" : "Buat Akun Manajer"}</div>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && SIGNUP_OPEN && (
+          {!isLogin && (
             <>
               <input required type="text" placeholder="Nama Lengkap" value={fullName} onChange={(e) => setFullName(e.target.value)}
                 className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white outline-none focus:border-indigo-500" />
@@ -407,17 +407,24 @@ const SupabaseAuthGate = ({ onLoginSuccess }) => {
           </button>
         </form>
         <div className="mt-6 text-center">
-          {SIGNUP_OPEN ? (
-            <button onClick={() => { setIsLogin(!isLogin); setError(""); setSuccessMsg(""); }} className="text-xs text-slate-400 hover:text-white transition-colors">
-              {isLogin ? "Belum punya akun? Daftar di sini" : "Sudah punya akun? Masuk di sini"}
-            </button>
-          ) : (
-            <p className="text-xs text-slate-600">
-              Akses diberikan setelah pembelian. Hubungi kami jika ada kendala.
-            </p>
-          )}
+          <button onClick={() => { setIsLogin(!isLogin); setError(""); setSuccessMsg(""); }} className="text-xs text-slate-400 hover:text-white transition-colors">
+            {isLogin ? "Belum punya akun? Daftar di sini" : "Sudah punya akun? Masuk di sini"}
+          </button>
         </div>
       </div>
+      {/* WhatsApp Floating Button */}
+      <a
+        href={WA_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Hubungi Support via WhatsApp"
+        className="hide-on-print fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
+        style={{ background: "#25D366" }}
+      >
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="white" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+      </a>
     </div>
   );
 };
@@ -438,10 +445,16 @@ export default function App() {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [expandedPlan, setExpandedPlan] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // ── New: flow state ────────────────────────────────────────────────────────
+  const [appFlow, setAppFlow] = useState("loading"); // loading | setPassword | onboarding | app
 
   const fetchManagerProfile = async (userId) => {
     const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
-    if (!error && data) setManagerProfile(data);
+    if (!error && data && data.full_name) {
+      setManagerProfile(data);
+      return true; // profile complete
+    }
+    return false; // profile incomplete
   };
 
   const fetchMembersForUser = useCallback(async (userId) => {
@@ -469,19 +482,30 @@ export default function App() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session) {
-        fetchManagerProfile(session.user.id);
-        fetchMembersForUser(session.user.id);
+        fetchManagerProfile(session.user.id).then(hasProfile => {
+          setAppFlow(hasProfile ? "app" : "onboarding");
+          fetchMembersForUser(session.user.id);
+        });
+      } else {
+        setAppFlow("login");
       }
     });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
+      if (event === "PASSWORD_RECOVERY" || event === "USER_UPDATED") {
+        // User just clicked invite link — need to set password
+        if (session) setAppFlow("setPassword");
+        return;
+      }
       if (session) {
-        fetchManagerProfile(session.user.id);
-        fetchMembersForUser(session.user.id);
+        fetchManagerProfile(session.user.id).then(hasProfile => {
+          setAppFlow(hasProfile ? "app" : "onboarding");
+          fetchMembersForUser(session.user.id);
+        });
       } else {
         setManagerProfile(null);
         setMembers([]);
-        setIsLoadingData(false);
+        setAppFlow("login");
       }
     });
     return () => subscription.unsubscribe();
@@ -597,8 +621,19 @@ export default function App() {
 
   const handlePrint = () => window.print();
 
-  if (!isMounted) return null;
-  if (!session) return <SupabaseAuthGate onLoginSuccess={(sess) => setSession(sess)} />;
+  if (!isMounted || appFlow === "loading") return null;
+  if (appFlow === "login" || !session) return <SupabaseAuthGate onLoginSuccess={(sess) => { setSession(sess); }} />;
+  if (appFlow === "setPassword") return <SetPasswordScreen onSuccess={() => setAppFlow("onboarding")} />;
+  if (appFlow === "onboarding") return (
+    <OnboardingScreen
+      session={session}
+      onSuccess={(profile) => {
+        setManagerProfile(profile);
+        fetchMembersForUser(session.user.id);
+        setAppFlow("app");
+      }}
+    />
+  );
 
   return (
     <div className="min-h-screen bg-slate-950 text-white pb-24" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
@@ -631,7 +666,13 @@ export default function App() {
             </div>
             <div>
               <div className="text-sm sm:text-base lg:text-xl font-black tracking-tight leading-none uppercase">LEADER<span className="text-slate-400">LENS</span></div>
-              <div className="text-[9px] sm:text-[11px] lg:text-xs text-slate-500 font-mono mt-0.5">People Diagnostics Premium</div>
+              {managerProfile?.full_name ? (
+                <div className="text-[9px] sm:text-[11px] lg:text-xs text-slate-400 mt-0.5">
+                  Halo, <span className="text-emerald-400 font-bold">{managerProfile.full_name.split(' ')[0]}</span>! 👋
+                </div>
+              ) : (
+                <div className="text-[9px] sm:text-[11px] lg:text-xs text-slate-500 font-mono mt-0.5">People Diagnostics Premium</div>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -1238,6 +1279,19 @@ export default function App() {
           </div>
         </div>
       )}
+      {/* WhatsApp Floating Button */}
+      <a
+        href={WA_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Hubungi Support via WhatsApp"
+        className="hide-on-print fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
+        style={{ background: "#25D366" }}
+      >
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="white" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+      </a>
     </div>
   );
 }
