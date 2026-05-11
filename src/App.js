@@ -429,6 +429,100 @@ const SupabaseAuthGate = ({ onLoginSuccess }) => {
   );
 };
 
+
+// ── KOMPONEN SET PASSWORD (setelah klik invite link) ─────────────────────────
+const SetPasswordScreen = ({ onSuccess }) => {
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (password !== confirm) { setError("Password tidak sama."); return; }
+    if (password.length < 6) { setError("Password minimal 6 karakter."); return; }
+    setLoading(true);
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) { setError(error.message); setLoading(false); }
+    else onSuccess();
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-[32px] p-8 sm:p-10 shadow-2xl">
+        <div className="text-center mb-8">
+          <div className="text-2xl sm:text-3xl font-black text-white">LEADER<span className="text-slate-400">LENS</span></div>
+          <div className="text-xs text-slate-500 font-mono mt-2">Buat Password Anda</div>
+          <p className="text-xs text-slate-400 mt-3">Buat password untuk login berikutnya.</p>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input required type="password" placeholder="Password baru (min. 6 karakter)" value={password}
+            onChange={e => setPassword(e.target.value)}
+            className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white outline-none focus:border-indigo-500" />
+          <input required type="password" placeholder="Konfirmasi password" value={confirm}
+            onChange={e => setConfirm(e.target.value)}
+            className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white outline-none focus:border-indigo-500" />
+          {error && <p className="text-xs text-red-500 font-bold text-center">{error}</p>}
+          <button type="submit" disabled={loading}
+            className="w-full bg-white text-slate-900 py-3.5 rounded-xl font-black uppercase tracking-widest hover:bg-slate-200 transition-all disabled:opacity-50">
+            {loading ? "Menyimpan..." : "Simpan Password"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// ── KOMPONEN ONBOARDING PROFIL ────────────────────────────────────────────────
+const OnboardingScreen = ({ session, onSuccess }) => {
+  const [fullName, setFullName] = useState("");
+  const [title, setTitle] = useState("");
+  const [company, setCompany] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const { error } = await supabase.from("profiles").upsert([{
+      id: session.user.id,
+      full_name: fullName.trim(),
+      title: title.trim(),
+      company: company.trim(),
+    }]);
+    if (error) { setError(error.message); setLoading(false); }
+    else onSuccess({ full_name: fullName.trim(), title: title.trim(), company: company.trim() });
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-[32px] p-8 sm:p-10 shadow-2xl">
+        <div className="text-center mb-8">
+          <div className="text-2xl sm:text-3xl font-black text-white">LEADER<span className="text-slate-400">LENS</span></div>
+          <div className="text-xs text-slate-500 font-mono mt-2">Lengkapi Profil Anda</div>
+          <p className="text-xs text-slate-400 mt-3">Data ini akan muncul di action plan yang Anda buat.</p>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input required type="text" placeholder="Nama Lengkap" value={fullName}
+            onChange={e => setFullName(e.target.value)}
+            className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white outline-none focus:border-indigo-500" />
+          <input required type="text" placeholder="Jabatan (contoh: Sales Manager)" value={title}
+            onChange={e => setTitle(e.target.value)}
+            className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white outline-none focus:border-indigo-500" />
+          <input required type="text" placeholder="Nama Perusahaan" value={company}
+            onChange={e => setCompany(e.target.value)}
+            className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white outline-none focus:border-indigo-500" />
+          {error && <p className="text-xs text-red-500 font-bold text-center">{error}</p>}
+          <button type="submit" disabled={loading}
+            className="w-full bg-white text-slate-900 py-3.5 rounded-xl font-black uppercase tracking-widest hover:bg-slate-200 transition-all disabled:opacity-50">
+            {loading ? "Menyimpan..." : "Mulai Gunakan LeaderLens →"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 // ── MAIN APP ──────────────────────────────────────────────────────────────
 const EMPTY_FORM = { name: "", role: "", competency: 3, commitment: 3, competencyNotes: [""], commitmentNotes: [""], disc: "S" };
 
