@@ -543,12 +543,12 @@ export default function App() {
   const [appFlow, setAppFlow] = useState("loading"); // loading | setPassword | onboarding | app
 
   const fetchManagerProfile = async (userId) => {
-    const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
     if (!error && data && data.full_name) {
       setManagerProfile(data);
       return true; // profile complete
     }
-    return false; // profile incomplete
+    return false; // profile incomplete or not found
   };
 
   const fetchMembersForUser = useCallback(async (userId) => {
@@ -601,7 +601,7 @@ export default function App() {
 
         if (isNewUser && hasNoPassword) {
           // Cek apakah sudah punya profil
-          const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', session.user.id).single();
+          const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', session.user.id).maybeSingle();
           if (!profile?.full_name) {
             setAppFlow("setPassword");
             return;
