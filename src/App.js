@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 import {
   Plus, Users, LayoutGrid, BookOpen, Trash2, Edit3, TrendingUp,
@@ -547,16 +547,22 @@ export default function App() {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [expandedPlan, setExpandedPlan] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // ── New: flow state ────────────────────────────────────────────────────────
-  const [appFlow, setAppFlow] = useState("loading"); // loading | setPassword | onboarding | app
+  const [appFlow, setAppFlow] = useState("loading");
+  // Ref to track flow — onAuthStateChange reads this to avoid overriding manual transitions
+  const appFlowRef = useRef("loading");
+
+  const updateFlow = (flow) => {
+    appFlowRef.current = flow;
+    setAppFlow(flow);
+  };
 
   const fetchManagerProfile = async (userId) => {
     const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
     if (!error && data && data.full_name) {
       setManagerProfile(data);
-      return true; // profile complete
+      return true;
     }
-    return false; // profile incomplete or not found
+    return false;
   };
 
   const fetchMembersForUser = useCallback(async (userId) => {
@@ -581,51 +587,45 @@ export default function App() {
 
   useEffect(() => {
     setIsMounted(true);
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session) {
         fetchManagerProfile(session.user.id).then(hasProfile => {
-          setAppFlow(hasProfile ? "app" : "onboarding");
+          updateFlow(hasProfile ? "app" : "onboarding");
           fetchMembersForUser(session.user.id);
         });
       } else {
-        setAppFlow("login");
+        updateFlow("login");
       }
     });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
+
+      // PASSWORD_RECOVERY = user klik link reset password
       if (event === "PASSWORD_RECOVERY") {
-        setAppFlow("setPassword");
+        updateFlow("setPassword");
         return;
       }
+
+      // Jangan override flow yang sudah di-set manual
+      // Hanya proses SIGNED_IN dan SIGNED_OUT
+      if (event === "USER_UPDATED") return;
+      if (event === "SIGNED_IN" && ["onboarding", "app", "setPassword"].includes(appFlowRef.current)) return;
+
       if (session) {
-        // Cek apakah user baru (dari invite link) — belum punya password
-        // Tandanya: provider adalah 'email' dan created_at sangat baru (< 5 menit)
-        const createdAt = new Date(session.user.created_at).getTime();
-        const now = Date.now();
-        const isNewUser = (now - createdAt) < 5 * 60 * 1000; // < 5 menit
-        const hasNoPassword = session.user.identities?.every(i => i.provider === 'email') &&
-          session.user.app_metadata?.provider === 'email';
-
-        if (isNewUser && hasNoPassword) {
-          // Cek apakah sudah punya profil
-          const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', session.user.id).maybeSingle();
-          if (!profile?.full_name) {
-            setAppFlow("setPassword");
-            return;
-          }
-        }
-
         fetchManagerProfile(session.user.id).then(hasProfile => {
-          setAppFlow(hasProfile ? "app" : "onboarding");
+          updateFlow(hasProfile ? "app" : "onboarding");
           fetchMembersForUser(session.user.id);
         });
       } else {
         setManagerProfile(null);
         setMembers([]);
-        setAppFlow("login");
+        updateFlow("login");
       }
     });
+
     return () => subscription.unsubscribe();
   }, [fetchMembersForUser]);
 
@@ -741,14 +741,14 @@ export default function App() {
 
   if (!isMounted || appFlow === "loading") return null;
   if (appFlow === "login" || !session) return <SupabaseAuthGate onLoginSuccess={(sess) => { setSession(sess); }} />;
-  if (appFlow === "setPassword") return <SetPasswordScreen onSuccess={() => setAppFlow("onboarding")} />;
+  if (appFlow === "setPassword") return <SetPasswordScreen onSuccess={() => updateFlow("onboarding")} />;
   if (appFlow === "onboarding") return (
     <OnboardingScreen
       session={session}
-      onSuccess={(profile) => {
+      onSuccess={async (profile) => {
         setManagerProfile(profile);
-        fetchMembersForUser(session.user.id);
-        setAppFlow("app");
+        await fetchMembersForUser(session.user.id);
+        updateFlow("app");
       }}
     />
   );
