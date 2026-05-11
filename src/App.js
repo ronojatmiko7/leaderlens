@@ -588,6 +588,37 @@ export default function App() {
   useEffect(() => {
     setIsMounted(true);
 
+    // Handle token dari URL hash (invite link redirect)
+    const hash = window.location.hash;
+    console.log("URL HASH:", hash);
+    if (hash && hash.includes('access_token')) {
+      const params = new URLSearchParams(hash.substring(1));
+      const type = params.get('type');
+      const accessToken = params.get('access_token');
+      const refreshToken = params.get('refresh_token');
+      console.log("TOKEN TYPE:", type, "ACCESS:", accessToken?.substring(0,20));
+      if (accessToken && refreshToken) {
+        supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
+          .then(({ data, error }) => {
+            console.log("SET SESSION:", error ? error.message : "OK", data?.session?.user?.email);
+            if (!error && data.session) {
+              setSession(data.session);
+              if (type === 'invite' || type === 'recovery') {
+                updateFlow("setPassword");
+              } else {
+                fetchManagerProfile(data.session.user.id).then(hasProfile => {
+                  updateFlow(hasProfile ? "app" : "onboarding");
+                  fetchMembersForUser(data.session.user.id);
+                });
+              }
+              // Bersihkan hash dari URL
+              window.history.replaceState(null, '', window.location.pathname);
+            }
+          });
+        return;
+      }
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session) {
