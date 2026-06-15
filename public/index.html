@@ -1,3 +1,56 @@
-<div id="root"></div>
-<script src="https://cdn.tailwindcss.com"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#0E131B" />
+    <meta
+      name="description"
+      content="LeaderLens — Kelola tim, bukan tebak-tebakan. DISC + Skill×Will untuk pemimpin baru."
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+    <!-- Google Fonts: Newsreader (headings), IBM Plex Sans (body/UI), IBM Plex Mono (labels/eyebrow) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              navy: '#0E131B',
+              soft: '#161D29',
+              cream: '#FCFBF8',
+              cream2: '#F4F2EC',
+              ink: '#1B2027',
+              muted: '#6A717C',
+              mutedsoft: '#8A909A',
+              gold: '#F2B441',
+              'gold-deep': '#C8902F',
+              'line-cream': '#ECEAE1',
+              'line-dark': 'rgba(242,180,65,0.14)',
+              'line-soft': 'rgba(255,255,255,0.08)',
+            },
+            fontFamily: {
+              serif: ['Newsreader', 'Georgia', 'serif'],
+              sans: ['IBM Plex Sans', '-apple-system', 'Arial', 'sans-serif'],
+              mono: ['IBM Plex Mono', 'monospace'],
+            },
+          },
+        },
+      };
+    </script>
+
+    <title>LeaderLens</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
