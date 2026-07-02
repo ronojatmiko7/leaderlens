@@ -613,7 +613,7 @@ const NoteInput = ({ label, type, notes, onAdd, onUpdate, onRemove, prompt }) =>
         <div key={i} className="flex gap-2 items-center">
           <input 
             className="flex-1 px-4 py-3 bg-cream border border-line-cream rounded-xl text-sm sm:text-base text-ink outline-none focus:ring-2 focus:ring-gold placeholder:text-mutedsoft"
-            placeholder="Tuliskan bukti perilaku..." 
+            placeholder="Tuliskan alasannya..."
             value={n}
             onChange={e => onUpdate(type, i, e.target.value)} 
           />
@@ -1854,11 +1854,11 @@ export default function App() {
                 <div className="space-y-8 sm:space-y-10 border-t border-line-cream pt-8 sm:pt-10">
                   <div className="space-y-5">
                     <RatingSelector label="Skill (Kemampuan)" dim="competency" value={form.competency} onChange={v => setForm({ ...form, competency: v })} />
-                    <NoteInput label="Bukti Kemampuan" type="competencyNotes" notes={form.competencyNotes} onAdd={addNote} onUpdate={updateNote} onRemove={removeNote} prompt="Bukti perilaku spesifik?" />
+                    <NoteInput label="Alasan Skor Kemampuan" type="competencyNotes" notes={form.competencyNotes} onAdd={addNote} onUpdate={updateNote} onRemove={removeNote} prompt="Berikan alasan mengapa Anda memberikan skor tersebut." />
                   </div>
                   <div className="space-y-5 border-t border-line-cream pt-8 sm:pt-10">
                     <RatingSelector label="Will (Kemauan)" dim="commitment" value={form.commitment} onChange={v => setForm({ ...form, commitment: v })} />
-                    <NoteInput label="Bukti Kemauan" type="commitmentNotes" notes={form.commitmentNotes} onAdd={addNote} onUpdate={updateNote} onRemove={removeNote} prompt="Bukti motivasi spesifik?" />
+                    <NoteInput label="Alasan Skor Kemauan" type="commitmentNotes" notes={form.commitmentNotes} onAdd={addNote} onUpdate={updateNote} onRemove={removeNote} prompt="Berikan alasan mengapa Anda memberikan skor tersebut." />
                   </div>
                 </div>
                 <div className="pt-4">
