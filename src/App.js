@@ -179,7 +179,7 @@ const DIALOGUE_EXAMPLES = {
     { speaker: "karyawan", text: "Makasih, saya coba buktiin minggu ini." },
   ],
   D_Q2: [
-    { speaker: "manager", text: "Saya lihat kamu semangat banget belakangan ini — bagus banget. Sekarang kita percepat biar skill kamu ngejar semangatnya." },
+    { speaker: "manager", text: "Saya lihat kamu semangat banget belakangan ini — bagus banget. Sekarang kita percepat biar kemampuan kamu ngejar semangatnya." },
     { speaker: "karyawan", text: "Siap, saya emang masih perlu banyak belajar di beberapa bagian, tapi saya nggak sabar buat langsung eksekusi." },
     { speaker: "manager", text: "Saya suka energinya. Menurut kamu sendiri, area mana yang paling perlu kamu kuasai duluan?" },
     { speaker: "karyawan", text: "Saya rasa bagian teknis intinya dulu, biar saya bisa pegang tugas lebih besar secepatnya." },
@@ -235,7 +235,7 @@ const DIALOGUE_EXAMPLES = {
     { speaker: "karyawan", text: "Makasih banyak, saya jadi lebih lega ngomongin ini." },
   ],
   I_Q2: [
-    { speaker: "manager", text: "Saya seneng banget lihat semangat kamu belakangan ini! Yuk kita obrolin gimana biar skill kamu makin ngejar." },
+    { speaker: "manager", text: "Saya seneng banget lihat semangat kamu belakangan ini! Yuk kita obrolin gimana biar kemampuan kamu makin ngejar." },
     { speaker: "karyawan", text: "Iya, saya emang masih belajar banyak hal, tapi saya excited banget buat coba-coba." },
     { speaker: "manager", text: "Bagus, saya suka energi kamu. Kira-kira bagian mana yang bikin kamu paling penasaran buat dipelajari?" },
     { speaker: "karyawan", text: "Saya pengen lebih jago di beberapa proses yang sering saya lihat rekan-rekan lain kerjain." },
@@ -291,7 +291,7 @@ const DIALOGUE_EXAMPLES = {
     { speaker: "karyawan", text: "Terima kasih banyak, saya jadi lebih lega." },
   ],
   S_Q2: [
-    { speaker: "manager", text: "Saya lihat kamu udah cukup nyaman belakangan ini, dan saya mau bantu skill kamu makin berkembang pelan-pelan." },
+    { speaker: "manager", text: "Saya lihat kamu udah cukup nyaman belakangan ini, dan saya mau bantu kemampuan kamu makin berkembang pelan-pelan." },
     { speaker: "karyawan", text: "Saya emang masih agak ragu di beberapa bagian, tapi saya mau belajar." },
     { speaker: "manager", text: "Bagus, nggak perlu buru-buru kok. Menurut kamu, bagian mana yang bikin kamu paling nggak yakin?" },
     { speaker: "karyawan", text: "Saya rasa saya butuh lihat contoh dulu sebelum coba sendiri, biar nggak salah arah." },
@@ -347,7 +347,7 @@ const DIALOGUE_EXAMPLES = {
     { speaker: "karyawan", text: "Terima kasih, saya coba maksimalkan dari sekarang." },
   ],
   C_Q2: [
-    { speaker: "manager", text: "Saya lihat progress kamu di area ini cukup baik. Yuk kita bahas gimana mempercepat penguasaan skill kamu." },
+    { speaker: "manager", text: "Saya lihat progress kamu di area ini cukup baik. Yuk kita bahas gimana mempercepat penguasaan kemampuan kamu." },
     { speaker: "karyawan", text: "Saya masih butuh referensi yang lebih lengkap di beberapa bagian sebelum saya yakin buat eksekusi." },
     { speaker: "manager", text: "Masuk akal. Menurut kamu, dokumentasi atau contoh kasus mana yang paling kamu butuhkan sekarang?" },
     { speaker: "karyawan", text: "Saya rasa saya perlu panduan step-by-step yang lebih detail, biar nggak salah interpretasi." },
@@ -418,13 +418,13 @@ const getActionPlan = (m) => {
   } else {
     if (m.competency < 3) {
       quadrantItems.push(
-        "SKILL — Tentukan dulu area keterampilan spesifik yang perlu diperkuat, dari catatan ini: " + (m.competencyNotes[0] || "[Belum ada catatan]"),
+        "KEMAMPUAN — Tentukan dulu area keterampilan spesifik yang perlu diperkuat, dari catatan ini: " + (m.competencyNotes[0] || "[Belum ada catatan]"),
         "Pasangkan dia dengan rekan yang lebih senior buat mendampingi (shadowing) selama 1–2 minggu. Mulai dari tugas kecil dulu, terus cek bareng tiap hari (bukan mingguan) — biar kalau ada yang keliru, bisa cepat dibantu."
       );
     }
     if (m.commitment < 3) {
       quadrantItems.push(
-        "WILL — Coba pahami dulu akar penurunan motivasinya, dari catatan ini: " + (m.commitmentNotes[0] || "[Belum ada catatan]"),
+        "KEMAUAN — Coba pahami dulu akar penurunan motivasinya, dari catatan ini: " + (m.commitmentNotes[0] || "[Belum ada catatan]"),
         "Ajak ngobrol terbuka dari hati ke hati. Tanyakan: 'Apa sih yang sekarang paling ngehambat kerjaanmu?' Lalu bangun lagi kepercayaannya dengan kasih dia otonomi di area yang udah dia kuasai."
       );
     }
@@ -436,7 +436,7 @@ const getActionPlan = (m) => {
       );
     } else if (q.id === "Q3") {
       quadrantItems.push(
-        "Dia sebenarnya punya skill, cuma lagi kehilangan semangat. Kalau diawasi terlalu ketat, bisa-bisa malah tambah parah.",
+        "Dia sebenarnya punya kemampuan, cuma lagi kehilangan semangat. Kalau diawasi terlalu ketat, bisa-bisa malah tambah parah.",
         "LANGKAH UTAMA — DENGERIN DULU: Buka obrolan dengan rasa ingin tahu, bukan curiga. Tanyakan apa yang bikin dia capek belakangan ini, tanpa menghakimi.",
         "Kasih tantangan baru atau variasi kerjaan kalau ternyata kejenuhan yang jadi akar masalahnya."
       );
@@ -537,7 +537,7 @@ const RatingSelector = ({ label, dim, value, onChange }) => (
 
 const DISCSelector = ({ value, onChange }) => (
   <div className="space-y-1.5 sm:space-y-2">
-    <label className="block text-xs sm:text-sm font-mono font-black text-muted uppercase tracking-widest">Profil Komunikasi (Opsional)</label>
+    <label className="block text-xs sm:text-sm font-mono font-black text-muted uppercase tracking-widest">Profil Komunikasi</label>
     <div className="grid grid-cols-5 gap-1 sm:gap-2">
       {Object.entries(DISC_META).map(([id, m]) => (
         <button key={id} type="button" onClick={() => onChange(id)}
@@ -1266,16 +1266,16 @@ export default function App() {
 
                       {/* Axis endpoint labels — now in the outer padding */}
                       <div className="absolute top-0 left-1/2 -translate-x-1/2 text-center text-slate-400 z-10 pointer-events-none select-none">
-                        <span className="text-[8px] sm:text-[10px] font-mono font-black uppercase tracking-widest">Will Tinggi</span>
+                        <span className="text-[8px] sm:text-[10px] font-mono font-black uppercase tracking-widest">Kemauan Tinggi</span>
                       </div>
                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center text-slate-400 z-10 pointer-events-none select-none">
-                        <span className="text-[8px] sm:text-[10px] font-mono font-black uppercase tracking-widest">Will Rendah</span>
+                        <span className="text-[8px] sm:text-[10px] font-mono font-black uppercase tracking-widest">Kemauan Rendah</span>
                       </div>
                       <div className="absolute left-0 top-1/2 -translate-y-1/2 text-slate-400 z-10 pointer-events-none select-none" style={{ writingMode: 'vertical-rl', transform: 'translateY(-50%) rotate(180deg)' }}>
-                        <span className="text-[8px] sm:text-[10px] font-mono font-black uppercase tracking-widest">Skill Rendah</span>
+                        <span className="text-[8px] sm:text-[10px] font-mono font-black uppercase tracking-widest">Kemampuan Rendah</span>
                       </div>
                       <div className="absolute right-0 top-1/2 -translate-y-1/2 text-slate-400 z-10 pointer-events-none select-none" style={{ writingMode: 'vertical-rl' }}>
-                        <span className="text-[8px] sm:text-[10px] font-mono font-black uppercase tracking-widest">Skill Tinggi</span>
+                        <span className="text-[8px] sm:text-[10px] font-mono font-black uppercase tracking-widest">Kemampuan Tinggi</span>
                       </div>
 
                     {/* The actual matrix box */}
@@ -1559,7 +1559,7 @@ export default function App() {
             <div className="w-8 h-8 rounded-2xl bg-gold/10 flex items-center justify-center text-gold font-black flex-shrink-0">1</div>
             <div>
               <div className="font-semibold text-white">Update Penilaian</div>
-              <p className="text-sm text-slate-400 mt-1">Lakukan rating Skill & Will setiap 4–6 minggu. Tulis bukti faktual (bukan opini).</p>
+              <p className="text-sm text-slate-400 mt-1">Lakukan rating Kemampuan & Kemauan setiap 4–6 minggu. Tulis bukti faktual (bukan opini).</p>
             </div>
           </div>
           <div className="flex gap-4">
@@ -1602,75 +1602,14 @@ export default function App() {
       </div>
     </section>
 
-    {/* 2. Matriks - unchanged from previous */}
+    {/* 2. ENHANCED DISC SECTION - This is the only part we expanded */}
     <section>
       <h3 className="text-xl sm:text-2xl font-black font-serif text-white mb-6 flex items-center gap-3">
-        <LayoutGrid className="w-7 h-7 text-slate-400" /> 
-        2. Memahami 4 Kuadran Tim Anda
-      </h3>
-
-      {/* Rating scale reference */}
-      <div className="bg-soft border border-line-soft rounded-2xl p-6 mb-6">
-        <p className="text-sm text-slate-400 mb-4">Skor 1–4 yang Anda isi untuk setiap anggota tim artinya:</p>
-        <div className="grid sm:grid-cols-2 gap-6 text-sm">
-          <div>
-            <div className="font-bold text-white mb-2">Skill (Kemampuan)</div>
-            <ul className="space-y-1.5 text-slate-300">
-              {[1, 2, 3, 4].map(n => (
-                <li key={n} className="flex gap-2"><span className="text-slate-500 font-mono shrink-0">{n}</span><span>{RATING_ANCHORS.competency[n]}</span></li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <div className="font-bold text-white mb-2">Will (Kemauan)</div>
-            <ul className="space-y-1.5 text-slate-300">
-              {[1, 2, 3, 4].map(n => (
-                <li key={n} className="flex gap-2"><span className="text-slate-500 font-mono shrink-0">{n}</span><span>{RATING_ANCHORS.commitment[n]}</span></li>
-              ))}
-            </ul>
-          </div>
-        </div>
-        <p className="text-xs text-slate-500 mt-4">Skor 3–4 dianggap "tinggi" — kombinasinya menentukan posisi kuadran di bawah ini.</p>
-      </div>
-
-      <div className="grid gap-6 sm:gap-8">
-        {QUADRANT_GUIDE.map(g => (
-          <div key={g.q} className="bg-cream rounded-3xl border border-line-cream overflow-hidden shadow-sm text-ink">
-            <div className="p-6 flex items-center gap-5 font-bold text-lg" style={{ background: g.bg }}>
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white text-2xl font-serif" style={{ background: g.color }}>
-                {g.q}
-              </div>
-              <div>{g.label}</div>
-            </div>
-            <div className="p-6 space-y-5 text-sm">
-              <p className="font-medium">{g.diagnosis}</p>
-              <div className="grid sm:grid-cols-2 gap-5 text-xs sm:text-sm">
-                <div className="bg-cream2 p-5 rounded-2xl border border-line-cream">
-                  <strong className="block text-muted mb-2">Mengapa terjadi?</strong>
-                  {g.rootCause}
-                </div>
-                <div className="bg-rose-50 p-5 rounded-2xl border border-rose-100">
-                  <strong className="block text-rose-600 mb-2">Kesalahan yang sering dilakukan</strong>
-                  {g.mistake}
-                </div>
-              </div>
-              <div className="bg-gold/10 p-5 rounded-2xl border border-gold/20">
-                <strong className="text-gold-deep">Langkah pertama yang paling penting:</strong> {g.urgency}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-
-    {/* 3. ENHANCED DISC SECTION - This is the only part we expanded */}
-    <section>
-      <h3 className="text-xl sm:text-2xl font-black font-serif text-white mb-6 flex items-center gap-3">
-        <Users className="w-7 h-7 text-slate-400" /> 
-        3. Memahami Profil Komunikasi DISC
+        <Users className="w-7 h-7 text-slate-400" />
+        2. Memahami Profil Komunikasi DISC
       </h3>
       <p className="text-slate-400 mb-8 max-w-3xl">
-        DISC membantu Anda menyesuaikan gaya komunikasi agar pesan lebih mudah diterima. 
+        DISC membantu Anda menyesuaikan gaya komunikasi agar pesan lebih mudah diterima.
         Pilih tipe yang paling mendekati perilaku karyawan. Gunakan ini sebagai panduan fleksibel, bukan label tetap.
       </p>
 
@@ -1678,7 +1617,7 @@ export default function App() {
         {Object.entries(DISC_META).map(([id, data]) => (
           <div key={id} className="bg-cream rounded-3xl p-8 border-l-8 shadow-sm" style={{ borderColor: data.color }}>
             <div className="flex items-start gap-6 mb-8">
-              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-4xl font-black font-serif text-white flex-shrink-0`} 
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-4xl font-black font-serif text-white flex-shrink-0`}
                    style={{ backgroundColor: data.color }}>
                 {id}
               </div>
@@ -1729,6 +1668,67 @@ export default function App() {
                   <span><strong>Hindari:</strong> {getDISCScript(id).avoid}</span>
                 </li>
               </ul>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {/* 3. Matriks - unchanged from previous */}
+    <section>
+      <h3 className="text-xl sm:text-2xl font-black font-serif text-white mb-6 flex items-center gap-3">
+        <LayoutGrid className="w-7 h-7 text-slate-400" />
+        3. Memahami 4 Kuadran Tim Anda
+      </h3>
+
+      {/* Rating scale reference */}
+      <div className="bg-soft border border-line-soft rounded-2xl p-6 mb-6">
+        <p className="text-sm text-slate-400 mb-4">Skor 1–4 yang Anda isi untuk setiap anggota tim artinya:</p>
+        <div className="grid sm:grid-cols-2 gap-6 text-sm">
+          <div>
+            <div className="font-bold text-white mb-2">Kemampuan</div>
+            <ul className="space-y-1.5 text-slate-300">
+              {[1, 2, 3, 4].map(n => (
+                <li key={n} className="flex gap-2"><span className="text-slate-500 font-mono shrink-0">{n}</span><span>{RATING_ANCHORS.competency[n]}</span></li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <div className="font-bold text-white mb-2">Kemauan</div>
+            <ul className="space-y-1.5 text-slate-300">
+              {[1, 2, 3, 4].map(n => (
+                <li key={n} className="flex gap-2"><span className="text-slate-500 font-mono shrink-0">{n}</span><span>{RATING_ANCHORS.commitment[n]}</span></li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <p className="text-xs text-slate-500 mt-4">Skor 3–4 dianggap "tinggi" — kombinasinya menentukan posisi kuadran di bawah ini.</p>
+      </div>
+
+      <div className="grid gap-6 sm:gap-8">
+        {QUADRANT_GUIDE.map(g => (
+          <div key={g.q} className="bg-cream rounded-3xl border border-line-cream overflow-hidden shadow-sm text-ink">
+            <div className="p-6 flex items-center gap-5 font-bold text-lg" style={{ background: g.bg }}>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white text-2xl font-serif" style={{ background: g.color }}>
+                {g.q}
+              </div>
+              <div>{g.label}</div>
+            </div>
+            <div className="p-6 space-y-5 text-sm">
+              <p className="font-medium">{g.diagnosis}</p>
+              <div className="grid sm:grid-cols-2 gap-5 text-xs sm:text-sm">
+                <div className="bg-cream2 p-5 rounded-2xl border border-line-cream">
+                  <strong className="block text-muted mb-2">Mengapa terjadi?</strong>
+                  {g.rootCause}
+                </div>
+                <div className="bg-rose-50 p-5 rounded-2xl border border-rose-100">
+                  <strong className="block text-rose-600 mb-2">Kesalahan yang sering dilakukan</strong>
+                  {g.mistake}
+                </div>
+              </div>
+              <div className="bg-gold/10 p-5 rounded-2xl border border-gold/20">
+                <strong className="text-gold-deep">Langkah pertama yang paling penting:</strong> {g.urgency}
+              </div>
             </div>
           </div>
         ))}
@@ -1852,11 +1852,11 @@ export default function App() {
                 </div>
                 <div className="space-y-8 sm:space-y-10 border-t border-line-cream pt-8 sm:pt-10">
                   <div className="space-y-5">
-                    <RatingSelector label="Skill (Kemampuan)" dim="competency" value={form.competency} onChange={v => setForm({ ...form, competency: v })} />
+                    <RatingSelector label="Kemampuan" dim="competency" value={form.competency} onChange={v => setForm({ ...form, competency: v })} />
                     <NoteInput label="Alasan Skor Kemampuan" type="competencyNotes" notes={form.competencyNotes} onAdd={addNote} onUpdate={updateNote} onRemove={removeNote} prompt="Berikan alasan mengapa Anda memberikan skor tersebut." />
                   </div>
                   <div className="space-y-5 border-t border-line-cream pt-8 sm:pt-10">
-                    <RatingSelector label="Will (Kemauan)" dim="commitment" value={form.commitment} onChange={v => setForm({ ...form, commitment: v })} />
+                    <RatingSelector label="Kemauan" dim="commitment" value={form.commitment} onChange={v => setForm({ ...form, commitment: v })} />
                     <NoteInput label="Alasan Skor Kemauan" type="commitmentNotes" notes={form.commitmentNotes} onAdd={addNote} onUpdate={updateNote} onRemove={removeNote} prompt="Berikan alasan mengapa Anda memberikan skor tersebut." />
                   </div>
                 </div>
