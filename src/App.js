@@ -544,7 +544,6 @@ const DISCSelector = ({ value, onChange }) => (
           className={`flex flex-col items-center p-1 sm:p-3 rounded-xl sm:rounded-2xl border-2 transition-all ${value === id ? "border-gold bg-cream2 shadow-md scale-105" : "border-line-cream bg-cream hover:border-gold/30"}`}>
           <div className={`w-6 h-6 sm:w-10 sm:h-10 rounded-full mb-1 sm:mb-2 ${m.bg} flex items-center justify-center text-white text-xs sm:text-lg font-black font-serif shadow`}>{id}</div>
           <span className="text-[8px] sm:text-[11px] font-black uppercase text-muted leading-tight text-center">{m.label}</span>
-          <span className="text-[7px] sm:text-[9px] font-mono font-bold text-mutedsoft leading-tight text-center">{id}</span>
         </button>
       ))}
     </div>
