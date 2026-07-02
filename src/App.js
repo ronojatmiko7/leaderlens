@@ -71,33 +71,310 @@ const RATING_ANCHORS = {
   },
 };
 
+const DISC_QUIZ_QUESTIONS = [
+  {
+    text: "Saat rapat tim, dia biasanya...",
+    options: [
+      { letter: "D", text: "Langsung ke inti masalah, kadang motong pembicaraan orang lain" },
+      { letter: "I", text: "Aktif ngomong, suka cerita, bikin suasana hidup" },
+      { letter: "S", text: "Lebih banyak dengerin, baru ngomong kalau ditanya" },
+      { letter: "C", text: "Nyiapin data/poin dulu sebelum bicara, to the point" },
+    ],
+  },
+  {
+    text: "Waktu dikasih tugas baru yang belum jelas SOP-nya, dia...",
+    options: [
+      { letter: "D", text: "Langsung jalan, cari cara sendiri sambil eksekusi" },
+      { letter: "I", text: "Nanya-nanya ke banyak orang, exploratory, semangat coba hal baru" },
+      { letter: "S", text: "Agak ragu mulai duluan, nunggu arahan atau contoh dulu" },
+      { letter: "C", text: "Minta detail/dokumentasi lengkap dulu sebelum mulai" },
+    ],
+  },
+  {
+    text: "Kalau ada masalah atau kesalahan di kerjaannya, reaksinya...",
+    options: [
+      { letter: "D", text: "Defensif atau langsung mau buktiin dia benar" },
+      { letter: "I", text: "Agak baper tapi cepat pulih, tetap positif" },
+      { letter: "S", text: "Diam, kadang nyimpen kekecewaan sendiri" },
+      { letter: "C", text: "Overthinking, ngulik detail buat cari apa yang salah" },
+    ],
+  },
+  {
+    text: "Gaya kerja sehari-harinya lebih...",
+    options: [
+      { letter: "D", text: "Cepat, banyak hal sekaligus, kadang kurang rapi di detail" },
+      { letter: "I", text: "Spontan, fleksibel, kurang suka rutinitas kaku" },
+      { letter: "S", text: "Stabil, konsisten, tidak suka perubahan mendadak" },
+      { letter: "C", text: "Terstruktur, teliti, perfeksionis di detail kecil" },
+    ],
+  },
+];
+
+const scoreDiscQuiz = (answers) => {
+  const letters = ["D", "I", "S", "C"];
+  const tally = { D: 0, I: 0, S: 0, C: 0 };
+  answers.forEach(a => { if (a) tally[a] += 1; });
+  const maxCount = Math.max(...letters.map(l => tally[l]));
+  const tied = letters.filter(l => tally[l] === maxCount);
+  return tied.includes(answers[0]) ? answers[0] : tied[0];
+};
+
 const getDISCScript = (disc) => ({
   D: {
-    open: "Fokus pada solusi: 'Mari kita diskusikan progres di [area spesifik]. Saya ingin mendengar pandanganmu agar kita bisa capai target bersama.'",
-    body: "Fokus pada dampak bisnis secara objektif. Beri ruang bagi mereka untuk mengusulkan cara perbaikan: 'Menurutmu, apa langkah terbaik untuk mengejar ini?' Sepakati target dan berikan mereka otonomi eksekusi.",
-    avoid: "Hindari menegur di depan umum atau bahasa yang emosional. Gunakan pendekatan berorientasi ke depan (solusi).",
+    open: "Ajak ngobrol dengan fokus ke solusi: 'Yuk kita bahas progres di [area spesifik]. Saya pengen dengar pandanganmu, biar kita bisa sama-sama capai target ini.'",
+    body: "Bahas dampaknya secara objektif, apa adanya. Kasih dia ruang buat usul cara perbaikan sendiri: 'Menurutmu, langkah terbaik buat ngejar ini apa?' Sepakati target bareng, terus kasih dia keleluasaan buat eksekusi.",
+    avoid: "Hindari menegur di depan orang lain atau pakai bahasa yang kelewat emosional. Tetap arahkan obrolan ke depan — ke solusi, bukan ke siapa yang salah.",
   },
   I: {
-    open: "Mulai dengan apresiasi: 'Saya melihat potensi besar. Boleh kita ngobrol santai tentang bagaimana kita bisa memaksimalkan itu?'",
-    body: "Libatkan mereka secara personal. Ajak brainstorm solusi: 'Kira-kira dukungan apa yang kamu butuhkan agar kerjamu lebih lancar dan menyenangkan?'",
-    avoid: "Jangan langsung memberikan kritik tajam tanpa konteks apresiasi. Pastikan diskusi menghasilkan kesepakatan tertulis yang sederhana.",
+    open: "Buka dengan apresiasi dulu: 'Saya lihat potensimu gede banget. Boleh kita ngobrol santai soal gimana caranya kita maksimalkan itu?'",
+    body: "Libatkan dia secara personal, ajak brainstorm bareng: 'Kira-kira dukungan apa yang kamu butuh biar kerjamu makin lancar dan tetap enjoy?'",
+    avoid: "Jangan langsung lempar kritik tajam tanpa basa-basi apresiasi dulu. Pastikan di akhir obrolan ada kesepakatan sederhana yang tertulis, biar nggak cuma jadi obrolan angin lalu.",
   },
   S: {
-    open: "Ciptakan rasa aman: 'Saya ingin kita ngobrol berdua untuk melihat bagaimana saya bisa lebih men-support pekerjaanmu.'",
-    body: "Gunakan pendekatan yang sabar dan penuh empati. Dengarkan lebih banyak. 'Apa kendala yang paling sering kamu rasakan?' Jelaskan rencana perbaikan secara bertahap.",
-    avoid: "Hindari desakan untuk berubah drastis atau konfrontasi langsung. Pastikan mereka benar-benar nyaman untuk berbicara.",
+    open: "Ciptakan suasana yang bikin dia nyaman: 'Saya pengen kita ngobrol berdua, lihat gimana saya bisa lebih support kerjaanmu.'",
+    body: "Pakai pendekatan yang sabar dan penuh empati. Lebih banyak dengerin dulu. 'Apa sih kendala yang paling sering kamu rasain?' Jelaskan rencana perbaikannya pelan-pelan, bertahap.",
+    avoid: "Hindari desakan buat berubah drastis atau konfrontasi langsung. Pastikan dia beneran merasa nyaman buat cerita.",
   },
   C: {
-    open: "Buka dengan objektivitas: 'Saya menghargai ketelitianmu, dan ingin mendengar analisismu tentang data dari project terakhir.'",
-    body: "Berikan fakta konkret secara tenang. Beri waktu mereka untuk mencerna dan merespons. Fokus pada perbaikan sistem dan kualitas.",
-    avoid: "Hindari feedback yang hanya berdasarkan perasaan. Jangan terburu-buru meminta keputusan saat itu juga.",
+    open: "Buka dengan sikap objektif: 'Saya menghargai ketelitianmu, dan pengen dengar analisismu soal data dari proyek terakhir.'",
+    body: "Sampaikan fakta yang konkret dengan tenang. Kasih dia waktu buat mencerna dan merespons. Fokusnya ke perbaikan sistem dan kualitas kerja.",
+    avoid: "Hindari feedback yang cuma berdasarkan perasaan. Jangan buru-buru minta keputusan saat itu juga — kasih dia ruang mikir.",
   },
   "?": {
-    open: "Pendekatan Kolaboratif: 'Saya ingin kita diskusi santai tentang apa yang sudah berjalan baik dan apa yang bisa kita tingkatkan bersama.'",
-    body: "Terapkan prinsip coaching dasar: dengarkan 80%, bicara 20%. Tanyakan kendala mereka secara terbuka. Fokus pada membangun rasa aman (psychological safety) agar mereka nyaman bercerita jujur.",
-    avoid: "Jangan memberikan instruksi sepihak atau langsung berasumsi mengenai kendala mereka sebelum mendengarkan perspektif mereka secara utuh.",
+    open: "Pendekatan kolaboratif: 'Saya pengen kita diskusi santai soal apa yang udah berjalan baik dan apa yang bisa kita tingkatkan bareng-bareng.'",
+    body: "Terapkan prinsip coaching dasar: dengerin 80%, ngomong 20%. Tanyakan kendalanya secara terbuka. Fokus ke bikin dia merasa aman (psychological safety) biar nyaman cerita jujur.",
+    avoid: "Jangan kasih instruksi sepihak atau langsung berasumsi soal kendalanya sebelum bener-bener dengerin sudut pandangnya secara utuh.",
   }
 }[disc]);
+
+const DIALOGUE_EXAMPLES = {
+  D_Q1: [
+    { speaker: "manager", text: "Saya mau ngobrol serius soal performa kamu belakangan ini — kamu langsung aja, apa yang menurut kamu sendiri paling berat sekarang?" },
+    { speaker: "karyawan", text: "Jujur, saya juga ngerasa banyak yang meleset. Beberapa target nggak kekejar, dan saya sendiri bingung harus mulai benerin dari mana." },
+    { speaker: "manager", text: "Saya hargai kamu jujur soal itu. Coba kita breakdown — dari sisi kemampuan, bagian mana yang paling bikin kamu stuck?" },
+    { speaker: "karyawan", text: "Ada beberapa proses yang sebenarnya belum benar-benar saya kuasai, cuma selama ini saya coba jalan sendiri aja." },
+    { speaker: "manager", text: "Noted. Nah, dari sisi semangat gimana? Soalnya saya lihat belakangan ini kamu juga kayak agak menjauh dari tim." },
+    { speaker: "karyawan", text: "Saya ngerasa kayak ketinggalan terus, jadi lama-lama males buat ngejar." },
+    { speaker: "manager", text: "Masuk akal. Gini aja — saya pasangin kamu sama satu rekan senior buat pegang satu proses spesifik dulu, bukan semuanya sekaligus." },
+    { speaker: "karyawan", text: "Oke, itu ngebantu banget sih, daripada saya coba semuanya sendirian." },
+    { speaker: "manager", text: "Kita set target kecil tiap minggu, dan saya cek langsung progressnya bareng kamu — bukan buat nyalahin, tapi biar cepat ketahuan kalau ada yang nyangkut." },
+    { speaker: "karyawan", text: "Siap, saya coba fokus ke situ dulu." },
+    { speaker: "manager", text: "Kalau kamu udah mulai nemu ritmenya, saya kembalikan otonominya pelan-pelan. Kamu tetap punya kesempatan buat balik jadi andalan kok." },
+    { speaker: "karyawan", text: "Makasih, saya coba buktiin minggu ini." },
+  ],
+  D_Q2: [
+    { speaker: "manager", text: "Saya lihat kamu semangat banget belakangan ini — bagus banget. Sekarang kita percepat biar skill kamu ngejar semangatnya." },
+    { speaker: "karyawan", text: "Siap, saya emang masih perlu banyak belajar di beberapa bagian, tapi saya nggak sabar buat langsung eksekusi." },
+    { speaker: "manager", text: "Saya suka energinya. Menurut kamu sendiri, area mana yang paling perlu kamu kuasai duluan?" },
+    { speaker: "karyawan", text: "Saya rasa bagian teknis intinya dulu, biar saya bisa pegang tugas lebih besar secepatnya." },
+    { speaker: "manager", text: "Sip, kita fokus ke situ dulu minggu ini. Saya pasangkan kamu sama rekan senior, tapi kamu yang pegang kendali eksekusinya." },
+    { speaker: "karyawan", text: "Oke, saya lebih suka belajar sambil langsung praktik daripada cuma teori." },
+    { speaker: "manager", text: "Pas, kita emang akan langsung jalan. Saya kasih kamu satu target konkret buat dicapai minggu ini." },
+    { speaker: "karyawan", text: "Siap, saya usahakan cepat nangkep dan langsung eksekusi." },
+    { speaker: "manager", text: "Saya cek progressnya tiap hari, tapi bukan buat ngatur-ngatur kamu, lebih ke mastiin kamu nggak nyasar arah." },
+    { speaker: "karyawan", text: "Oke, saya emang lebih suka ada checkpoint yang jelas." },
+    { speaker: "manager", text: "Saya percaya kamu bisa cepat naik level. Begitu kamu udah solid, saya kasih kamu tanggung jawab yang lebih besar lagi." },
+    { speaker: "karyawan", text: "Siap, saya akan buktiin secepatnya." },
+  ],
+  D_Q3: [
+    { speaker: "manager", text: "Saya lihat hasil kerja kamu tetap bagus, tapi kayaknya ada yang beda dari cara kamu belakangan ini." },
+    { speaker: "karyawan", text: "Iya, jujur saya lagi agak jenuh, meskipun hasilnya masih sesuai target." },
+    { speaker: "manager", text: "Saya hargai kamu tetap jaga kualitas meski lagi jenuh. Boleh cerita, jenuhnya kenapa?" },
+    { speaker: "karyawan", text: "Kerjaannya berasa itu-itu aja, nggak ada tantangan baru yang bikin saya harus mikir keras lagi." },
+    { speaker: "manager", text: "Masuk akal, kamu emang tipe yang butuh tantangan buat tetap ngegas. Kira-kira arah apa yang paling menarik buat kamu sekarang?" },
+    { speaker: "karyawan", text: "Saya pengen pegang sesuatu yang lebih besar, yang hasilnya langsung kelihatan dampaknya." },
+    { speaker: "manager", text: "Oke, saya mau kasih kamu satu inisiatif baru yang lebih menantang, dan kamu yang pegang kendali penuh." },
+    { speaker: "karyawan", text: "Itu yang saya cari, saya siap ambil tanggung jawabnya." },
+    { speaker: "manager", text: "Saya nggak akan micromanage, saya cuma mau tahu progress besarnya tiap minggu." },
+    { speaker: "karyawan", text: "Setuju, saya emang lebih produktif kalau dikasih ruang buat gerak sendiri." },
+    { speaker: "manager", text: "Bagus. Kalau ini jalan lancar, ini bisa jadi portofolio kuat buat langkah kamu berikutnya." },
+    { speaker: "karyawan", text: "Siap, saya akan buktiin hasilnya." },
+  ],
+  D_Q4: [
+    { speaker: "manager", text: "Kamu salah satu andalan saya di tim ini. Saya mau kasih kamu tanggung jawab yang lebih besar." },
+    { speaker: "karyawan", text: "Wah, siap, saya emang udah nunggu tantangan yang lebih gede." },
+    { speaker: "manager", text: "Bagus. Saya mau kamu pegang satu inisiatif baru mulai sekarang, dengan kendali penuh atas eksekusinya." },
+    { speaker: "karyawan", text: "Oke, saya coba maksimalkan — boleh saya tahu target akhirnya seperti apa?" },
+    { speaker: "manager", text: "Tentu, kita sepakati targetnya sekarang, tapi caranya sepenuhnya kamu yang tentuin." },
+    { speaker: "karyawan", text: "Saya suka itu, saya emang lebih efektif kalau dikasih otonomi penuh." },
+    { speaker: "manager", text: "Selain itu, saya juga mau kamu mulai membimbing satu rekan yang lebih junior." },
+    { speaker: "karyawan", text: "Siap, saya coba, meskipun saya lebih terbiasa eksekusi sendiri." },
+    { speaker: "manager", text: "Nggak apa-apa, kamu bisa fokus ke hasil, bukan gaya ngajarnya. Saya cuma mau dia belajar dari cara kerja kamu." },
+    { speaker: "karyawan", text: "Oke, saya siap coba pendekatan itu." },
+    { speaker: "manager", text: "Bagus. Saya juga mau pastikan kontribusi kamu diakui — kita bahas jalur karier kamu bulan depan." },
+    { speaker: "karyawan", text: "Saya tunggu itu, saya emang pengen tahu langkah berikutnya." },
+  ],
+  I_Q1: [
+    { speaker: "manager", text: "Sebelum masuk kerjaan, saya pengen tahu dulu — gimana kabar kamu belakangan ini, beneran?" },
+    { speaker: "karyawan", text: "Jujur agak berantakan sih, banyak yang bikin saya bingung dan kurang semangat juga." },
+    { speaker: "manager", text: "Makasih udah cerita. Saya di sini bukan buat nge-judge, saya cuma pengen bantu kamu keluar dari fase ini bareng-bareng." },
+    { speaker: "karyawan", text: "Saya ngerasa ketinggalan terus, jadi makin lama makin nggak pede buat nanya." },
+    { speaker: "manager", text: "Nggak apa-apa, semua orang pernah di titik itu kok. Kira-kira bagian mana yang paling bikin kamu bingung?" },
+    { speaker: "karyawan", text: "Beberapa proses saya masih suka salah, dan saya juga jarang ngobrol sama tim belakangan ini." },
+    { speaker: "manager", text: "Oke, gimana kalau kita mulai dari ngumpul bareng tim lagi, sekalian saya pasangin kamu sama rekan yang asik buat belajar bareng?" },
+    { speaker: "karyawan", text: "Wah, itu bakal bantu banget, saya emang lebih semangat kalau belajarnya rame-rame." },
+    { speaker: "manager", text: "Sip, kita bikin target kecil dulu minggu ini, dan saya rutin cek-in santai sama kamu, bukan yang formal-formal amat." },
+    { speaker: "karyawan", text: "Oke, saya coba pelan-pelan bangun ritmenya lagi." },
+    { speaker: "manager", text: "Saya percaya kamu bisa balik semangat kayak dulu, kok. Kita jalanin bareng ya." },
+    { speaker: "karyawan", text: "Makasih banyak, saya jadi lebih lega ngomongin ini." },
+  ],
+  I_Q2: [
+    { speaker: "manager", text: "Saya seneng banget lihat semangat kamu belakangan ini! Yuk kita obrolin gimana biar skill kamu makin ngejar." },
+    { speaker: "karyawan", text: "Iya, saya emang masih belajar banyak hal, tapi saya excited banget buat coba-coba." },
+    { speaker: "manager", text: "Bagus, saya suka energi kamu. Kira-kira bagian mana yang bikin kamu paling penasaran buat dipelajari?" },
+    { speaker: "karyawan", text: "Saya pengen lebih jago di beberapa proses yang sering saya lihat rekan-rekan lain kerjain." },
+    { speaker: "manager", text: "Sip, gimana kalau saya pasangin kamu sama rekan senior yang seru diajak belajar bareng, biar makin semangat juga?" },
+    { speaker: "karyawan", text: "Wah, mau banget, saya emang lebih cepat nangkep kalau belajarnya interaktif." },
+    { speaker: "manager", text: "Oke, kita bikin sesi belajar bareng tiap minggu, sambil ngobrol santai juga biar nggak kaku." },
+    { speaker: "karyawan", text: "Setuju banget, itu bikin saya makin nyaman buat nanya-nanya." },
+    { speaker: "manager", text: "Kita cek progressnya bareng, dan saya juga bakal rayain tiap kemajuan kecil kamu di depan tim." },
+    { speaker: "karyawan", text: "Wah itu bikin saya makin termotivasi buat ngebuktiin." },
+    { speaker: "manager", text: "Saya yakin kamu bakal cepat berkembang. Kalau udah solid, saya kasih kamu proyek yang lebih seru lagi." },
+    { speaker: "karyawan", text: "Siap, saya nggak sabar buat mulai!" },
+  ],
+  I_Q3: [
+    { speaker: "manager", text: "Saya kangen lihat kamu se-semangat dulu. Ada yang lagi mengganggu, kah?" },
+    { speaker: "karyawan", text: "Ada sih, saya ngerasa kontribusi saya kurang kelihatan belakangan ini, jadi rada males semangat." },
+    { speaker: "manager", text: "Makasih udah jujur, itu penting banget buat saya tahu. Kira-kira momen mana yang bikin kamu ngerasa gitu?" },
+    { speaker: "karyawan", text: "Beberapa ide saya kayak lewat gitu aja tanpa ada yang notice, jadi saya jadi kurang pengen ngomong lagi." },
+    { speaker: "manager", text: "Saya minta maaf soal itu, dan saya pengen benerin. Saya pengen tahu, kamu pengen kontribusi kamu dilihat gimana?" },
+    { speaker: "karyawan", text: "Saya cuma pengen ngerasa didengar dan diapresiasi aja, nggak perlu yang besar-besar." },
+    { speaker: "manager", text: "Noted banget. Mulai sekarang saya pastikan ide kamu kelihatan di depan tim, dan saya kasih kamu ruang buat presentasiin langsung." },
+    { speaker: "karyawan", text: "Wah, itu bakal bikin saya semangat lagi." },
+    { speaker: "manager", text: "Kita juga cari proyek baru yang lebih seru buat kamu pegang, biar energi kamu balik lagi." },
+    { speaker: "karyawan", text: "Saya suka itu, saya emang lebih hidup kalau kerjaannya interaktif." },
+    { speaker: "manager", text: "Sip, saya akan sering cek-in santai sama kamu ke depannya, biar hal kayak gini nggak kejadian lagi." },
+    { speaker: "karyawan", text: "Makasih banyak, saya jadi lebih lega ngomongin ini." },
+  ],
+  I_Q4: [
+    { speaker: "manager", text: "Kamu salah satu orang yang bikin tim ini hidup. Saya mau ngobrol soal masa depan kamu di sini." },
+    { speaker: "karyawan", text: "Wah, saya seneng banget denger itu, saya emang betah banget kerja bareng tim ini." },
+    { speaker: "manager", text: "Saya mau kamu mulai pegang peran yang lebih besar, sekalian jadi orang yang menyemangati tim lain juga." },
+    { speaker: "karyawan", text: "Siap, saya suka banget kerja bareng orang-orang, itu bikin saya makin semangat." },
+    { speaker: "manager", text: "Pas banget, karena kamu emang jago bikin suasana tetap positif meski lagi sibuk." },
+    { speaker: "karyawan", text: "Makasih, saya emang berusaha bikin semua orang tetap nyaman kerja bareng." },
+    { speaker: "manager", text: "Saya juga mau kamu lebih sering tampil di depan, presentasi atau jadi wajah tim di beberapa proyek." },
+    { speaker: "karyawan", text: "Wah, saya suka itu, saya emang lebih hidup kalau ketemu banyak orang." },
+    { speaker: "manager", text: "Kita rencanain bareng ya, biar kontribusi kamu makin kelihatan ke atasan juga." },
+    { speaker: "karyawan", text: "Setuju, saya nggak sabar buat mulai." },
+    { speaker: "manager", text: "Saya juga mau pastikan kerja keras kamu diakui secara resmi, bukan cuma di obrolan santai aja." },
+    { speaker: "karyawan", text: "Makasih banyak, itu artinya besar buat saya." },
+  ],
+  S_Q1: [
+    { speaker: "manager", text: "Saya pengen ngobrol pelan-pelan aja soal kerjaan kamu belakangan ini. Ini ruang aman, saya cuma mau dengerin dulu." },
+    { speaker: "karyawan", text: "Terima kasih. Jujur saya ngerasa agak keteteran, tapi saya nggak enak mau cerita." },
+    { speaker: "manager", text: "Nggak apa-apa, ambil waktu yang kamu butuh. Kira-kira bagian mana yang paling berat buat kamu sekarang?" },
+    { speaker: "karyawan", text: "Saya rasa saya butuh bimbingan lebih di beberapa proses, tapi saya juga takut ngerepotin orang lain." },
+    { speaker: "manager", text: "Kamu nggak ngerepotin sama sekali, justru saya seneng kamu ngomong dari awal. Semangat kamu belakangan ini gimana?" },
+    { speaker: "karyawan", text: "Agak turun sih, karena saya ngerasa nggak yakin sama kerjaan saya sendiri." },
+    { speaker: "manager", text: "Oke, kita nggak perlu buru-buru. Saya dampingi kamu pelan-pelan, mulai dari satu proses kecil dulu minggu ini." },
+    { speaker: "karyawan", text: "Itu bikin saya lebih tenang, soalnya saya emang butuh waktu buat nyerna hal baru." },
+    { speaker: "manager", text: "Kita cek bareng tiap minggu ya, santai aja, nggak perlu terburu-buru sama sekali." },
+    { speaker: "karyawan", text: "Baik, saya coba jalanin pelan-pelan." },
+    { speaker: "manager", text: "Saya yakin kamu bisa, kamu cuma butuh ruang dan waktu aja. Saya akan selalu ada buat dampingi." },
+    { speaker: "karyawan", text: "Terima kasih banyak, saya jadi lebih lega." },
+  ],
+  S_Q2: [
+    { speaker: "manager", text: "Saya lihat kamu udah cukup nyaman belakangan ini, dan saya mau bantu skill kamu makin berkembang pelan-pelan." },
+    { speaker: "karyawan", text: "Saya emang masih agak ragu di beberapa bagian, tapi saya mau belajar." },
+    { speaker: "manager", text: "Bagus, nggak perlu buru-buru kok. Menurut kamu, bagian mana yang bikin kamu paling nggak yakin?" },
+    { speaker: "karyawan", text: "Saya rasa saya butuh lihat contoh dulu sebelum coba sendiri, biar nggak salah arah." },
+    { speaker: "manager", text: "Oke, wajar banget. Saya pasangkan kamu sama rekan yang sabar juga, biar kamu nyaman belajar bareng." },
+    { speaker: "karyawan", text: "Itu bikin saya lebih tenang, soalnya saya emang butuh waktu buat adaptasi." },
+    { speaker: "manager", text: "Kita mulai dari satu tugas kecil dulu minggu ini, nggak perlu langsung banyak." },
+    { speaker: "karyawan", text: "Baik, saya coba ikuti pelan-pelan, semoga bisa cepat terbiasa." },
+    { speaker: "manager", text: "Nggak perlu terburu-buru, saya cek progressnya bareng kamu tiap minggu, santai aja." },
+    { speaker: "karyawan", text: "Terima kasih, saya jadi lebih nyaman buat coba hal baru." },
+    { speaker: "manager", text: "Saya yakin kamu bisa berkembang dengan ritme kamu sendiri. Saya akan terus dampingi." },
+    { speaker: "karyawan", text: "Makasih banyak, saya akan usahakan yang terbaik." },
+  ],
+  S_Q3: [
+    { speaker: "manager", text: "Saya lihat ada yang beda dari kamu belakangan ini. Boleh cerita, nggak perlu buru-buru." },
+    { speaker: "karyawan", text: "Sebenernya saya ngerasa agak capek belakangan ini, meskipun kerjaan tetap saya selesein." },
+    { speaker: "manager", text: "Makasih udah cerita. Saya di sini buat dengerin dulu. Capeknya lebih ke beban kerja, atau ada hal lain?" },
+    { speaker: "karyawan", text: "Lebih ke saya ngerasa ritmenya berubah terus belakangan ini, jadi saya agak susah adaptasi." },
+    { speaker: "manager", text: "Saya paham, perubahan mendadak emang berat buat kamu. Kira-kira apa yang bisa bikin kamu lebih nyaman?" },
+    { speaker: "karyawan", text: "Saya cuma butuh sedikit waktu buat napas, dan ritme yang lebih stabil aja." },
+    { speaker: "manager", text: "Oke, kita atur ritmenya bareng ya, saya nggak akan buru-buru kamu." },
+    { speaker: "karyawan", text: "Terima kasih, itu ngebantu banget buat saya." },
+    { speaker: "manager", text: "Saya juga mau pastikan kontribusi kamu selama ini tetap kelihatan, meskipun kamu nggak yang paling vokal di tim." },
+    { speaker: "karyawan", text: "Saya seneng dengernya, soalnya saya emang jarang ngomong soal itu." },
+    { speaker: "manager", text: "Kita cek-in pelan-pelan tiap minggu, dan kamu bebas cerita kapan aja kalau ada yang berat." },
+    { speaker: "karyawan", text: "Makasih banyak, saya jadi lebih tenang." },
+  ],
+  S_Q4: [
+    { speaker: "manager", text: "Saya mau bilang, kamu salah satu orang yang paling bisa saya andalkan di tim ini." },
+    { speaker: "karyawan", text: "Terima kasih banyak, saya seneng dengernya, meskipun saya jarang bilang-bilang." },
+    { speaker: "manager", text: "Saya mau kasih kamu tanggung jawab lebih, tapi tetap dengan ritme yang nyaman buat kamu." },
+    { speaker: "karyawan", text: "Saya siap, asal pelan-pelan ya, biar saya bisa adaptasi dengan baik." },
+    { speaker: "manager", text: "Pasti, kita jalanin bareng, nggak akan saya buru-buru kamu." },
+    { speaker: "karyawan", text: "Makasih, saya emang lebih nyaman kalau perubahannya bertahap." },
+    { speaker: "manager", text: "Saya juga mau kamu mulai dampingi rekan baru, karena cara kamu kerja itu contoh yang bagus buat mereka." },
+    { speaker: "karyawan", text: "Oke, saya coba, saya emang seneng bantu orang lain juga." },
+    { speaker: "manager", text: "Kamu nggak perlu ubah gaya kamu, saya cuma mau kamu bagikan cara kerja kamu yang konsisten itu." },
+    { speaker: "karyawan", text: "Baik, saya akan coba pelan-pelan." },
+    { speaker: "manager", text: "Saya pastikan kontribusi kamu tetap diakui, meskipun kamu nggak yang paling vokal soal itu." },
+    { speaker: "karyawan", text: "Terima kasih banyak, saya jadi makin semangat kerja di sini." },
+  ],
+  C_Q1: [
+    { speaker: "manager", text: "Saya mau bahas data kerja kamu belakangan ini secara objektif, biar kita bisa cari solusinya bareng-bareng." },
+    { speaker: "karyawan", text: "Baik, saya juga udah lihat sendiri ada beberapa yang meleset dari target." },
+    { speaker: "manager", text: "Menurut kamu, dari sisi proses, bagian mana yang paling sering bikin hasilnya nggak sesuai?" },
+    { speaker: "karyawan", text: "Saya rasa saya kurang paham detail di beberapa langkah, jadi saya sering ragu pas eksekusi." },
+    { speaker: "manager", text: "Oke, itu jelas. Dari sisi motivasi gimana? Soalnya saya lihat progress kamu juga agak melambat." },
+    { speaker: "karyawan", text: "Jujur saya agak nggak nyaman kerja tanpa panduan yang jelas, jadi lama-lama saya jadi ragu terus." },
+    { speaker: "manager", text: "Masuk akal. Saya siapkan dokumentasi dan SOP yang lebih detail buat kamu, biar nggak perlu nebak-nebak lagi." },
+    { speaker: "karyawan", text: "Itu bakal sangat membantu, saya emang lebih nyaman kalau ada acuan yang jelas." },
+    { speaker: "manager", text: "Kita cek progressnya tiap minggu berdasarkan data konkret, bukan asumsi, biar kamu juga bisa lihat sendiri perkembangannya." },
+    { speaker: "karyawan", text: "Baik, saya siap ikuti prosesnya." },
+    { speaker: "manager", text: "Pelan-pelan aja, yang penting akurat. Saya yakin kamu bisa balik solid kalau prosesnya udah jelas." },
+    { speaker: "karyawan", text: "Terima kasih, saya coba maksimalkan dari sekarang." },
+  ],
+  C_Q2: [
+    { speaker: "manager", text: "Saya lihat progress kamu di area ini cukup baik. Yuk kita bahas gimana mempercepat penguasaan skill kamu." },
+    { speaker: "karyawan", text: "Saya masih butuh referensi yang lebih lengkap di beberapa bagian sebelum saya yakin buat eksekusi." },
+    { speaker: "manager", text: "Masuk akal. Menurut kamu, dokumentasi atau contoh kasus mana yang paling kamu butuhkan sekarang?" },
+    { speaker: "karyawan", text: "Saya rasa saya perlu panduan step-by-step yang lebih detail, biar nggak salah interpretasi." },
+    { speaker: "manager", text: "Noted, saya siapkan dokumentasi dan contoh kasusnya minggu ini." },
+    { speaker: "karyawan", text: "Terima kasih, itu bakal sangat membantu saya buat lebih percaya diri eksekusi." },
+    { speaker: "manager", text: "Kita review progressnya tiap minggu dengan data yang jelas, biar kamu juga bisa lihat perkembangannya secara konkret." },
+    { speaker: "karyawan", text: "Saya suka pendekatan itu, jadi nggak nebak-nebak lagi." },
+    { speaker: "manager", text: "Kalau ada yang masih ambigu, kamu bisa tanya saya kapan aja, saya lebih suka kamu klarifikasi dulu daripada salah jalan." },
+    { speaker: "karyawan", text: "Baik, saya akan lebih proaktif nanya kalau ada yang kurang jelas." },
+    { speaker: "manager", text: "Bagus. Begitu kamu udah solid di area ini, saya kasih kamu scope yang lebih luas lagi." },
+    { speaker: "karyawan", text: "Siap, saya akan pastikan kualitasnya tetap terjaga." },
+  ],
+  C_Q3: [
+    { speaker: "manager", text: "Hasil kerja kamu tetap konsisten bagus, tapi saya perhatikan ada pola yang berubah belakangan ini. Boleh saya tahu kenapa?" },
+    { speaker: "karyawan", text: "Sejujurnya saya merasa prosesnya kurang efisien belakangan ini, itu bikin saya agak frustrasi." },
+    { speaker: "manager", text: "Terima kasih sudah menjelaskan secara spesifik. Bisa kasih contoh bagian mana yang paling mengganggu?" },
+    { speaker: "karyawan", text: "Terutama di satu proses tertentu, itu banyak makan waktu tanpa hasil yang jelas." },
+    { speaker: "manager", text: "Baik, saya catat detailnya. Menurut kamu sendiri, gimana proses itu seharusnya berjalan?" },
+    { speaker: "karyawan", text: "Saya rasa kalau datanya lebih terstruktur dari awal, prosesnya bisa jauh lebih cepat dan akurat." },
+    { speaker: "manager", text: "Masuk akal, saya akan tinjau ulang prosesnya berdasarkan masukan kamu, dan saya libatkan kamu di revisinya." },
+    { speaker: "karyawan", text: "Saya seneng bisa ikut benerin langsung, biar sesuai standar yang saya rasa perlu." },
+    { speaker: "manager", text: "Kita jadwalkan review bareng minggu depan, dengan data konkret biar semua jelas dan terukur." },
+    { speaker: "karyawan", text: "Baik, saya siapkan analisisnya dari sekarang." },
+    { speaker: "manager", text: "Saya hargai ketelitian kamu, ini bakal ngebantu banget buat tim ke depannya." },
+    { speaker: "karyawan", text: "Terima kasih, saya akan pastikan detailnya rapi." },
+  ],
+  C_Q4: [
+    { speaker: "manager", text: "Berdasarkan data performa kamu selama ini, kamu konsisten jadi salah satu kontributor terbaik di tim." },
+    { speaker: "karyawan", text: "Terima kasih, saya berusaha menjaga kualitas kerja saya di setiap proses." },
+    { speaker: "manager", text: "Saya mau kasih kamu tanggung jawab analisis yang lebih strategis mulai sekarang." },
+    { speaker: "karyawan", text: "Baik, saya siap — boleh saya lihat detail scope dan datanya dulu?" },
+    { speaker: "manager", text: "Tentu, saya siapkan dokumennya, dan kita bahas bareng minggu ini secara detail." },
+    { speaker: "karyawan", text: "Terima kasih, saya lebih nyaman kalau semuanya jelas dari awal." },
+    { speaker: "manager", text: "Saya juga mau kamu mulai terlibat di keputusan berbasis data untuk tim, bukan cuma eksekusi aja." },
+    { speaker: "karyawan", text: "Saya tertarik, saya emang suka kalau kerjaan saya berdampak ke keputusan yang lebih besar." },
+    { speaker: "manager", text: "Kita review progressnya tiap bulan dengan metrik yang jelas, biar kontribusi kamu juga bisa terukur." },
+    { speaker: "karyawan", text: "Baik, saya siapkan laporannya secara berkala." },
+    { speaker: "manager", text: "Saya hargai ketelitian kamu selama ini, dan saya pastikan itu diakui secara resmi." },
+    { speaker: "karyawan", text: "Terima kasih banyak, saya akan terus jaga standarnya." },
+  ],
+};
+
+const getDialogueExample = (disc, quadrantId) => DIALOGUE_EXAMPLES[`${disc}_${quadrantId}`] || null;
 
 const getActionPlan = (m) => {
   m = { 
@@ -107,11 +384,66 @@ const getActionPlan = (m) => {
   };
 
   const q = getQuadrant(m.competency, m.commitment);
-  const selectedDisc = m.disc || "?"; 
+  const selectedDisc = m.disc || "?";
   const script = getDISCScript(selectedDisc);
   const discData = DISC_META[selectedDisc];
+  const guide = QUADRANT_GUIDE.find(g => g.q === q.id);
   const plan = [];
 
+  // ── CARD 1: Posisi Kuadran — apa artinya & langkah yang perlu diambil ──────
+  const quadrantItems = [`APA ARTINYA: ${guide.diagnosis}`];
+  if (q.id === "Q1") {
+    quadrantItems.push(
+      "Ini momen yang butuh kehadiran kamu langsung. Dampingi dengan semangat 'yuk kita perbaiki ini bareng-bareng', bukan dengan nada menghakimi.",
+      "LANGKAH 1 (Dengerin & pahami dulu): Mulai dari obrolan terbuka buat cari tahu akar masalahnya. Catatan kemampuan: " + (m.competencyNotes[0] || "[Belum ada catatan]") + ". Catatan motivasi: " + (m.commitmentNotes[0] || "[Belum ada catatan]") + ". Jangan buru-buru berasumsi.",
+      "LANGKAH 2 (Susun bareng): Bikin rencana belajar bersama — pasangkan dia dengan rekan senior buat mendampingi (shadowing), mulai dari tugas kecil dulu, dan sepakati target harian/mingguan yang masuk akal.",
+      "LANGKAH 3 (Cek rutin & kasih kepercayaan): Tinjau tiap minggu dengan suportif, rayakan tiap kemajuan sekecil apa pun, dan kembalikan otonominya pelan-pelan di area yang udah mulai dia kuasai."
+    );
+  } else {
+    if (m.competency < 3) {
+      quadrantItems.push(
+        "SKILL — Tentukan dulu area keterampilan spesifik yang perlu diperkuat, dari catatan ini: " + (m.competencyNotes[0] || "[Belum ada catatan]"),
+        "Pasangkan dia dengan rekan yang lebih senior buat mendampingi (shadowing) selama 1–2 minggu. Mulai dari tugas kecil dulu, terus cek bareng tiap hari (bukan mingguan) — biar kalau ada yang keliru, bisa cepat dibantu."
+      );
+    }
+    if (m.commitment < 3) {
+      quadrantItems.push(
+        "WILL — Coba pahami dulu akar penurunan motivasinya, dari catatan ini: " + (m.commitmentNotes[0] || "[Belum ada catatan]"),
+        "Ajak ngobrol terbuka dari hati ke hati. Tanyakan: 'Apa sih yang sekarang paling ngehambat kerjaanmu?' Lalu bangun lagi kepercayaannya dengan kasih dia otonomi di area yang udah dia kuasai."
+      );
+    }
+    if (q.id === "Q2") {
+      quadrantItems.push(
+        "FOKUS UTAMA: Bangun rasa percaya dirinya lewat keterampilan teknis yang makin solid.",
+        "Kasih ruang mandiri sedikit demi sedikit: biarkan dia pegang tugas kecil sendiri, dengan dukungan yang jelas kalau dibutuhkan.",
+        "Dorong dia buat ikut pelatihan lanjutan atau sertifikasi di bidangnya."
+      );
+    } else if (q.id === "Q3") {
+      quadrantItems.push(
+        "Dia sebenarnya punya skill, cuma lagi kehilangan semangat. Kalau diawasi terlalu ketat, bisa-bisa malah tambah parah.",
+        "LANGKAH UTAMA — DENGERIN DULU: Buka obrolan dengan rasa ingin tahu, bukan curiga. Tanyakan apa yang bikin dia capek belakangan ini, tanpa menghakimi.",
+        "Kasih tantangan baru atau variasi kerjaan kalau ternyata kejenuhan yang jadi akar masalahnya."
+      );
+    } else if (q.id === "Q4") {
+      quadrantItems.push(
+        "FOKUS UTAMA: Kasih tantangan yang lebih strategis, bukan cuma nambahin beban kerja.",
+        "Libatkan dia dalam keputusan tingkat tim, atau jadikan dia mentor buat rekan yang lagi belajar.",
+        "Pastikan pengakuan dan apresiasinya sepadan dengan kontribusi besar yang udah dia kasih."
+      );
+    }
+  }
+
+  plan.push({
+    type: "quadrant",
+    title: `Posisi Kuadran: ${q.label}`,
+    color: q.color,
+    bg: q.bg,
+    border: q.border,
+    icon: "compass",
+    items: quadrantItems,
+  });
+
+  // ── CARD 2: Profil DISC — apa artinya & pendekatan yang pas ────────────────
   plan.push({
     type: "profile",
     title: `Panduan Obrolan 1-on-1: Pendekatan ${discData.label}`,
@@ -120,104 +452,34 @@ const getActionPlan = (m) => {
     border: "#E2E8F0",
     icon: "info",
     items: [
-      `BUKA OBROLAN (jadwalkan 30 menit, fokus mendengar). Mulai dengan: "${script.open}"`,
-      `GAYA KOMUNIKASI YANG PAS: ${script.body}`,
+      `APA ARTINYA: ${discData.desc}. ${discData.strengths}`,
+      `MULAI OBROLANNYA (luangkan sekitar 30 menit, dan fokus buat banyak dengerin). Coba buka dengan: "${script.open}"`,
+      `GAYA NGOBROL YANG PAS: ${script.body}`,
       `YANG SEBAIKNYA DIHINDARI: ${script.avoid}`
     ],
   });
 
-  if (q.id === "Q1") {
-    plan.push({
-      type: "support",
-      title: "Pendampingan Penuh — Skill & Will",
-      color: "#EF4444",
-      bg: "#FEF2F2",
-      border: "#FECACA",
-      icon: "shield",
-      items: [
-        "Ini situasi yang butuh kehadiran Anda. Dampingi dengan semangat 'bagaimana kita perbaiki ini bersama?', bukan menghakimi.",
-        "LANGKAH 1 (Dengar & pahami): Mulai dari obrolan terbuka untuk memahami akar masalahnya. Catatan kemampuan: " + (m.competencyNotes[0] || "[Belum ada catatan]") + ". Catatan motivasi: " + (m.commitmentNotes[0] || "[Belum ada catatan]") + ". Jangan berasumsi dulu.",
-        "LANGKAH 2 (Susun bersama): Buat rencana belajar bareng — pasangkan dengan rekan senior untuk mendampingi (shadowing), mulai dari tugas kecil, dan sepakati target harian/mingguan yang masuk akal.",
-        "LANGKAH 3 (Cek rutin & beri kepercayaan): Tinjau tiap minggu dengan suportif, rayakan setiap kemajuan kecil, dan kembalikan otonomi secara bertahap di area yang sudah mulai mereka kuasai."
-      ],
-    });
-  } else {
-    if (m.competency < 3) {
-      plan.push({
-        type: "competency",
-        title: "Menutup Jarak Kemampuan (Skill)",
-        color: "#F59E0B",
-        bg: "#FFFBEB",
-        border: "#FDE68A",
-        icon: "wrench",
-        items: [
-          "Tentukan area keterampilan spesifik yang perlu dikuatkan dari catatan ini: " + (m.competencyNotes[0] || "[Belum ada catatan]"),
-          "Pasangkan dengan rekan yang lebih senior untuk mendampingi (shadowing) selama 1–2 minggu.",
-          "Mulai dari tugas kecil dulu, lalu cek bersama setiap hari (bukan mingguan) supaya bisa cepat dibantu saat ada yang keliru."
-        ],
-      });
-    }
+  // ── CARD 3: Rekomendasi penempatan peran sesuai DISC ────────────────────────
+  const ROLE_FIT_COPY = {
+    D: "Karena dia tipe D, coba kasih dia peran yang menantang dan butuh mimpin di depan: pegang proyek, tanggung jawab penuh atas satu hasil, atau koordinasi orang lain. Dia biasanya makin bersemangat kalau ada sesuatu yang perlu digerakkan, bukan cuma dijalani.",
+    I: "Karena dia tipe I, coba arahkan ke peran yang banyak ketemu orang: jadi contact person ke klien atau stakeholder, presentasi, atau yang bikin suasana tim tetap hidup. Dia juga oke banget dijadiin jembatan antar divisi yang kepentingannya beda-beda.",
+    S: "Karena dia tipe S, cocokkan dengan peran yang butuh kestabilan dan kesabaran: pegang proses yang jalan jangka panjang, tugas yang konsisten, atau mendampingi dan onboarding rekan baru. Dia bakal berkembang di tempat yang nggak berubah-ubah drastis.",
+    C: "Karena dia tipe C, arahkan ke peran yang butuh presisi: analisis, quality control, dokumentasi, atau perencanaan — apa pun yang butuh ketelitian tinggi. Dia bakal lebih nyaman, dan hasilnya lebih maksimal, di ranah yang detailnya jelas.",
+    "?": "Belum ada data DISC yang cukup buat kasih rekomendasi spesifik. Coba amati dulu kecenderungan alami karyawan ini sebelum menetapkan peran tetap buat dia.",
+  };
 
-    if (m.commitment < 3) {
-      plan.push({
-        type: "commitment",
-        title: "Membangun Kembali Kemauan (Will)",
-        color: "#8B5CF6",
-        bg: "#F5F3FF",
-        border: "#DDD6FE",
-        icon: "alert",
-        items: [
-          "Pahami akar penurunan motivasi dari catatan ini: " + (m.commitmentNotes[0] || "[Belum ada catatan]"),
-          "Lakukan obrolan terbuka dari hati ke hati. Tanyakan: 'Apa yang saat ini paling menghambat pekerjaanmu?'",
-          "Kembalikan kepercayaan dengan memberi otonomi di area yang sudah mereka kuasai."
-        ],
-      });
-    }
-
-    if (q.id === "Q2") {
-      plan.push({
-        type: "dev",
-        title: "Percepatan Belajar — dari Pemula ke Andalan",
-        color: "#F59E0B",
-        bg: "#FFFBEB",
-        border: "#FDE68A",
-        icon: "target",
-        items: [
-          "FOKUS UTAMA: Bangun rasa percaya diri lewat keterampilan teknis yang makin solid.",
-          "Beri ruang mandiri bertahap: biarkan mereka memimpin tugas kecil sendiri, dengan dukungan yang jelas saat dibutuhkan.",
-          "Dorong mereka ikut pelatihan lanjutan atau sertifikasi di bidangnya."
-        ],
-      });
-    } else if (q.id === "Q3") {
-      plan.push({
-        type: "reengagement",
-        title: "Menyalakan Kembali Motivasi",
-        color: "#3B82F6",
-        bg: "#EFF6FF",
-        border: "#BFDBFE",
-        icon: "refresh",
-        items: [
-          "Mereka punya skill, tapi sedang kehilangan semangat. Mengawasi terlalu ketat justru memperburuk keadaan.",
-          "LANGKAH UTAMA — DENGARKAN: Buka obrolan dengan rasa ingin tahu. Tanyakan apa yang menguras energi mereka belakangan ini, tanpa menghakimi.",
-          "Beri tantangan baru atau variasi pekerjaan kalau kejenuhan ternyata akar masalahnya."
-        ],
-      });
-    } else if (q.id === "Q4") {
-      plan.push({
-        type: "retention",
-        title: "Delegasi & Pengembangan — Menjaga Sang Andalan",
-        color: "#10B981",
-        bg: "#ECFDF5",
-        border: "#A7F3D0",
-        icon: "award",
-        items: [
-          "FOKUS UTAMA: Beri tantangan yang lebih strategis, bukan sekadar menambah beban kerja.",
-          "Libatkan mereka dalam keputusan tingkat tim, atau jadikan mentor bagi rekan yang sedang belajar.",
-          "Pastikan pengakuan dan apresiasi sepadan dengan kontribusi besar yang mereka berikan."
-        ],
-      });
-    }
-  }
+  plan.push({
+    type: "rolefit",
+    title: "Rekomendasi Penempatan Peran",
+    color: "#6366F1",
+    bg: "#EEF2FF",
+    border: "#C7D2FE",
+    icon: "target",
+    items: [
+      "Peran yang dijalankan sangat memengaruhi kualitas kinerja. Kadang, kinerja yang rendah bukan karena orangnya kurang mampu — tapi karena ia mengerjakan hal yang kurang cocok dengan tipenya. Berikut rekomendasi penempatan dan peran yang cenderung sesuai dengan profil DISC-nya.",
+      ROLE_FIT_COPY[selectedDisc] || ROLE_FIT_COPY["?"],
+    ],
+  });
 
   return plan;
 };
@@ -272,6 +534,54 @@ const DISCSelector = ({ value, onChange }) => (
     </div>
   </div>
 );
+
+const DISCQuiz = ({ initialAnswers, onComplete, onSkip }) => {
+  const [answers, setAnswers] = useState(initialAnswers);
+
+  const handleSelect = (qIdx, letter) => {
+    const next = [...answers];
+    next[qIdx] = letter;
+    setAnswers(next);
+    if (next.every(a => a)) onComplete(next);
+  };
+
+  const allAnswered = answers.every(a => a);
+
+  return (
+    <div className="space-y-5 sm:space-y-6 bg-cream2 border border-line-cream rounded-2xl sm:rounded-3xl p-5 sm:p-6">
+      <div className="flex justify-between items-center gap-3">
+        <label className="block text-xs sm:text-sm font-mono font-black text-muted uppercase tracking-widest">Kuis Penentu DISC</label>
+        <button type="button" onClick={onSkip} className="text-[11px] sm:text-xs font-bold text-indigo-600 hover:text-indigo-700 whitespace-nowrap">
+          Lewati, saya sudah tahu
+        </button>
+      </div>
+      {DISC_QUIZ_QUESTIONS.map((q, qi) => (
+        <div key={qi} className="space-y-2">
+          <p className="text-xs sm:text-sm font-bold text-ink">{qi + 1}. {q.text}</p>
+          <div className="space-y-2">
+            {q.options.map(opt => (
+              <button
+                key={opt.letter}
+                type="button"
+                onClick={() => handleSelect(qi, opt.letter)}
+                className={`w-full text-left px-4 py-3 rounded-xl border-2 text-xs sm:text-sm transition-all ${
+                  answers[qi] === opt.letter
+                    ? "border-gold bg-cream text-ink shadow-md"
+                    : "border-line-cream bg-cream text-mutedsoft hover:border-gold/40"
+                }`}
+              >
+                {opt.text}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+      {!allAnswered && (
+        <p className="text-[11px] sm:text-xs text-mutedsoft italic">Jawab semua pertanyaan untuk melihat hasilnya.</p>
+      )}
+    </div>
+  );
+};
 
 const NoteInput = ({ label, type, notes, onAdd, onUpdate, onRemove, prompt }) => (
   <div className="space-y-1.5 sm:space-y-2">
@@ -535,7 +845,7 @@ const OnboardingScreen = ({ session, onSuccess }) => {
 };
 
 // ── MAIN APP ──────────────────────────────────────────────────────────────
-const EMPTY_FORM = { name: "", role: "", competency: 3, commitment: 3, competencyNotes: [""], commitmentNotes: [""], disc: "S" };
+const EMPTY_FORM = { name: "", role: "", competency: 3, commitment: 3, competencyNotes: [""], commitmentNotes: [""], disc: "S", discQuizAnswers: null };
 
 export default function App() {
   const [session, setSession] = useState(null);
@@ -547,6 +857,7 @@ export default function App() {
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [quizExpanded, setQuizExpanded] = useState(true);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [expandedPlan, setExpandedPlan] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -668,17 +979,25 @@ export default function App() {
 
   const closeModal = () => { setModal(false); setEditId(null); setForm(EMPTY_FORM); };
 
+  const openAdd = () => {
+    setForm(EMPTY_FORM);
+    setEditId(null);
+    setQuizExpanded(true);
+    setModal(true);
+  };
+
   const openEdit = (m) => {
     const cleanNotes = (arr) => {
       const filtered = (Array.isArray(arr) ? arr : [arr || ""]).filter(n => n.trim());
       return filtered.length ? filtered : [""];
     };
-    setForm({ 
-      ...m, 
+    setForm({
+      ...m,
       competencyNotes: cleanNotes(m.competencyNotes),
       commitmentNotes: cleanNotes(m.commitmentNotes),
     });
     setEditId(m.id);
+    setQuizExpanded(false);
     setModal(true);
   };
 
@@ -703,6 +1022,7 @@ export default function App() {
         commitment: Number(clean.commitment),
         competencyNotes: clean.competencyNotes,
         commitmentNotes: clean.commitmentNotes,
+        discQuizAnswers: clean.discQuizAnswers || null,
         updatedAt: Date.now(),
       };
       const { error } = await supabase.from('members').update(payload).eq('id', editId);
@@ -729,6 +1049,7 @@ export default function App() {
         commitment: Number(clean.commitment),
         competencyNotes: Array.isArray(clean.competencyNotes) ? clean.competencyNotes : [],
         commitmentNotes: Array.isArray(clean.commitmentNotes) ? clean.commitmentNotes : [],
+        discQuizAnswers: clean.discQuizAnswers || null,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
@@ -835,7 +1156,7 @@ export default function App() {
                 <div className="text-sm sm:text-base font-semibold font-serif text-white">{health.score}<span className="text-slate-500 text-[10px]">/100</span></div>
               </div>
             )}
-            <button onClick={() => setModal(true)}
+            <button onClick={openAdd}
               className="bg-gold text-ink px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-black text-[10px] sm:text-xs lg:text-sm tracking-widest uppercase hover:bg-gold-deep transition-all active:scale-95 shadow-lg">
               + Tambah
             </button>
@@ -1025,6 +1346,8 @@ export default function App() {
             <div className="space-y-4">
               {members.map(m => {
                 const q = getQuadrant(m.competency, m.commitment);
+                const plan = getActionPlan(m);
+                const dialogue = m.disc && m.disc !== "?" ? getDialogueExample(m.disc, q.id) : null;
                 return (
                   <div key={m.id} className={`bg-soft rounded-2xl sm:rounded-3xl overflow-hidden border border-line-soft shadow-sm transition-all ${expandedPlan !== m.id ? 'hide-on-print' : ''}`}>
                     <button onClick={() => setExpandedPlan(expandedPlan === m.id ? null : m.id)}
@@ -1069,7 +1392,7 @@ export default function App() {
                               </div>
                             </div>
                             <div className="space-y-6">
-                              {getActionPlan(m).map((item, idx) => (
+                              {plan.map((item, idx) => (
                                 <div key={idx} className="break-inside-avoid bg-cream border border-line-cream rounded-xl p-5 shadow-sm">
                                   <h3 className="text-sm font-black font-serif uppercase tracking-wider mb-3 flex items-center gap-2 border-b border-line-cream pb-2" style={{ color: item.color }}>
                                     <span className="w-6 h-6 rounded flex items-center justify-center text-xs font-serif text-white" style={{ background: item.color }}>{idx + 1}</span>
@@ -1086,7 +1409,31 @@ export default function App() {
                           </div>
 
                           {/* ========================================================= */}
-                          {/* HALAMAN 2: UNTUK ANGGOTA TIM (1-Kolom, Padat & Rapi)        */}
+                          {/* HALAMAN 2: CONTOH PERCAKAPAN (KHUSUS MANAJER)               */}
+                          {/* ========================================================= */}
+                          <div className="p-8 sm:p-12 border-t-8 border-ink" style={{ pageBreakBefore: 'always' }}>
+                            <div className="border-b-2 border-ink pb-4 mb-6 text-center">
+                              <h1 className="text-lg sm:text-xl font-black font-serif uppercase tracking-tight text-ink mb-1">Contoh Percakapan</h1>
+                              <p className="text-[10px] font-bold text-muted uppercase tracking-[0.2em]">{managerProfile?.company || "Dokumen Pengembangan Tim"}</p>
+                              <p className="text-xs font-bold text-gold-deep uppercase tracking-widest mt-2">Simulasi Obrolan 1-on-1 Sesuai Profil DISC & Kuadran</p>
+                            </div>
+                            <div className="break-inside-avoid bg-cream border border-line-cream rounded-xl p-5 sm:p-6 shadow-sm">
+                              {dialogue ? (
+                                <div className="space-y-3 pl-1">
+                                  {dialogue.map((line, i) => (
+                                    <p key={i} className="text-xs sm:text-sm text-muted leading-relaxed">
+                                      <span className="font-black text-ink">{line.speaker === "manager" ? "Manager" : "Karyawan"}:</span> {line.text}
+                                    </p>
+                                  ))}
+                                </div>
+                              ) : (
+                                <p className="text-xs sm:text-sm text-muted italic">Contoh percakapan akan lebih personal setelah profil DISC ditentukan.</p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* ========================================================= */}
+                          {/* HALAMAN 3: UNTUK ANGGOTA TIM (1-Kolom, Padat & Rapi)        */}
                           {/* ========================================================= */}
                           <div className="p-6 sm:p-10 border-t-8 border-ink" style={{ pageBreakBefore: 'always' }}>
                             
@@ -1152,12 +1499,11 @@ export default function App() {
                                 <div className="border-b border-line-cream h-10 mx-6"></div>
                                 <p className="mt-1.5 text-xs font-black text-ink">{managerProfile?.full_name || "Manajer"}</p>
                                 {managerProfile?.title && <p className="text-[9px] text-mutedsoft font-medium">{managerProfile.title}</p>}
-                                <p className="text-[9px] text-muted uppercase font-bold tracking-wider">Atasan</p>
                               </div>
                               <div>
                                 <div className="border-b border-line-cream h-10 mx-6"></div>
                                 <p className="mt-1.5 text-xs font-black text-ink">{m.name}</p>
-                                <p className="text-[9px] text-muted uppercase font-bold tracking-wider">Karyawan</p>
+                                <p className="text-[9px] text-mutedsoft font-medium">{m.role || "—"}</p>
                               </div>
                             </div>
                           </div>
@@ -1474,7 +1820,21 @@ export default function App() {
                     className="w-full px-4 py-3 sm:py-4 bg-cream2 border border-line-cream rounded-2xl text-sm sm:text-base font-bold outline-none text-ink focus:ring-2 focus:ring-gold placeholder:text-mutedsoft"
                     placeholder="Jabatan" value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} />
                 </div>
-                <DISCSelector value={form.disc} onChange={v => setForm({ ...form, disc: v })} />
+                <div className="space-y-3">
+                  {quizExpanded ? (
+                    <DISCQuiz
+                      initialAnswers={form.discQuizAnswers || [null, null, null, null]}
+                      onComplete={(answers) => setForm(f => ({ ...f, discQuizAnswers: answers, disc: scoreDiscQuiz(answers) }))}
+                      onSkip={() => setQuizExpanded(false)}
+                    />
+                  ) : (
+                    <button type="button" onClick={() => setQuizExpanded(true)}
+                      className="text-[11px] sm:text-xs font-bold text-indigo-600 hover:text-indigo-700">
+                      {form.discQuizAnswers ? "Jalankan ulang kuis" : "Belum yakin? Coba kuis penentu DISC"}
+                    </button>
+                  )}
+                  <DISCSelector value={form.disc} onChange={v => setForm({ ...form, disc: v })} />
+                </div>
                 <div className="space-y-8 sm:space-y-10 border-t border-line-cream pt-8 sm:pt-10">
                   <div className="space-y-5">
                     <RatingSelector label="Skill (Kemampuan)" dim="competency" value={form.competency} onChange={v => setForm({ ...form, competency: v })} />
