@@ -73,50 +73,66 @@ const RATING_ANCHORS = {
 
 const DISC_QUIZ_QUESTIONS = [
   {
-    text: "Saat rapat tim, dia biasanya...",
+    axis: "pace",
+    text: "Saat rapat, dia biasanya...",
     options: [
-      { letter: "D", text: "Langsung ke inti masalah, kadang motong pembicaraan orang lain" },
-      { letter: "I", text: "Aktif ngomong, suka cerita, bikin suasana hidup" },
-      { letter: "S", text: "Lebih banyak dengerin, baru ngomong kalau ditanya" },
-      { letter: "C", text: "Nyiapin data/poin dulu sebelum bicara, to the point" },
+      { value: "Cepat", text: "Langsung bicara, cepat respons, kadang motong pembicaraan" },
+      { value: "Terukur", text: "Mikir dulu sebelum ngomong, lebih terukur" },
     ],
   },
   {
-    text: "Waktu dikasih tugas baru yang belum jelas SOP-nya, dia...",
+    axis: "pace",
+    text: "Waktu dikasih tugas baru, dia biasanya...",
     options: [
-      { letter: "D", text: "Langsung jalan, cari cara sendiri sambil eksekusi" },
-      { letter: "I", text: "Nanya-nanya ke banyak orang, exploratory, semangat coba hal baru" },
-      { letter: "S", text: "Agak ragu mulai duluan, nunggu arahan atau contoh dulu" },
-      { letter: "C", text: "Minta detail/dokumentasi lengkap dulu sebelum mulai" },
+      { value: "Cepat", text: "Langsung eksekusi, belajar sambil jalan" },
+      { value: "Terukur", text: "Pelajari dulu, baru mulai kerja" },
     ],
   },
   {
-    text: "Kalau ada masalah atau kesalahan di kerjaannya, reaksinya...",
+    axis: "pace",
+    text: "Dalam mengambil keputusan sehari-hari, dia...",
     options: [
-      { letter: "D", text: "Defensif atau langsung mau buktiin dia benar" },
-      { letter: "I", text: "Agak baper tapi cepat pulih, tetap positif" },
-      { letter: "S", text: "Diam, kadang nyimpen kekecewaan sendiri" },
-      { letter: "C", text: "Overthinking, ngulik detail buat cari apa yang salah" },
+      { value: "Cepat", text: "Cepat putuskan, gerak duluan" },
+      { value: "Terukur", text: "Perlu waktu, pertimbangkan matang-matang dulu" },
     ],
   },
   {
-    text: "Gaya kerja sehari-harinya lebih...",
+    axis: "focus",
+    text: "Saat kerja bareng tim, dia lebih fokus ke...",
     options: [
-      { letter: "D", text: "Cepat, banyak hal sekaligus, kadang kurang rapi di detail" },
-      { letter: "I", text: "Spontan, fleksibel, kurang suka rutinitas kaku" },
-      { letter: "S", text: "Stabil, konsisten, tidak suka perubahan mendadak" },
-      { letter: "C", text: "Terstruktur, teliti, perfeksionis di detail kecil" },
+      { value: "Tugas", text: "Hasil dan target selesai dengan benar" },
+      { value: "Orang", text: "Suasana dan hubungan baik dengan rekan kerja" },
+    ],
+  },
+  {
+    axis: "focus",
+    text: "Kalau ada masalah/kesalahan, dia lebih...",
+    options: [
+      { value: "Tugas", text: "Fokus cari solusi/benerin masalahnya" },
+      { value: "Orang", text: "Fokus jaga suasana/perasaan orang yang terlibat" },
+    ],
+  },
+  {
+    axis: "focus",
+    text: "Gaya komunikasinya sehari-hari lebih...",
+    options: [
+      { value: "Tugas", text: "To the point, fokus ke isi/substansi" },
+      { value: "Orang", text: "Ramah, banyak basa-basi dulu sebelum ke inti" },
     ],
   },
 ];
 
 const scoreDiscQuiz = (answers) => {
-  const letters = ["D", "I", "S", "C"];
-  const tally = { D: 0, I: 0, S: 0, C: 0 };
-  answers.forEach(a => { if (a) tally[a] += 1; });
-  const maxCount = Math.max(...letters.map(l => tally[l]));
-  const tied = letters.filter(l => tally[l] === maxCount);
-  return tied.includes(answers[0]) ? answers[0] : tied[0];
+  const tally = (vals, a, b) => {
+    const countA = vals.filter(v => v === a).length;
+    return countA >= 2 ? a : b;
+  };
+  const pace = tally(answers.slice(0, 3), "Cepat", "Terukur");
+  const focus = tally(answers.slice(3, 6), "Tugas", "Orang");
+  if (pace === "Cepat" && focus === "Tugas") return "D";
+  if (pace === "Cepat" && focus === "Orang") return "I";
+  if (pace === "Terukur" && focus === "Orang") return "S";
+  return "C";
 };
 
 const getDISCScript = (disc) => ({
@@ -538,9 +554,9 @@ const DISCSelector = ({ value, onChange }) => (
 const DISCQuiz = ({ initialAnswers, onComplete, onSkip }) => {
   const [answers, setAnswers] = useState(initialAnswers);
 
-  const handleSelect = (qIdx, letter) => {
+  const handleSelect = (qIdx, value) => {
     const next = [...answers];
-    next[qIdx] = letter;
+    next[qIdx] = value;
     setAnswers(next);
     if (next.every(a => a)) onComplete(next);
   };
@@ -558,14 +574,14 @@ const DISCQuiz = ({ initialAnswers, onComplete, onSkip }) => {
       {DISC_QUIZ_QUESTIONS.map((q, qi) => (
         <div key={qi} className="space-y-2">
           <p className="text-xs sm:text-sm font-bold text-ink">{qi + 1}. {q.text}</p>
-          <div className="space-y-2">
+          <div className="grid grid-cols-2 gap-2">
             {q.options.map(opt => (
               <button
-                key={opt.letter}
+                key={opt.value}
                 type="button"
-                onClick={() => handleSelect(qi, opt.letter)}
-                className={`w-full text-left px-4 py-3 rounded-xl border-2 text-xs sm:text-sm transition-all ${
-                  answers[qi] === opt.letter
+                onClick={() => handleSelect(qi, opt.value)}
+                className={`text-left px-3 py-3 rounded-xl border-2 text-xs sm:text-sm transition-all ${
+                  answers[qi] === opt.value
                     ? "border-gold bg-cream text-ink shadow-md"
                     : "border-line-cream bg-cream text-mutedsoft hover:border-gold/40"
                 }`}
@@ -1823,7 +1839,7 @@ export default function App() {
                 <div className="space-y-3">
                   {quizExpanded ? (
                     <DISCQuiz
-                      initialAnswers={form.discQuizAnswers || [null, null, null, null]}
+                      initialAnswers={form.discQuizAnswers || [null, null, null, null, null, null]}
                       onComplete={(answers) => setForm(f => ({ ...f, discQuizAnswers: answers, disc: scoreDiscQuiz(answers) }))}
                       onSkip={() => setQuizExpanded(false)}
                     />
